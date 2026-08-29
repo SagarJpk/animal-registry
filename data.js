@@ -38,7 +38,7 @@ const animals = [
     alternatePhone: "",
     location: "Koppal, Karnataka, India",
     mapUrl: "",
-    photo: "pinku.jpg",
+    photo: "Pinku.jpg",
     behaviour: "Cautious",
     neutering: "No",
     status: "ACTIVE RECORD",
