@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#08243f">
+<title>Animal Registry</title><link rel="stylesheet" href="style.css"><script src="data.js"></script>
+</head><body><div class="page"><div class="card">
+<header class="header"><div class="brand"><div class="logo">🐾</div><div><h1>ANIMAL DIGITAL ID</h1><p>Private animal registry • individual digital profiles</p></div></div><nav class="nav"><a href="./">Home</a></nav></header>
+<main class="content"><div class="notice">🛡️ <strong>Private Animal Registry:</strong> Owner-maintained records. These profiles are not government-issued identity documents.</div>
+<div class="registry-head"><div><h2 style="margin:0">Animal Registry</h2><p style="color:var(--muted);font-size:12px">Select an animal to open its individual profile.</p></div></div>
+<input id="search" class="search" type="search" placeholder="Search by name, ID, breed, parent or location…"><div id="count" style="font-size:10px;color:var(--muted);margin-bottom:10px"></div><div id="petGrid" class="grid"></div></main>
+<footer class="footer"><strong>ANIMAL DIGITAL ID</strong> • Private owner-maintained registry • Not government-issued</footer>
+</div></div>
+<script>
+const grid=document.getElementById('petGrid'),search=document.getElementById('search'),count=document.getElementById('count');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(){const q=search.value.trim().toLowerCase();const list=animals.filter(a=>[a.name,a.animalId,a.breed,a.parent,a.location,a.type,a.gender,a.behaviour].join(' ').toLowerCase().includes(q));count.textContent=`${list.length} registered animal${list.length===1?'':'s'}`;grid.innerHTML=list.length?list.map(a=>`<a class="pet" href="./?id=${encodeURIComponent(a.id)}"><div class="pet-img"><img src="${esc(a.photo)}" alt="${esc(a.name)}"></div><div><div class="pet-top"><div class="pet-name">${esc(a.name)}</div><span class="pill">✓ ${esc(a.status)}</span></div><div class="pet-id">${esc(a.animalId)}</div><div class="pet-meta"><div class="meta"><span>Type</span><strong>${esc(a.type)}</strong></div><div class="meta"><span>Behaviour</span><strong>${esc(a.behaviour)}</strong></div><div class="meta"><span>Parent</span><strong>${esc(a.parent)}</strong></div><div class="meta"><span>Location</span><strong>${esc(a.location.split(',')[0])}</strong></div></div></div></a>`).join(''):'<div class="empty" style="grid-column:1/-1">No matching animal found.</div>'}search.addEventListener('input',render);render();
+</script></body></html>
