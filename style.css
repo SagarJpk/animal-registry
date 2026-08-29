@@ -591,206 +591,581 @@ td{
 
 }
 
-/* =========================================
-   CHANGE REQUEST
-========================================= */
-
-.profile-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.change-button,
-.back-button {
-  cursor: pointer;
-}
-
-.change-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 12px;
-  border: 1px solid rgba(255,255,255,.35);
-  border-radius: 8px;
-  color: #fff;
-  background: rgba(255,255,255,.08);
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.change-button:hover {
-  background: rgba(255,255,255,.16);
-}
-
-
-/* Overlay */
+/* =========================================================
+   CHANGE REQUEST MODAL
+   ========================================================= */
 
 .change-request {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 10000;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding: 20px;
+  padding: 24px;
 
-  background: rgba(0,0,0,.55);
+  background: rgba(7, 24, 42, 0.68);
+
+  backdrop-filter: blur(5px);
 
   overflow-y: auto;
+
+  animation: requestFadeIn 0.18s ease-out;
 }
 
 
-/* Form card */
+@keyframes requestFadeIn {
+
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+
+}
+
+
+/* =========================================================
+   MODAL CARD
+   ========================================================= */
 
 .change-request-card {
-  width: min(520px, 100%);
 
-  max-height: 90vh;
+  width: min(560px, 100%);
+
+  max-height: calc(100vh - 48px);
+
   overflow-y: auto;
 
-  background: #fff;
+  background: #ffffff;
 
-  border-radius: 16px;
+  border: 1px solid #dbe4eb;
 
-  padding: 22px;
+  border-radius: 18px;
 
-  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.30);
+
+  animation: requestSlideUp 0.22s ease-out;
+
 }
 
 
-/* Header */
+@keyframes requestSlideUp {
+
+  from {
+
+    opacity: 0;
+
+    transform: translateY(18px) scale(0.98);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+
+  }
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .change-request-header {
+
   display: flex;
-  justify-content: space-between;
+
   align-items: flex-start;
 
-  margin-bottom: 18px;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 20px 22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #08243f,
+      #123f66
+    );
+
+  border-radius: 18px 18px 0 0;
+
+  color: #ffffff;
+
 }
+
+
+.request-title-area {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+}
+
+
+.request-icon {
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: rgba(255,255,255,0.12);
+
+  border: 1px solid rgba(255,255,255,0.25);
+
+  font-size: 20px;
+
+}
+
 
 .change-request-header h3 {
+
   margin: 0;
-  color: #163c63;
+
   font-size: 18px;
-}
 
-.change-request-header p {
-  margin: 5px 0 0;
-  color: #788692;
-  font-size: 11px;
-}
-
-.close-request {
-  border: 0;
-  background: transparent;
-
-  font-size: 24px;
-  line-height: 1;
-
-  color: #6d7882;
-
-  cursor: pointer;
-}
-
-
-/* Form */
-
-.change-request-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.change-request-card label {
-  margin-top: 7px;
-
-  font-size: 10px;
   font-weight: 800;
 
-  color: #536473;
+  color: #ffffff;
 
-  text-transform: uppercase;
-  letter-spacing: .5px;
 }
 
-.change-request-card input,
-.change-request-card select,
-.change-request-card textarea {
+
+.change-request-header p {
+
+  margin: 5px 0 0;
+
+  font-size: 11px;
+
+  color: rgba(255,255,255,0.72);
+
+}
+
+
+.change-request-header p span {
+
+  padding: 0 4px;
+
+  color: #d8b44a;
+
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.close-request {
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid rgba(255,255,255,0.25);
+
+  border-radius: 8px;
+
+  background: rgba(255,255,255,0.08);
+
+  color: #ffffff;
+
+  font-size: 22px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+
+}
+
+
+.close-request:hover {
+
+  background: rgba(255,255,255,0.18);
+
+  transform: scale(1.05);
+
+}
+
+
+/* =========================================================
+   INFORMATION NOTICE
+   ========================================================= */
+
+.request-notice {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  margin: 18px 22px 4px;
+
+  padding: 11px 13px;
+
+  border: 1px solid #d9e7f2;
+
+  border-radius: 10px;
+
+  background: #f3f8fc;
+
+  color: #24415b;
+
+}
+
+
+.request-notice > span {
+
+  font-size: 15px;
+
+}
+
+
+.request-notice strong {
+
+  display: block;
+
+  font-size: 11px;
+
+}
+
+
+.request-notice p {
+
+  margin: 3px 0 0;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+
+  color: #65798a;
+
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.change-form {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 13px;
+
+  padding: 18px 22px 22px;
+
+}
+
+
+.form-group {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  min-width: 0;
+
+}
+
+
+.form-group label {
+
+  display: block;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.5px;
+
+  text-transform: uppercase;
+
+  color: #526676;
+
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
 
   width: 100%;
+
   box-sizing: border-box;
+
+  border: 1px solid #d5dfe7;
+
+  border-radius: 9px;
+
+  background: #f9fbfc;
+
+  color: #1f3447;
+
+  font-family: inherit;
+
+  font-size: 12px;
 
   padding: 10px 11px;
 
-  border: 1px solid #d8e0e6;
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+
+}
+
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+
+  color: #9aa8b4;
+
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+
+  background: #ffffff;
+
+  border-color: #47769c;
+
+  box-shadow:
+    0 0 0 3px rgba(71,118,156,0.10);
+
+}
+
+
+.form-group select {
+
+  cursor: pointer;
+
+}
+
+
+.form-group textarea {
+
+  min-height: 95px;
+
+  resize: vertical;
+
+  line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   TWO COLUMN FIELDS
+   ========================================================= */
+
+.form-row {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 13px;
+
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.request-actions {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap: 9px;
+
+  margin-top: 5px;
+
+  padding-top: 15px;
+
+  border-top: 1px solid #e5ebef;
+
+}
+
+
+.cancel-request,
+.submit-change {
+
   border-radius: 9px;
 
-  background: #fafcfd;
-
-  color: #263746;
+  padding: 10px 15px;
 
   font-family: inherit;
-  font-size: 12px;
 
-  outline: none;
-}
+  font-size: 11px;
 
-.change-request-card input:focus,
-.change-request-card select:focus,
-.change-request-card textarea:focus {
-  border-color: #5c82a5;
-  background: #fff;
-}
-
-.change-request-card textarea {
-  resize: vertical;
-}
-
-
-/* Submit */
-
-.submit-change {
-  margin-top: 14px;
-
-  padding: 11px 16px;
-
-  border: 0;
-  border-radius: 9px;
-
-  background: #163c63;
-  color: #fff;
-
-  font-size: 12px;
   font-weight: 800;
 
   cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+
 }
+
+
+.cancel-request {
+
+  border: 1px solid #d4dee5;
+
+  background: #ffffff;
+
+  color: #536675;
+
+}
+
+
+.cancel-request:hover {
+
+  background: #f5f7f8;
+
+}
+
+
+.submit-change {
+
+  border: 1px solid #123f66;
+
+  background: #123f66;
+
+  color: #ffffff;
+
+}
+
 
 .submit-change:hover {
-  background: #0d2f50;
+
+  background: #08243f;
+
+  box-shadow:
+    0 4px 12px rgba(8,36,63,0.20);
+
+  transform: translateY(-1px);
+
 }
 
 
-/* Mobile */
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
-@media (max-width: 700px) {
-
-  .profile-nav {
-    width: 100%;
-  }
+@media (max-width: 600px) {
 
   .change-request {
+
     align-items: flex-start;
-    padding: 12px;
+
+    padding: 10px;
+
   }
 
+
   .change-request-card {
-    margin-top: 10px;
+
+    max-height: calc(100vh - 20px);
+
+    border-radius: 15px;
+
+  }
+
+
+  .change-request-header {
+
     padding: 17px;
+
+    border-radius: 15px 15px 0 0;
+
+  }
+
+
+  .change-form {
+
+    padding: 15px 17px 18px;
+
+  }
+
+
+  .request-notice {
+
+    margin: 14px 17px 2px;
+
+  }
+
+
+  .form-row {
+
+    grid-template-columns: 1fr;
+
+    gap: 13px;
+
+  }
+
+
+  .request-actions {
+
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+
+  }
+
+
+  .cancel-request,
+  .submit-change {
+
+    width: 100%;
+
+    padding: 11px;
+
   }
 
 }
