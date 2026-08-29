@@ -124,10 +124,19 @@ function renderProfile() {
 
         <!-- BACK TO REGISTRY -->
         <nav class="profile-nav">
-          <a href="./index.html" class="back-button">
-            ← Back to Registry
-          </a>
-        </nav>
+
+  <a href="./index.html" class="back-button">
+    ← Back to Registry
+  </a>
+
+  <button
+    type="button"
+    class="change-button"
+    onclick="openChangeRequest()">
+    📝 Request a Change
+  </button>
+
+</nav>
 
         <div class="id-panel">
 
@@ -377,6 +386,175 @@ function renderProfile() {
     );
 
   }
+}
+
+function openChangeRequest() {
+
+  const a = getAnimal();
+
+  const existing = document.getElementById("changeRequest");
+
+  if (existing) {
+    existing.remove();
+    return;
+  }
+
+  const form = document.createElement("div");
+
+  form.id = "changeRequest";
+
+  form.className = "change-request";
+
+  form.innerHTML = `
+
+    <div class="change-request-card">
+
+      <div class="change-request-header">
+
+        <div>
+          <h3>Request a Change</h3>
+
+          <p>
+            ${esc(a.name)} • ${esc(a.animalId)}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="close-request"
+          onclick="document.getElementById('changeRequest').remove()">
+          ×
+        </button>
+
+      </div>
+
+
+      <form
+        action="https://formsubmit.co/sony.sagar269@gmail.com"
+        method="POST">
+
+        <input
+          type="hidden"
+          name="_subject"
+          value="Animal Registry Change Request">
+
+        <input
+          type="hidden"
+          name="Animal Name"
+          value="${esc(a.name)}">
+
+        <input
+          type="hidden"
+          name="Animal ID"
+          value="${esc(a.animalId)}">
+
+
+        <label>
+          Information to change
+        </label>
+
+        <select name="Requested Field" required>
+
+          <option value="">
+            Select a field
+          </option>
+
+          <option>Animal Name</option>
+          <option>Breed</option>
+          <option>Gender</option>
+          <option>Date of Birth</option>
+          <option>Pet Parent</option>
+          <option>Phone</option>
+          <option>Alternate Phone</option>
+          <option>Location</option>
+          <option>Behaviour</option>
+          <option>Behaviour Traits</option>
+          <option>Neutering Status</option>
+          <option>Vaccination</option>
+          <option>Photo</option>
+
+        </select>
+
+
+        <label>
+          Current Information
+        </label>
+
+        <input
+          type="text"
+          name="Current Information"
+          placeholder="What is currently shown?"
+          required>
+
+
+        <label>
+          Requested Information
+        </label>
+
+        <input
+          type="text"
+          name="Requested Information"
+          placeholder="What should it be changed to?"
+          required>
+
+
+        <label>
+          Reason / Additional Details
+        </label>
+
+        <textarea
+          name="Reason"
+          rows="4"
+          placeholder="Please explain the requested change..."
+          required></textarea>
+
+
+        <label>
+          Your Name
+        </label>
+
+        <input
+          type="text"
+          name="Requester Name"
+          placeholder="Your name"
+          required>
+
+
+        <label>
+          Your Contact
+        </label>
+
+        <input
+          type="text"
+          name="Requester Contact"
+          placeholder="Phone or email"
+          required>
+
+
+        <input
+          type="hidden"
+          name="_captcha"
+          value="true">
+
+        <input
+          type="hidden"
+          name="_template"
+          value="table">
+
+
+        <button
+          type="submit"
+          class="submit-change">
+          Submit Change Request
+        </button>
+
+      </form>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(form);
 }
 
 renderProfile();
