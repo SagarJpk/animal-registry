@@ -399,29 +399,39 @@ function openChangeRequest() {
     return;
   }
 
-  const form = document.createElement("div");
+  const modal = document.createElement("div");
 
-  form.id = "changeRequest";
+  modal.id = "changeRequest";
+  modal.className = "change-request";
 
-  form.className = "change-request";
-
-  form.innerHTML = `
+  modal.innerHTML = `
 
     <div class="change-request-card">
 
       <div class="change-request-header">
 
-        <div>
-          <h3>Request a Change</h3>
+        <div class="request-title-area">
 
-          <p>
-            ${esc(a.name)} • ${esc(a.animalId)}
-          </p>
+          <div class="request-icon">
+            📝
+          </div>
+
+          <div>
+            <h3>Request a Change</h3>
+
+            <p>
+              ${esc(a.name)}
+              <span>•</span>
+              ${esc(a.animalId)}
+            </p>
+          </div>
+
         </div>
 
         <button
           type="button"
           class="close-request"
+          aria-label="Close"
           onclick="document.getElementById('changeRequest').remove()">
           ×
         </button>
@@ -429,9 +439,25 @@ function openChangeRequest() {
       </div>
 
 
+      <div class="request-notice">
+        <span>🔎</span>
+
+        <div>
+          <strong>Information review</strong>
+
+          <p>
+            Submitted changes are reviewed by the registry owner
+            before the animal profile is updated.
+          </p>
+        </div>
+      </div>
+
+
       <form
-        action="https://formsubmit.co/sony.sagar269@gmail.com"
+        class="change-form"
+        action="https://formsubmit.co/YOUR_EMAIL_HERE"
         method="POST">
+
 
         <input
           type="hidden"
@@ -449,86 +475,122 @@ function openChangeRequest() {
           value="${esc(a.animalId)}">
 
 
-        <label>
-          Information to change
-        </label>
+        <div class="form-group">
 
-        <select name="Requested Field" required>
+          <label for="requestedField">
+            Information to change
+          </label>
 
-          <option value="">
-            Select a field
-          </option>
+          <select
+            id="requestedField"
+            name="Requested Field"
+            required>
 
-          <option>Animal Name</option>
-          <option>Breed</option>
-          <option>Gender</option>
-          <option>Date of Birth</option>
-          <option>Pet Parent</option>
-          <option>Phone</option>
-          <option>Alternate Phone</option>
-          <option>Location</option>
-          <option>Behaviour</option>
-          <option>Behaviour Traits</option>
-          <option>Neutering Status</option>
-          <option>Vaccination</option>
-          <option>Photo</option>
+            <option value="">
+              Select a field
+            </option>
 
-        </select>
+            <option>Animal Name</option>
+            <option>Breed</option>
+            <option>Gender</option>
+            <option>Date of Birth</option>
+            <option>Pet Parent</option>
+            <option>Phone</option>
+            <option>Alternate Phone</option>
+            <option>Location</option>
+            <option>Behaviour</option>
+            <option>Behaviour Traits</option>
+            <option>Neutering Status</option>
+            <option>Vaccination</option>
+            <option>Photo</option>
 
+          </select>
 
-        <label>
-          Current Information
-        </label>
-
-        <input
-          type="text"
-          name="Current Information"
-          placeholder="What is currently shown?"
-          required>
+        </div>
 
 
-        <label>
-          Requested Information
-        </label>
+        <div class="form-group">
 
-        <input
-          type="text"
-          name="Requested Information"
-          placeholder="What should it be changed to?"
-          required>
+          <label for="currentInformation">
+            Current information
+          </label>
 
+          <input
+            id="currentInformation"
+            type="text"
+            name="Current Information"
+            placeholder="What is currently shown?"
+            required>
 
-        <label>
-          Reason / Additional Details
-        </label>
-
-        <textarea
-          name="Reason"
-          rows="4"
-          placeholder="Please explain the requested change..."
-          required></textarea>
+        </div>
 
 
-        <label>
-          Your Name
-        </label>
+        <div class="form-group">
 
-        <input
-          type="text"
-          name="Requester Name"
-          placeholder="Your name"
-          required>
+          <label for="requestedInformation">
+            Requested information
+          </label>
+
+          <input
+            id="requestedInformation"
+            type="text"
+            name="Requested Information"
+            placeholder="What should it be changed to?"
+            required>
+
+        </div>
 
 
-        <label>
-          Your Contact
-        </label>
+        <div class="form-group">
 
-        <input
-          type="text"
-          name="Requester Contact"
-          placeholder="Phone or email"
-          required>
+          <label for="reason">
+            Reason / additional details
+          </label>
+
+          <textarea
+            id="reason"
+            name="Reason"
+            rows="4"
+            placeholder="Please explain the requested change..."
+            required></textarea>
+
+        </div>
+
+
+        <div class="form-row">
+
+          <div class="form-group">
+
+            <label for="requesterName">
+              Your name
+            </label>
+
+            <input
+              id="requesterName"
+              type="text"
+              name="Requester Name"
+              placeholder="Your name"
+              required>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="requesterContact">
+              Your contact
+            </label>
+
+            <input
+              id="requesterContact"
+              type="text"
+              name="Requester Contact"
+              placeholder="Phone or email"
+              required>
+
+          </div>
+
+        </div>
 
 
         <input
@@ -542,11 +604,27 @@ function openChangeRequest() {
           value="table">
 
 
-        <button
-          type="submit"
-          class="submit-change">
-          Submit Change Request
-        </button>
+        <div class="request-actions">
+
+          <button
+            type="button"
+            class="cancel-request"
+            onclick="document.getElementById('changeRequest').remove()">
+
+            Cancel
+
+          </button>
+
+
+          <button
+            type="submit"
+            class="submit-change">
+
+            ✓ Submit Request
+
+          </button>
+
+        </div>
 
       </form>
 
@@ -554,7 +632,41 @@ function openChangeRequest() {
 
   `;
 
-  document.body.appendChild(form);
+  document.body.appendChild(modal);
+
+
+  /* Close when clicking outside the card */
+
+  modal.addEventListener("click", function(e) {
+
+    if (e.target === modal) {
+      modal.remove();
+    }
+
+  });
+
+
+  /* Close with ESC */
+
+  document.addEventListener("keydown", function escHandler(e) {
+
+    if (e.key === "Escape") {
+
+      const current = document.getElementById("changeRequest");
+
+      if (current) {
+        current.remove();
+      }
+
+      document.removeEventListener(
+        "keydown",
+        escHandler
+      );
+
+    }
+
+  });
+
 }
 
 renderProfile();
