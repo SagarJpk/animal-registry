@@ -123,18 +123,18 @@ function renderProfile() {
         </div>
 
         <!-- BACK TO REGISTRY -->
-        <nav class="profile-nav">
+        <nav class="profile-actions">
 
-  <a href="./index.html" class="back-button">
-    ← Back to Registry
-  </a>
+<a href="./index.html" class="back-registry">
+  ← Back to Registry
+</a>
 
-  <button
-    type="button"
-    class="change-button"
-    onclick="openChangeRequest()">
-    📝 Request a Change
-  </button>
+<button
+  type="button"
+  class="request-change-btn"
+  onclick="openChangeRequest()">
+  📝 Request a Change
+</button>
 
 </nav>
 
