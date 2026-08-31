@@ -608,6 +608,23 @@ function openChangeRequest() {
           name="_template"
           value="table">
 
+<div
+  id="changeRequestSuccess"
+  class="request-success"
+  style="display:none;">
+  
+  <span class="success-icon">✓</span>
+
+  <div>
+    <strong>Request submitted successfully</strong>
+
+    <p>
+      Your change request has been received and will be
+      reviewed by the registry owner.
+    </p>
+  </div>
+
+</div>
 
         <div class="request-actions">
 
