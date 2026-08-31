@@ -1,3 +1,12 @@
+// =========================================================
+// ANIMAL DIGITAL ID - PROFILE.JS
+// =========================================================
+
+
+// =========================================================
+// HTML ESCAPE
+// =========================================================
+
 function esc(v = "") {
   return String(v).replace(/[&<>"']/g, c => ({
     '&': '&amp;',
@@ -8,77 +17,174 @@ function esc(v = "") {
   }[c]));
 }
 
+
+// =========================================================
+// GET CURRENT ANIMAL
+// =========================================================
+
 function getAnimal() {
-  const id = new URLSearchParams(location.search).get('id');
-  return animals.find(a => a.id === id || a.animalId === id) || animals[0];
+
+  const id =
+    new URLSearchParams(location.search).get('id');
+
+  return (
+    animals.find(
+      a => a.id === id || a.animalId === id
+    )
+    || animals[0]
+  );
+
 }
+
+
+// =========================================================
+// DETAIL FIELD
+// =========================================================
 
 function detail(label, value) {
+
   return `
     <div class="detail">
-      <span class="label">${esc(label)}</span>
-      <span class="value">${esc(value || 'Not Added')}</span>
+      <span class="label">
+        ${esc(label)}
+      </span>
+
+      <span class="value">
+        ${esc(value || 'Not Added')}
+      </span>
     </div>
   `;
+
 }
 
+
+// =========================================================
+// GET BEHAVIOUR TRAITS
+// Supports both:
+// traits
+// behaviourTraits
+// =========================================================
+
+function getBehaviourTraits(a) {
+
+  if (Array.isArray(a.behaviourTraits)) {
+    return a.behaviourTraits;
+  }
+
+  if (Array.isArray(a.traits)) {
+    return a.traits;
+  }
+
+  return [];
+
+}
+
+
+// =========================================================
+// BEHAVIOUR SUMMARY
+// =========================================================
+
 function behaviourSummary(a) {
-  const traits = Array.isArray(a.traits) ? a.traits : [];
-  const previewTraits = traits.slice(0, 4);
 
-  const traitHTML = previewTraits.length
-    ? previewTraits.map(trait => `
-        <span class="trait-chip">${esc(trait)}</span>
-      `).join('')
-    : `<span class="trait-empty">No behaviour traits added</span>`;
+  const traits = getBehaviourTraits(a);
 
-  const moreCount = traits.length > 4
-    ? `<span class="trait-more">+${traits.length - 4} more</span>`
-    : '';
+  const previewTraits =
+    traits.slice(0, 4);
+
+
+  const traitHTML =
+    previewTraits.length
+
+      ? previewTraits.map(trait => `
+          <span class="trait-chip">
+            ${esc(trait)}
+          </span>
+        `).join('')
+
+      : `
+          <span class="trait-empty">
+            No behaviour traits added
+          </span>
+        `;
+
+
+  const moreCount =
+    traits.length > 4
+
+      ? `
+          <span class="trait-more">
+            +${traits.length - 4} more
+          </span>
+        `
+
+      : '';
+
 
   return `
+
     <section class="section">
 
       <div class="section-title">
         🧠 Behaviour & Temperament
       </div>
 
+
       <div class="behaviour-summary">
 
         <div class="behaviour-summary-main">
 
           <div>
-            <span class="label">Overall Behaviour</span>
+
+            <span class="label">
+              Overall Behaviour
+            </span>
 
             <strong class="behaviour-value">
-              ${esc(a.behaviour || 'Not Added')}
+              ${esc(
+                a.behaviour || 'Not Added'
+              )}
             </strong>
+
           </div>
+
 
           <button
             type="button"
             class="details-button"
             onclick="openBehaviourDetails()">
+
             View Details
+
           </button>
 
         </div>
+
 
         <div class="traits-heading">
           Behaviour Traits
         </div>
 
+
         <div class="trait-list">
+
           ${traitHTML}
+
           ${moreCount}
+
         </div>
 
       </div>
 
     </section>
+
   `;
+
 }
 
+
+// =========================================================
+// VACCINATION SUMMARY
+// =========================================================
 
 function vaccinationSummary(a) {
 
@@ -87,649 +193,758 @@ function vaccinationSummary(a) {
       ? a.vaccinations
       : [];
 
+
   const latest =
     vaccinations.length
       ? vaccinations[vaccinations.length - 1]
       : null;
 
+
   return `
+
     <section class="section">
 
       <div class="section-title">
         💉 Vaccination Records
       </div>
 
+
       <div class="vaccination-summary">
 
         <div class="vaccination-summary-info">
 
-          <div class="summary-stat">
-            <span class="label">Total Records</span>
-            <strong>${vaccinations.length}</strong>
-          </div>
 
           <div class="summary-stat">
-            <span class="label">Latest Vaccine</span>
+
+            <span class="label">
+              Total Records
+            </span>
 
             <strong>
-              ${latest ? esc(latest[0]) : 'Not Done'}
+              ${vaccinations.length}
             </strong>
+
           </div>
+
 
           <div class="summary-stat">
-            <span class="label">Next Due</span>
+
+            <span class="label">
+              Latest Vaccine
+            </span>
 
             <strong>
-              ${latest && latest[2]
-                ? esc(latest[2])
-                : 'Not Added'}
+              ${
+                latest
+                  ? esc(latest[0])
+                  : 'Not Done'
+              }
             </strong>
+
           </div>
+
+
+          <div class="summary-stat">
+
+            <span class="label">
+              Next Due
+            </span>
+
+            <strong>
+
+              ${
+                latest && latest[2]
+                  ? esc(latest[2])
+                  : 'Not Added'
+              }
+
+            </strong>
+
+          </div>
+
 
         </div>
+
 
         <button
           type="button"
           class="details-button"
           onclick="openVaccinationDetails()">
+
           View Full History
+
         </button>
+
 
       </div>
 
     </section>
+
   `;
+
 }
 
+
+// =========================================================
+// RENDER PROFILE
+// =========================================================
+
 function renderProfile() {
+
   const a = getAnimal();
 
-  document.title = `${a.name} | Animal Digital ID`;
 
-  const vaccineRows = a.vaccinations.length
-    ? a.vaccinations.map((v, i) => `
-        <tr class="${i === a.vaccinations.length - 1 ? 'latest' : ''}">
-          <td>${esc(v[0])}</td>
-          <td>${esc(v[1])}</td>
-          <td>${esc(v[2])}</td>
-          <td><span class="vaccine-status">${esc(v[3])}</span></td>
-        </tr>
-      `).join('')
-    : `
-        <tr>
-          <td colspan="4" class="empty-row">
-            Vaccination: Not Done
-          </td>
-        </tr>
-      `;
+  document.title =
+    `${a.name} | Animal Digital ID`;
+
+
+  // =======================================================
+  // LOCATION BUTTON
+  // =======================================================
 
   const map = a.mapUrl
+
     ? `
-      <a class="button"
-         href="${esc(a.mapUrl)}"
-         target="_blank"
-         rel="noopener">
-        📍 View Location
-      </a>
-    `
+        <a
+          class="button"
+          href="${esc(a.mapUrl)}"
+          target="_blank"
+          rel="noopener">
+
+          📍 View Location
+
+        </a>
+      `
+
     : `
-      <span class="button disabled">
-        📍 Location not added
-      </span>
-    `;
+        <span class="button disabled">
+
+          📍 Location not added
+
+        </span>
+      `;
+
+
+  // =======================================================
+  // PHONE
+  // =======================================================
 
   const phone = a.phone
-    ? `<a href="tel:${esc(a.phone)}">${esc(a.phone)}</a>`
-    : '<span>Not Added</span>';
+
+    ? `
+        <a href="tel:${esc(a.phone)}">
+          ${esc(a.phone)}
+        </a>
+      `
+
+    : `
+        <span>
+          Not Added
+        </span>
+      `;
+
+
+  // =======================================================
+  // ALTERNATE PHONE
+  // =======================================================
 
   const alternate = a.alternatePhone
-    ? `<a href="tel:${esc(a.alternatePhone)}">${esc(a.alternatePhone)}</a>`
-    : '<span>Not Added</span>';
+
+    ? `
+        <a href="tel:${esc(a.alternatePhone)}">
+          ${esc(a.alternatePhone)}
+        </a>
+      `
+
+    : `
+        <span>
+          Not Added
+        </span>
+      `;
+
+
+  // =======================================================
+  // MAIN PROFILE HTML
+  // =======================================================
 
   document.getElementById('app').innerHTML = `
 
-  <div class="page">
-    <div class="card">
+    <div class="page">
 
-      <header class="header">
+      <div class="card">
 
-        <div class="brand">
-          <div class="logo">🐾</div>
 
-          <div>
-            <h1>ANIMAL DIGITAL ID</h1>
-            <p>
-              Digital identity record for a healthy & happy life
-            </p>
-          </div>
-        </div>
+        <!-- =================================================
+             HEADER
+        ================================================== -->
 
-        <!-- BACK TO REGISTRY -->
-        <nav class="profile-actions">
+        <header class="header">
 
-<a href="./index.html" class="back-registry">
-  ← Back to Registry
-</a>
 
-<button
-  type="button"
-  class="request-change-btn"
-  onclick="openChangeRequest()">
-  📝 Request a Change
-</button>
+          <div class="brand">
 
-</nav>
-
-        <div class="id-panel">
-
-          <div>
-            <div class="id-label">
-              Animal Identification Number
+            <div class="logo">
+              🐾
             </div>
 
-            <div class="id-number">
-              ${esc(a.animalId)}
-            </div>
-          </div>
-
-          <div class="status">
-            ✓ REGISTERED
-          </div>
-
-        </div>
-
-      </header>
-
-
-      <main class="content">
-
-        <!-- PRIVATE RECORD NOTICE -->
-        <div class="notice">
-          <span>🛡️</span>
-
-          <span>
-            <strong>Private Animal Digital ID:</strong>
-            This record is privately maintained by the owner
-            and is not a government-issued identity document.
-          </span>
-        </div>
-
-
-        <!-- PROFILE -->
-        <section class="profile">
-
-          <div class="photo-wrap">
-
-            <div class="photo-frame">
-
-              <img
-                src="${esc(a.photo)}"
-                alt="${esc(a.name)}'s photograph"
-                class="photo"
-              >
-
-              <div class="registered">
-                ✓ ${esc(a.status)}
-              </div>
-
-            </div>
-
-            <div class="caption">
-              Registered photograph • ${esc(a.name)}
-            </div>
-
-          </div>
-
-
-          <div class="details">
-
-            ${detail('Animal Name', a.name)}
-            ${detail('Animal ID', a.animalId)}
-            ${detail('Type', a.type)}
-            ${detail('Breed', a.breed)}
-
-            ${detail('Gender', a.gender)}
-            ${detail('Date of Birth', a.dob)}
-            ${detail('Pet Parent', a.parent)}
-            ${detail('Behaviour', a.behaviour)}
-
-            ${detail('Neutering Status', a.neutering)}
-            ${detail('Record Status', a.status)}
-
-          </div>
-
-        </section>
-
-
-       <!-- BEHAVIOUR SUMMARY -->
-          ${behaviourSummary(a)}
-
-
-       <!-- VACCINATION SUMMARY -->
-          ${vaccinationSummary(a)}
-
-        <!-- LOCATION -->
-        <section class="section">
-
-          <div class="section-title">
-            📍 Registered Location
-          </div>
-
-          <div class="location-box">
 
             <div>
 
-              <div class="location-name">
-                ${esc(a.location)}
+              <h1>
+                ANIMAL DIGITAL ID
+              </h1>
+
+              <p>
+                Digital identity record for a healthy & happy life
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================
+               PROFILE ACTIONS
+          ================================================== -->
+
+          <nav class="profile-actions">
+
+
+            <a
+              href="./index.html"
+              class="back-registry">
+
+              ← Back to Registry
+
+            </a>
+
+
+            <button
+              type="button"
+              class="request-change-btn"
+              onclick="openChangeRequest()">
+
+              📝 Request a Change
+
+            </button>
+
+
+          </nav>
+
+
+          <!-- =================================================
+               ID PANEL
+          ================================================== -->
+
+          <div class="id-panel">
+
+
+            <div>
+
+              <div class="id-label">
+                Animal Identification Number
               </div>
 
-              <div class="location-sub">
-                Registered location for ${esc(a.name)}
+
+              <div class="id-number">
+                ${esc(a.animalId)}
               </div>
 
             </div>
 
-            ${map}
+
+            <div class="status">
+              ✓ REGISTERED
+            </div>
+
 
           </div>
 
-        </section>
+
+        </header>
 
 
-        <!-- OWNER -->
-        <section class="section">
+        <!-- =================================================
+             MAIN CONTENT
+        ================================================== -->
 
-          <div class="section-title">
-            📞 Pet Parent & Emergency Information
-          </div>
-
-          <div class="owner-grid">
-
-            <div class="contact">
-              <span class="label">Pet Parent</span>
-              <strong>${esc(a.parent)}</strong>
-            </div>
-
-            <div class="contact">
-              <span class="label">Phone</span>
-              ${phone}
-            </div>
-
-            <div class="contact">
-              <span class="label">Alternate Phone</span>
-              ${alternate}
-            </div>
-
-            <div class="contact">
-              <span class="label">Behaviour</span>
-              <strong>${esc(a.behaviour)}</strong>
-            </div>
-
-          </div>
-
-        </section>
+        <main class="content">
 
 
-        <!-- QR -->
-        <section class="verification">
+          <!-- =================================================
+               PRIVATE NOTICE
+          ================================================== -->
 
-          <div>
+          <div class="notice">
 
-            <div class="verify-title">
-              🔎 Digital ID Verification
-            </div>
+            <span>
+              🛡️
+            </span>
 
-            <div class="verify-text">
-              Scan the QR code to open this animal's live profile.
-            </div>
+
+            <span>
+
+              <strong>
+                Private Animal Digital ID:
+              </strong>
+
+              This record is privately maintained by the owner
+              and is not a government-issued identity document.
+
+            </span>
 
           </div>
 
-          <div>
 
-            <div id="qrcode" class="qrcode"></div>
+          <!-- =================================================
+               PROFILE
+          ================================================== -->
 
-            <div class="mini-id">
-              ${esc(a.animalId)}
+          <section class="profile">
+
+
+            <div class="photo-wrap">
+
+
+              <div class="photo-frame">
+
+
+                <img
+                  src="${esc(a.photo)}"
+                  alt="${esc(a.name)}'s photograph"
+                  class="photo">
+
+
+                <div class="registered">
+
+                  ✓ ${esc(a.status)}
+
+                </div>
+
+
+              </div>
+
+
+              <div class="caption">
+
+                Registered photograph •
+                ${esc(a.name)}
+
+              </div>
+
+
             </div>
 
-          </div>
 
-        </section>
+            <!-- =================================================
+                 DETAILS
+            ================================================== -->
 
-      </main>
+            <div class="details">
 
 
-      <footer class="footer">
+              ${detail(
+                'Animal Name',
+                a.name
+              )}
 
-        <strong>ANIMAL DIGITAL ID</strong>
-        • ${esc(a.animalId)}
 
-        <br>
+              ${detail(
+                'Animal ID',
+                a.animalId
+              )}
 
-        Please contact the pet parent if
-        ${esc(a.name)} is found.
 
-        <br>
+              ${detail(
+                'Type',
+                a.type
+              )}
 
-        Private owner-maintained record
-        • Not a government-issued identity document
 
-      </footer>
+              ${detail(
+                'Breed',
+                a.breed
+              )}
+
+
+              ${detail(
+                'Gender',
+                a.gender
+              )}
+
+
+              ${detail(
+                'Date of Birth',
+                a.dob
+              )}
+
+
+              ${detail(
+                'Pet Parent',
+                a.parent
+              )}
+
+
+              ${detail(
+                'Behaviour',
+                a.behaviour
+              )}
+
+
+              ${detail(
+                'Neutering Status',
+                a.neutering
+              )}
+
+
+              ${detail(
+                'Record Status',
+                a.status
+              )}
+
+
+            </div>
+
+
+          </section>
+
+
+          <!-- =================================================
+               BEHAVIOUR SUMMARY
+          ================================================== -->
+
+          ${behaviourSummary(a)}
+
+
+          <!-- =================================================
+               VACCINATION SUMMARY
+          ================================================== -->
+
+          ${vaccinationSummary(a)}
+
+
+          <!-- =================================================
+               LOCATION
+          ================================================== -->
+
+          <section class="section">
+
+
+            <div class="section-title">
+
+              📍 Registered Location
+
+            </div>
+
+
+            <div class="location-box">
+
+
+              <div>
+
+                <div class="location-name">
+
+                  ${esc(a.location)}
+
+                </div>
+
+
+                <div class="location-sub">
+
+                  Registered location for
+                  ${esc(a.name)}
+
+                </div>
+
+              </div>
+
+
+              ${map}
+
+
+            </div>
+
+
+          </section>
+
+
+          <!-- =================================================
+               OWNER INFORMATION
+          ================================================== -->
+
+          <section class="section">
+
+
+            <div class="section-title">
+
+              📞 Pet Parent & Emergency Information
+
+            </div>
+
+
+            <div class="owner-grid">
+
+
+              <div class="contact">
+
+                <span class="label">
+                  Pet Parent
+                </span>
+
+                <strong>
+                  ${esc(a.parent)}
+                </strong>
+
+              </div>
+
+
+              <div class="contact">
+
+                <span class="label">
+                  Phone
+                </span>
+
+                ${phone}
+
+              </div>
+
+
+              <div class="contact">
+
+                <span class="label">
+                  Alternate Phone
+                </span>
+
+                ${alternate}
+
+              </div>
+
+
+              <div class="contact">
+
+                <span class="label">
+                  Behaviour
+                </span>
+
+                <strong>
+                  ${esc(a.behaviour)}
+                </strong>
+
+              </div>
+
+
+            </div>
+
+
+          </section>
+
+
+          <!-- =================================================
+               QR VERIFICATION
+          ================================================== -->
+
+          <section class="verification">
+
+
+            <div>
+
+              <div class="verify-title">
+
+                🔎 Digital ID Verification
+
+              </div>
+
+
+              <div class="verify-text">
+
+                Scan the QR code to open this animal's
+                live profile.
+
+              </div>
+
+            </div>
+
+
+            <div>
+
+              <div
+                id="qrcode"
+                class="qrcode">
+              </div>
+
+
+              <div class="mini-id">
+
+                ${esc(a.animalId)}
+
+              </div>
+
+            </div>
+
+
+          </section>
+
+
+        </main>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="footer">
+
+
+          <strong>
+            ANIMAL DIGITAL ID
+          </strong>
+
+          • ${esc(a.animalId)}
+
+
+          <br>
+
+
+          Please contact the pet parent if
+          ${esc(a.name)} is found.
+
+
+          <br>
+
+
+          Private owner-maintained record
+          • Not a government-issued identity document
+
+
+        </footer>
+
+
+      </div>
 
     </div>
-  </div>
+
   `;
 
 
- // QR CODE
+  // =======================================================
+  // QR CODE
+  // =======================================================
 
-if (window.QRCode) {
-  const url =
-    `${location.origin}${location.pathname}?id=${encodeURIComponent(a.id)}`;
+  if (window.QRCode) {
 
-  new QRCode(
-    document.getElementById('qrcode'),
-    {
-      text: url,
-      width: 90,
-      height: 90,
-      correctLevel: QRCode.CorrectLevel.M
+    const url =
+      `${location.origin}${location.pathname}?id=${encodeURIComponent(a.id)}`;
+
+
+    const qrElement =
+      document.getElementById('qrcode');
+
+
+    if (qrElement) {
+
+      new QRCode(
+        qrElement,
+        {
+          text: url,
+          width: 90,
+          height: 90,
+          correctLevel: QRCode.CorrectLevel.M
+        }
+      );
+
     }
-  );
+
+  }
+
 }
 
-} // end of renderProfile()
 
-// Close popup
+// =========================================================
+// CLOSE DETAIL POPUP
+// =========================================================
+
 function closeDetailModal() {
-  const modal = document.querySelector(".detail-modal");
+
+  const modal =
+    document.getElementById("detailModal");
+
 
   if (modal) {
+
     modal.remove();
+
   }
+
 }
+
 
 // =========================================================
 // BEHAVIOUR & TEMPERAMENT POPUP
 // =========================================================
 
 function openBehaviourDetails() {
-  const a = getAnimal();
 
-  const traits = Array.isArray(a.behaviourTraits)
-    ? a.behaviourTraits
-    : [];
+  // Remove any existing popup first
+  closeDetailModal();
 
-  const traitsHtml = traits.length
-    ? traits.map(trait =>
-        `<span class="trait-pill">${esc(trait)}</span>`
-      ).join('')
-    : `<span class="not-added">No behaviour traits added.</span>`;
-
-  const modal = document.createElement("div");
-
-  modal.id = "detailModal";
-  modal.className = "detail-modal";
-
-  modal.innerHTML = `
-    <div class="detail-modal-card">
-
-      <div class="detail-modal-header">
-
-        <div class="detail-modal-title">
-
-          <div class="detail-modal-icon">🧠</div>
-
-          <div>
-            <h3>Behaviour & Temperament</h3>
-            <p>${esc(a.name)} • ${esc(a.animalId)}</p>
-          </div>
-
-        </div>
-
-        <button
-          type="button"
-          class="detail-modal-close"
-          aria-label="Close">
-          ×
-        </button>
-
-      </div>
-
-
-      <div class="detail-modal-body">
-
-        <div class="behaviour-overall">
-
-          <span class="detail-small-label">
-            OVERALL BEHAVIOUR
-          </span>
-
-          <strong>
-            ${esc(a.behaviour || "Not Added")}
-          </strong>
-
-        </div>
-
-
-        <div class="traits-section">
-
-          <span class="detail-small-label">
-            BEHAVIOUR TRAITS
-          </span>
-
-          <div class="traits-list">
-            ${traitsHtml}
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  `;
-
-document.body.appendChild(modal);
-
-// Close button
-const closeButton = modal.querySelector(".detail-modal-close");
-
-if (closeButton) {
-  closeButton.addEventListener("click", function() {
-    modal.remove();
-  });
-}
-
-// Close when clicking outside the popup
-modal.addEventListener("click", function(e) {
-  if (e.target === modal) {
-    modal.remove();
-  }
-});
-
-
-// =========================================================
-// VACCINATION DETAILS POPUP
-// =========================================================
-
-function openVaccinationDetails() {
-  const a = getAnimal();
-
-  const vaccinations = Array.isArray(a.vaccinations)
-    ? a.vaccinations
-    : [];
-
-  const rows = vaccinations.length
-    ? vaccinations.map(v => `
-        <tr>
-          <td>${esc(v[0])}</td>
-          <td>${esc(v[1])}</td>
-          <td>${esc(v[2])}</td>
-          <td>
-            <span class="vaccine-status">
-              ${esc(v[3])}
-            </span>
-          </td>
-        </tr>
-      `).join('')
-    : `
-        <tr>
-          <td colspan="4" class="empty-row">
-            No vaccination records added.
-          </td>
-        </tr>
-      `;
-
-  const modal = document.createElement("div");
-
-  modal.id = "detailModal";
-  modal.className = "detail-modal";
-
-  modal.innerHTML = `
-    <div class="detail-modal-card vaccination-modal">
-
-      <div class="detail-modal-header">
-
-        <div class="detail-modal-title">
-
-          <div class="detail-modal-icon">💉</div>
-
-          <div>
-            <h3>Vaccination Records</h3>
-            <p>${esc(a.name)} • ${esc(a.animalId)}</p>
-          </div>
-
-        </div>
-
-        <button
-          type="button"
-          class="detail-modal-close"
-          aria-label="Close">
-          ×
-        </button>
-
-      </div>
-
-
-      <div class="detail-modal-body">
-
-        <div class="vaccination-table-wrap">
-
-          <table class="vaccination-popup-table">
-
-            <thead>
-              <tr>
-                <th>Vaccine / Record</th>
-                <th>Date</th>
-                <th>Next Due</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              ${rows}
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-// Close button
-const closeButton = modal.querySelector(".detail-modal-close");
-
-if (closeButton) {
-  closeButton.addEventListener("click", function() {
-    modal.remove();
-  });
-}
-
-// Close when clicking outside the popup
-modal.addEventListener("click", function(e) {
-  if (e.target === modal) {
-    modal.remove();
-  }
-});
-  
-}
-
-function openBehaviourDetails() {
 
   const a = getAnimal();
-
-  const existing =
-    document.getElementById("behaviourDetails");
-
-  if (existing) {
-    existing.remove();
-    return;
-  }
 
   const traits =
-    Array.isArray(a.traits)
-      ? a.traits
-      : [];
+    getBehaviourTraits(a);
 
-  const traitHTML = traits.length
+
+  const traitsHtml = traits.length
+
     ? traits.map(trait => `
-        <span class="trait-chip trait-chip-large">
+        <span class="trait-pill">
           ${esc(trait)}
         </span>
       `).join('')
+
     : `
-        <div class="trait-empty">
-          No behaviour traits have been added.
-        </div>
+        <span class="not-added">
+          No behaviour traits added.
+        </span>
       `;
 
 
-  const notes = a.behaviourNotes
-    ? `
-        <div class="behaviour-notes">
-
-          <span class="label">
-            Additional Notes
-          </span>
-
-          <p>
-            ${esc(a.behaviourNotes)}
-          </p>
-
-        </div>
-      `
-    : '';
+  const modal =
+    document.createElement("div");
 
 
-  const modal = document.createElement("div");
+  modal.id =
+    "detailModal";
 
-  modal.id = "behaviourDetails";
-  modal.className = "detail-modal";
+
+  modal.className =
+    "detail-modal";
 
 
   modal.innerHTML = `
 
     <div class="detail-modal-card">
 
+
+      <!-- HEADER -->
+
       <div class="detail-modal-header">
 
+
         <div class="detail-modal-title">
+
 
           <div class="detail-modal-icon">
             🧠
           </div>
+
 
           <div>
 
             <h3>
               Behaviour & Temperament
             </h3>
+
 
             <p>
               ${esc(a.name)}
@@ -739,47 +954,91 @@ function openBehaviourDetails() {
 
           </div>
 
+
         </div>
 
 
         <button
           type="button"
           class="detail-modal-close"
-          onclick="closeDetailModal('behaviourDetails')">
+          aria-label="Close">
+
           ×
+
         </button>
+
 
       </div>
 
+
+      <!-- BODY -->
 
       <div class="detail-modal-body">
 
-        <div class="behaviour-overall-card">
 
-          <span class="label">
-            Overall Behaviour
+        <div class="behaviour-overall">
+
+
+          <span class="detail-small-label">
+
+            OVERALL BEHAVIOUR
+
           </span>
 
+
           <strong>
-            ${esc(a.behaviour || 'Not Added')}
+
+            ${esc(
+              a.behaviour || "Not Added"
+            )}
+
           </strong>
 
+
         </div>
 
 
-        <div class="modal-subtitle">
-          Behaviour Traits
+        <div class="traits-section">
+
+
+          <span class="detail-small-label">
+
+            BEHAVIOUR TRAITS
+
+          </span>
+
+
+          <div class="traits-list">
+
+            ${traitsHtml}
+
+          </div>
+
+
         </div>
 
 
-        <div class="modal-trait-list">
-          ${traitHTML}
-        </div>
+        ${
+          a.behaviourNotes
+            ? `
+                <div class="behaviour-notes">
 
+                  <span class="detail-small-label">
+                    ADDITIONAL NOTES
+                  </span>
 
-        ${notes}
+                  <p>
+                    ${esc(a.behaviourNotes)}
+                  </p>
+
+                </div>
+              `
+            : ''
+        }
+
 
       </div>
+
 
     </div>
 
@@ -788,20 +1047,89 @@ function openBehaviourDetails() {
 
   document.body.appendChild(modal);
 
-  setupDetailModal(modal);
+
+  // =======================================================
+  // CLOSE BUTTON
+  // =======================================================
+
+  const closeButton =
+    modal.querySelector(
+      ".detail-modal-close"
+    );
+
+
+  if (closeButton) {
+
+    closeButton.addEventListener(
+      "click",
+      function () {
+
+        closeDetailModal();
+
+      }
+    );
+
+  }
+
+
+  // =======================================================
+  // CLICK OUTSIDE
+  // =======================================================
+
+  modal.addEventListener(
+    "click",
+    function (e) {
+
+      if (e.target === modal) {
+
+        closeDetailModal();
+
+      }
+
+    }
+  );
+
+
+  // =======================================================
+  // ESC KEY
+  // =======================================================
+
+  const escHandler =
+    function (e) {
+
+      if (e.key === "Escape") {
+
+        closeDetailModal();
+
+        document.removeEventListener(
+          "keydown",
+          escHandler
+        );
+
+      }
+
+    };
+
+
+  document.addEventListener(
+    "keydown",
+    escHandler
+  );
+
 }
+
+
+// =========================================================
+// VACCINATION DETAILS POPUP
+// =========================================================
 
 function openVaccinationDetails() {
 
+  // Remove any existing popup first
+  closeDetailModal();
+
+
   const a = getAnimal();
-
-  const existing =
-    document.getElementById("vaccinationDetails");
-
-  if (existing) {
-    existing.remove();
-    return;
-  }
 
 
   const vaccinations =
@@ -810,85 +1138,120 @@ function openVaccinationDetails() {
       : [];
 
 
-  const vaccineRows = vaccinations.length
+  const rows =
+    vaccinations.length
 
-    ? vaccinations.map((v, i) => `
 
-        <tr class="${
-          i === vaccinations.length - 1
-            ? 'latest'
-            : ''
-        }">
+      ? vaccinations.map((v, i) => `
 
-          <td>${esc(v[0])}</td>
+          <tr class="${
+            i === vaccinations.length - 1
+              ? 'latest'
+              : ''
+          }">
 
-          <td>${esc(v[1])}</td>
 
-          <td>${esc(v[2])}</td>
+            <td>
+              ${esc(v[0])}
+            </td>
 
-          <td>
 
-            <span class="vaccine-status">
-              ${esc(v[3])}
-            </span>
+            <td>
+              ${esc(v[1])}
+            </td>
 
-          </td>
 
-        </tr>
+            <td>
+              ${esc(v[2])}
+            </td>
 
-      `).join('')
 
-    : `
+            <td>
 
-        <tr>
+              <span class="vaccine-status">
 
-          <td
-            colspan="4"
-            class="empty-row">
+                ${esc(v[3])}
 
-            Vaccination: Not Done
+              </span>
 
-          </td>
+            </td>
 
-        </tr>
 
-      `;
+          </tr>
+
+        `).join('')
+
+
+      : `
+
+          <tr>
+
+            <td
+              colspan="4"
+              class="empty-row">
+
+              Vaccination: Not Done
+
+            </td>
+
+          </tr>
+
+        `;
 
 
   const modal =
     document.createElement("div");
 
-  modal.id = "vaccinationDetails";
-  modal.className = "detail-modal";
+
+  modal.id =
+    "detailModal";
+
+
+  modal.className =
+    "detail-modal";
 
 
   modal.innerHTML = `
 
     <div
-      class="detail-modal-card vaccination-modal-card">
+      class="detail-modal-card vaccination-modal">
+
+
+      <!-- HEADER -->
 
       <div class="detail-modal-header">
 
+
         <div class="detail-modal-title">
 
+
           <div class="detail-modal-icon">
+
             💉
+
           </div>
+
 
           <div>
 
             <h3>
+
               Vaccination Records
+
             </h3>
 
+
             <p>
+
               ${esc(a.name)}
               •
               ${vaccinations.length}
               record${vaccinations.length === 1 ? '' : 's'}
+
             </p>
 
           </div>
+
 
         </div>
 
@@ -896,37 +1259,53 @@ function openVaccinationDetails() {
         <button
           type="button"
           class="detail-modal-close"
-          onclick="closeDetailModal('vaccinationDetails')">
+          aria-label="Close">
+
           ×
+
         </button>
+
 
       </div>
 
 
+      <!-- BODY -->
+
       <div
         class="detail-modal-body vaccination-modal-body">
 
+
         <div class="vaccination-count">
 
+
           <strong>
+
             ${vaccinations.length}
+
           </strong>
 
+
           <span>
+
             vaccination record${
               vaccinations.length === 1
                 ? ''
                 : 's'
             }
+
           </span>
+
 
         </div>
 
 
         <div
-          class="table-wrap vaccination-table-wrap">
+          class="vaccination-table-wrap">
 
-          <table>
+
+          <table
+            class="vaccination-popup-table">
+
 
             <thead>
 
@@ -955,143 +1334,233 @@ function openVaccinationDetails() {
 
             <tbody>
 
-              ${vaccineRows}
+              ${rows}
 
             </tbody>
 
+
           </table>
+
 
         </div>
 
+
       </div>
+
 
     </div>
 
   `;
 
-function closeDetailModal(id) {
 
-  const modal =
-    document.getElementById(id);
+  document.body.appendChild(modal);
 
-  if (modal) {
-    modal.remove();
+
+  // =======================================================
+  // CLOSE BUTTON
+  // =======================================================
+
+  const closeButton =
+    modal.querySelector(
+      ".detail-modal-close"
+    );
+
+
+  if (closeButton) {
+
+    closeButton.addEventListener(
+      "click",
+      function () {
+
+        closeDetailModal();
+
+      }
+    );
+
   }
-}
 
 
-function setupDetailModal(modal) {
-
-  /* Click outside */
+  // =======================================================
+  // CLICK OUTSIDE
+  // =======================================================
 
   modal.addEventListener(
     "click",
-    function(e) {
+    function (e) {
 
       if (e.target === modal) {
-        modal.remove();
+
+        closeDetailModal();
+
       }
 
     }
   );
 
 
-  /* ESC key */
+  // =======================================================
+  // ESC KEY
+  // =======================================================
 
-  function escHandler(e) {
+  const escHandler =
+    function (e) {
 
-    if (e.key === "Escape") {
+      if (e.key === "Escape") {
 
-      if (
-        document.getElementById(modal.id)
-      ) {
-        modal.remove();
+        closeDetailModal();
+
+        document.removeEventListener(
+          "keydown",
+          escHandler
+        );
+
       }
 
-      document.removeEventListener(
-        "keydown",
-        escHandler
-      );
-
-    }
-
-  }
+    };
 
 
   document.addEventListener(
     "keydown",
     escHandler
   );
-}
-  
-  document.body.appendChild(modal);
 
-  setupDetailModal(modal);
 }
+
+
+// =========================================================
+// REQUEST A CHANGE
+// =========================================================
 
 function openChangeRequest() {
 
-  const a = getAnimal();
 
-  const existing = document.getElementById("changeRequest");
+  const a =
+    getAnimal();
+
+
+  // Remove existing form
+  const existing =
+    document.getElementById(
+      "changeRequest"
+    );
+
 
   if (existing) {
+
     existing.remove();
+
     return;
+
   }
 
-  const modal = document.createElement("div");
 
-  modal.id = "changeRequest";
-  modal.className = "change-request";
+  const modal =
+    document.createElement("div");
+
+
+  modal.id =
+    "changeRequest";
+
+
+  modal.className =
+    "change-request";
+
 
   modal.innerHTML = `
 
+
     <div class="change-request-card">
+
+
+      <!-- =================================================
+           HEADER
+      ================================================== -->
 
       <div class="change-request-header">
 
+
         <div class="request-title-area">
 
+
           <div class="request-icon">
+
             📝
+
           </div>
+
 
           <div>
-            <h3>Request a Change</h3>
+
+            <h3>
+              Request a Change
+            </h3>
+
 
             <p>
+
               ${esc(a.name)}
+
               <span>•</span>
+
               ${esc(a.animalId)}
+
             </p>
+
           </div>
 
+
         </div>
+
 
         <button
           type="button"
           class="close-request"
-          aria-label="Close"
-          onclick="document.getElementById('changeRequest').remove()">
+          aria-label="Close">
+
           ×
+
         </button>
 
+
       </div>
 
+
+      <!-- =================================================
+           NOTICE
+      ================================================== -->
 
       <div class="request-notice">
-        <span>🔎</span>
+
+
+        <span>
+          🔎
+        </span>
+
 
         <div>
-          <strong>Information review</strong>
+
+          <strong>
+            Information review
+          </strong>
+
 
           <p>
-            Submitted changes are reviewed by the registry owner
-            before the animal profile is updated.
+
+            Submitted changes are reviewed by
+            the registry owner before the
+            animal profile is updated.
+
           </p>
+
         </div>
+
+
       </div>
+
+
+      <!-- =================================================
+           FORM
+      ================================================== -->
 
       <form
         id="animalChangeForm"
@@ -1100,20 +1569,27 @@ function openChangeRequest() {
         method="POST">
 
 
+        <!-- Hidden Formspree subject -->
+
         <input
           type="hidden"
           name="_subject"
           value="Animal Registry Change Request">
+
+
+        <!-- Animal information -->
 
         <input
           type="hidden"
           name="Animal Name"
           value="${esc(a.name)}">
 
+
         <input
           type="hidden"
           name="Animal ID"
           value="${esc(a.animalId)}">
+
 
         <input
           type="hidden"
@@ -1121,45 +1597,115 @@ function openChangeRequest() {
           value="Animal Digital ID Registry">
 
 
+        <!-- =================================================
+             FIELD TO CHANGE
+        ================================================== -->
+
         <div class="form-group">
 
+
           <label for="requestedField">
+
             Information to change
+
           </label>
+
 
           <select
             id="requestedField"
             name="Requested Field"
             required>
 
+
             <option value="">
               Select a field
             </option>
 
-            <option>Animal Name</option>
-            <option>Breed</option>
-            <option>Gender</option>
-            <option>Date of Birth</option>
-            <option>Pet Parent</option>
-            <option>Phone</option>
-            <option>Alternate Phone</option>
-            <option>Location</option>
-            <option>Behaviour</option>
-            <option>Behaviour Traits</option>
-            <option>Neutering Status</option>
-            <option>Vaccination</option>
-            <option>Photo</option>
+
+            <option value="Animal Name">
+              Animal Name
+            </option>
+
+
+            <option value="Breed">
+              Breed
+            </option>
+
+
+            <option value="Gender">
+              Gender
+            </option>
+
+
+            <option value="Date of Birth">
+              Date of Birth
+            </option>
+
+
+            <option value="Pet Parent">
+              Pet Parent
+            </option>
+
+
+            <option value="Phone">
+              Phone
+            </option>
+
+
+            <option value="Alternate Phone">
+              Alternate Phone
+            </option>
+
+
+            <option value="Location">
+              Location
+            </option>
+
+
+            <option value="Behaviour">
+              Behaviour
+            </option>
+
+
+            <option value="Behaviour Traits">
+              Behaviour Traits
+            </option>
+
+
+            <option value="Neutering Status">
+              Neutering Status
+            </option>
+
+
+            <option value="Vaccination">
+              Vaccination
+            </option>
+
+
+            <option value="Photo">
+              Photo
+            </option>
+
 
           </select>
+
 
         </div>
 
 
+        <!-- =================================================
+             CURRENT INFORMATION
+        ================================================== -->
+
         <div class="form-group">
 
+
           <label for="currentInformation">
+
             Current information
+
           </label>
+
 
           <input
             id="currentInformation"
@@ -1168,14 +1714,23 @@ function openChangeRequest() {
             placeholder="What is currently shown?"
             required>
 
+
         </div>
 
 
+        <!-- =================================================
+             REQUESTED INFORMATION
+        ================================================== -->
+
         <div class="form-group">
 
+
           <label for="requestedInformation">
+
             Requested information
+
           </label>
+
 
           <input
             id="requestedInformation"
@@ -1184,14 +1739,23 @@ function openChangeRequest() {
             placeholder="What should it be changed to?"
             required>
 
+
         </div>
 
 
+        <!-- =================================================
+             REASON
+        ================================================== -->
+
         <div class="form-group">
 
+
           <label for="reason">
+
             Reason / additional details
+
           </label>
+
 
           <textarea
             id="reason"
@@ -1200,16 +1764,26 @@ function openChangeRequest() {
             placeholder="Please explain the requested change..."
             required></textarea>
 
+
         </div>
 
 
+        <!-- =================================================
+             REQUESTER
+        ================================================== -->
+
         <div class="form-row">
+
 
           <div class="form-group">
 
+
             <label for="requesterName">
+
               Your name
+
             </label>
+
 
             <input
               id="requesterName"
@@ -1218,14 +1792,19 @@ function openChangeRequest() {
               placeholder="Your name"
               required>
 
+
           </div>
 
 
           <div class="form-group">
 
+
             <label for="requesterContact">
+
               Your contact
+
             </label>
+
 
             <input
               id="requesterContact"
@@ -1234,45 +1813,109 @@ function openChangeRequest() {
               placeholder="Phone or email"
               required>
 
+
           </div>
+
 
         </div>
 
+
+        <!-- =================================================
+             FORMSPREE SETTINGS
+        ================================================== -->
 
         <input
           type="hidden"
           name="_captcha"
           value="true">
 
+
         <input
           type="hidden"
           name="_template"
           value="table">
 
-<div
-  id="changeRequestSuccess"
-  class="request-success"
-  style="display:none;">
-  
-  <span class="success-icon">✓</span>
 
-  <div>
-    <strong>Request submitted successfully</strong>
+        <!-- =================================================
+             SUCCESS MESSAGE
+        ================================================== -->
 
-    <p>
-      Your change request has been received and will be
-      reviewed by the registry owner.
-    </p>
-  </div>
+        <div
+          id="changeRequestSuccess"
+          class="request-success"
+          style="display:none;">
 
-</div>
+
+          <span class="success-icon">
+            ✓
+          </span>
+
+
+          <div>
+
+            <strong>
+              Request submitted successfully
+            </strong>
+
+
+            <p>
+
+              Your change request has been received
+              and will be reviewed by the registry owner.
+
+            </p>
+
+          </div>
+
+
+        </div>
+
+
+        <!-- =================================================
+             ERROR MESSAGE
+        ================================================== -->
+
+        <div
+          id="changeRequestError"
+          class="request-error"
+          style="display:none;">
+
+
+          <span class="error-icon">
+            !
+          </span>
+
+
+          <div>
+
+            <strong>
+              Unable to submit request
+            </strong>
+
+
+            <p>
+
+              Something went wrong while sending
+              the request. Please try again.
+
+            </p>
+
+          </div>
+
+
+        </div>
+
+
+        <!-- =================================================
+             BUTTONS
+        ================================================== -->
 
         <div class="request-actions">
 
+
           <button
             type="button"
-            class="cancel-request"
-            onclick="document.getElementById('changeRequest').remove()">
+            class="cancel-request">
 
             Cancel
 
@@ -1287,111 +1930,252 @@ function openChangeRequest() {
 
           </button>
 
+
         </div>
 
+
       </form>
+
 
     </div>
 
   `;
 
+
   document.body.appendChild(modal);
 
-  // =========================================
-// STEP 6: SUBMISSION HANDLING
-// =========================================
 
-const form = document.getElementById("animalChangeForm");
-const submitButton = form.querySelector(".submit-change");
-const successBox = document.getElementById("changeRequestSuccess");
-const errorBox = document.getElementById("changeRequestError");
+  // =======================================================
+  // ELEMENTS
+  // =======================================================
 
-form.addEventListener("submit", async function (e) {
-
-  e.preventDefault();
-
-  errorBox.style.display = "none";
-
-  submitButton.disabled = true;
-  submitButton.textContent = "Submitting...";
-
-  const formData = new FormData(form);
-
-  try {
-
-    const response = await fetch(
-      "https://formspree.io/f/xrpgegka",
-      {
-        method: "POST",
-        body: formData,
-        headers: {
-          Accept: "application/json"
-        }
-      }
+  const form =
+    document.getElementById(
+      "animalChangeForm"
     );
 
-    if (!response.ok) {
-      throw new Error("Submission failed");
-    }
 
-    form.style.display = "none";
-    successBox.style.display = "block";
-
-  } catch (error) {
-
-    console.error("Change request submission failed:", error);
-
-    submitButton.disabled = false;
-    submitButton.textContent = "✓ Submit Request";
-
-    errorBox.style.display = "block";
-  }
-
-});
+  const submitButton =
+    form.querySelector(
+      ".submit-change"
+    );
 
 
-/* Close when clicking outside the card */
+  const successBox =
+    document.getElementById(
+      "changeRequestSuccess"
+    );
 
-modal.addEventListener("click", function(e) {
 
-  if (e.target === modal) {
-    modal.remove();
-  }
+  const errorBox =
+    document.getElementById(
+      "changeRequestError"
+    );
 
-});
 
-  /* Close when clicking outside the card */
+  const closeButton =
+    modal.querySelector(
+      ".close-request"
+    );
 
-  modal.addEventListener("click", function(e) {
 
-    if (e.target === modal) {
+  const cancelButton =
+    modal.querySelector(
+      ".cancel-request"
+    );
+
+
+  // =======================================================
+  // CLOSE BUTTON
+  // =======================================================
+
+  closeButton.addEventListener(
+    "click",
+    function () {
+
       modal.remove();
+
     }
+  );
 
-  });
+
+  // =======================================================
+  // CANCEL BUTTON
+  // =======================================================
+
+  cancelButton.addEventListener(
+    "click",
+    function () {
+
+      modal.remove();
+
+    }
+  );
 
 
-  /* Close with ESC */
+  // =======================================================
+  // CLICK OUTSIDE
+  // =======================================================
 
-  document.addEventListener("keydown", function escHandler(e) {
+  modal.addEventListener(
+    "click",
+    function (e) {
 
-    if (e.key === "Escape") {
+      if (e.target === modal) {
 
-      const current = document.getElementById("changeRequest");
+        modal.remove();
 
-      if (current) {
-        current.remove();
       }
 
-      document.removeEventListener(
-        "keydown",
-        escHandler
-      );
+    }
+  );
+
+
+  // =======================================================
+  // ESC KEY
+  // =======================================================
+
+  const escHandler =
+    function (e) {
+
+      if (e.key === "Escape") {
+
+        if (
+          document.getElementById(
+            "changeRequest"
+          )
+        ) {
+
+          modal.remove();
+
+        }
+
+
+        document.removeEventListener(
+          "keydown",
+          escHandler
+        );
+
+      }
+
+    };
+
+
+  document.addEventListener(
+    "keydown",
+    escHandler
+  );
+
+
+  // =======================================================
+  // FORMSPREE SUBMISSION
+  // =======================================================
+
+  form.addEventListener(
+    "submit",
+    async function (e) {
+
+      e.preventDefault();
+
+
+      // Hide previous messages
+
+      successBox.style.display =
+        "none";
+
+
+      errorBox.style.display =
+        "none";
+
+
+      // Disable button
+
+      submitButton.disabled =
+        true;
+
+
+      submitButton.textContent =
+        "Submitting...";
+
+
+      const formData =
+        new FormData(form);
+
+
+      try {
+
+
+        const response =
+          await fetch(
+            "https://formspree.io/f/xrpgegka",
+            {
+              method: "POST",
+
+              body: formData,
+
+              headers: {
+                Accept:
+                  "application/json"
+              }
+            }
+          );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            "Form submission failed"
+          );
+
+        }
+
+
+        // Hide form
+
+        form.style.display =
+          "none";
+
+
+        // Show success
+
+        successBox.style.display =
+          "flex";
+
+
+      } catch (error) {
+
+
+        console.error(
+          "Change request submission failed:",
+          error
+        );
+
+
+        // Re-enable button
+
+        submitButton.disabled =
+          false;
+
+
+        submitButton.textContent =
+          "✓ Submit Request";
+
+
+        // Show error
+
+        errorBox.style.display =
+          "flex";
+
+      }
 
     }
-
-  });
+  );
 
 }
+
+
+// =========================================================
+// START PROFILE
+// =========================================================
 
 renderProfile();
