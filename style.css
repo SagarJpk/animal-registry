@@ -581,7 +581,7 @@ body::after {
 
 
 /* =========================================================
-   PROFILE
+   PROFILE PHOTO
    ========================================================= */
 
 .profile {
@@ -594,78 +594,81 @@ body::after {
 
 
 .photo-wrap {
-  text-align: center;
+  width: 100%;
+  max-width: 100%;
 }
 
 
 .photo-frame {
   position: relative;
+  width: 100%;
 
-  padding: 7px;
+  /* Keeps the photo area consistent across devices */
+  aspect-ratio: 4 / 5;
 
-  background:
-    linear-gradient(
-      145deg,
-      #f5f8fa,
-      #edf2f5
-    );
+  overflow: hidden;
 
-  border:
-    1px solid
-    var(--line);
+  border: 1px solid #d9e2e8;
+  border-radius: 16px;
 
-  border-radius: 18px;
+  background: #f4f7f9;
 
-  box-shadow: var(--shadow-sm);
+  box-sizing: border-box;
 }
 
 
-.photo {
+/* Actual pet photograph */
+
+.photo-frame .photo {
   display: block;
 
   width: 100%;
+  height: 100%;
 
-  height: 285px;
+  /* IMPORTANT:
+     Show the complete photograph instead of cropping it */
+  object-fit: contain;
 
-  object-fit: cover;
+  object-position: center center;
 
-  border-radius: 13px;
+  background: #f4f7f9;
+
+  /* Prevent browser-specific image rendering differences */
+  image-rendering: auto;
+
+  /* Avoid unwanted interpolation effects */
+  transform: translateZ(0);
+
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 
-.registered {
+/* Registered badge stays over the photo */
+
+.photo-frame .registered {
   position: absolute;
 
-  left: 17px;
+  left: 12px;
+  bottom: 12px;
 
-  bottom: 17px;
-
-  padding: 6px 10px;
-
-  border-radius: 20px;
-
-  background:
-    rgba(22, 121, 75, 0.95);
-
-  color: #ffffff;
-
-  font-size: 9px;
-
-  font-weight: 850;
-
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.16);
+  z-index: 2;
 }
 
 
-.caption {
-  margin-top: 8px;
+/* Photo caption */
+
+.photo-wrap .caption {
+  margin-top: 7px;
+
+  text-align: center;
+
+  font-size: 10px;
 
   color: var(--muted);
 
-  font-size: 9px;
+  line-height: 1.4;
 }
-
 
 /* =========================================================
    DETAIL GRID
