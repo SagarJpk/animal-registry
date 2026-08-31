@@ -656,6 +656,68 @@ function openChangeRequest() {
 
   document.body.appendChild(modal);
 
+  // =========================================
+// STEP 6: SUBMISSION HANDLING
+// =========================================
+
+const form = document.getElementById("animalChangeForm");
+const submitButton = form.querySelector(".submit-change");
+const successBox = document.getElementById("changeRequestSuccess");
+const errorBox = document.getElementById("changeRequestError");
+
+form.addEventListener("submit", async function (e) {
+
+  e.preventDefault();
+
+  errorBox.style.display = "none";
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Submitting...";
+
+  const formData = new FormData(form);
+
+  try {
+
+    const response = await fetch(
+      "https://formspree.io/f/xrpgegka",
+      {
+        method: "POST",
+        body: formData,
+        headers: {
+          Accept: "application/json"
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Submission failed");
+    }
+
+    form.style.display = "none";
+    successBox.style.display = "block";
+
+  } catch (error) {
+
+    console.error("Change request submission failed:", error);
+
+    submitButton.disabled = false;
+    submitButton.textContent = "✓ Submit Request";
+
+    errorBox.style.display = "block";
+  }
+
+});
+
+
+/* Close when clicking outside the card */
+
+modal.addEventListener("click", function(e) {
+
+  if (e.target === modal) {
+    modal.remove();
+  }
+
+});
 
   /* Close when clicking outside the card */
 
