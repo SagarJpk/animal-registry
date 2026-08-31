@@ -1323,3 +1323,558 @@ td{
   font-size: 10px;
   line-height: 1.45;
 }
+
+/* =========================================================
+   COMPACT BEHAVIOUR SUMMARY
+   ========================================================= */
+
+.behaviour-summary {
+  margin-top: 10px;
+  padding: 16px;
+  background: #f7f9fb;
+  border: 1px solid #e1e7ed;
+  border-radius: 13px;
+}
+
+.behaviour-summary-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  padding-bottom: 14px;
+
+  border-bottom: 1px solid #e1e7ed;
+}
+
+.behaviour-value {
+  display: block;
+
+  margin-top: 5px;
+
+  font-size: 16px;
+
+  color: #163c63;
+}
+
+.trait-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trait-more {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 7px 10px;
+
+  border: 1px dashed #c8d5df;
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  color: #6b7c89;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.trait-chip-large {
+  padding: 9px 13px;
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   VIEW DETAILS BUTTON
+   ========================================================= */
+
+.details-button {
+  flex-shrink: 0;
+
+  padding: 8px 11px;
+
+  border: 1px solid #c8d8e4;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #174d76;
+
+  font-family: inherit;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background .15s ease,
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+
+.details-button:hover {
+  background: #edf5fa;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 3px 9px rgba(8,36,63,.10);
+}
+
+
+/* =========================================================
+   VACCINATION SUMMARY
+   ========================================================= */
+
+.vaccination-summary {
+  margin-top: 10px;
+
+  padding: 16px;
+
+  background: #f7f9fb;
+
+  border: 1px solid #e1e7ed;
+
+  border-radius: 13px;
+}
+
+.vaccination-summary-info {
+  display: grid;
+
+  grid-template-columns:
+    110px 1fr 150px;
+
+  gap: 12px;
+
+  align-items: center;
+
+  padding-bottom: 14px;
+
+  border-bottom:
+    1px solid #e1e7ed;
+}
+
+.summary-stat strong {
+  display: block;
+
+  color: #163c63;
+
+  font-size: 13px;
+}
+
+.vaccination-summary
+> .details-button {
+  margin-top: 14px;
+}
+
+
+/* =========================================================
+   DETAIL MODAL
+   ========================================================= */
+
+.detail-modal {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 11000;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 24px;
+
+  background:
+    rgba(7,24,42,.68);
+
+  backdrop-filter: blur(5px);
+
+  overflow-y: auto;
+}
+
+
+.detail-modal-card {
+  width: min(560px,100%);
+
+  max-height:
+    calc(100vh - 48px);
+
+  display: flex;
+
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border:
+    1px solid #dbe4eb;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 25px 70px
+    rgba(0,0,0,.30);
+}
+
+
+.detail-modal-header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content:
+    space-between;
+
+  gap: 15px;
+
+  padding: 19px 21px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #08243f,
+      #123f66
+    );
+
+  color: #ffffff;
+}
+
+
+.detail-modal-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+}
+
+
+.detail-modal-icon {
+  width: 40px;
+
+  height: 40px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255,255,255,.11);
+
+  border:
+    1px solid
+    rgba(255,255,255,.22);
+
+  font-size: 19px;
+}
+
+
+.detail-modal-header h3 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 17px;
+
+  font-weight: 800;
+}
+
+
+.detail-modal-header p {
+  margin: 4px 0 0;
+
+  color:
+    rgba(255,255,255,.72);
+
+  font-size: 10px;
+}
+
+
+.detail-modal-close {
+  width: 32px;
+
+  height: 32px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border:
+    1px solid
+    rgba(255,255,255,.25);
+
+  border-radius: 8px;
+
+  background:
+    rgba(255,255,255,.08);
+
+  color: #ffffff;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+
+.detail-modal-close:hover {
+  background:
+    rgba(255,255,255,.18);
+}
+
+
+.detail-modal-body {
+  padding: 20px 21px 22px;
+
+  overflow-y: auto;
+}
+
+
+/* =========================================================
+   BEHAVIOUR MODAL
+   ========================================================= */
+
+.behaviour-overall-card {
+  padding: 14px;
+
+  background: #f3f8fc;
+
+  border:
+    1px solid #d9e7f2;
+
+  border-radius: 11px;
+}
+
+
+.behaviour-overall-card strong {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #163c63;
+
+  font-size: 18px;
+}
+
+
+.modal-subtitle {
+  margin:
+    20px 0 10px;
+
+  color: #526676;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: .7px;
+}
+
+
+.modal-trait-list {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+}
+
+
+.behaviour-notes {
+  margin-top: 20px;
+
+  padding-top: 16px;
+
+  border-top:
+    1px solid #e1e7ed;
+}
+
+
+.behaviour-notes p {
+  margin: 6px 0 0;
+
+  color: #4f6474;
+
+  font-size: 11px;
+
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   VACCINATION MODAL
+   ========================================================= */
+
+.vaccination-modal-card {
+  width:
+    min(760px,100%);
+}
+
+
+.vaccination-count {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 7px;
+
+  margin-bottom: 13px;
+
+  color: var(--muted);
+
+  font-size: 11px;
+}
+
+
+.vaccination-count strong {
+  color: #163c63;
+
+  font-size: 20px;
+}
+
+
+.vaccination-table-wrap {
+  margin-top: 0;
+
+  max-height:
+    min(55vh,480px);
+
+  overflow: auto;
+}
+
+
+.vaccination-table-wrap table {
+  min-width: 620px;
+}
+
+
+/* =========================================================
+   REQUEST ERROR
+   ========================================================= */
+
+.request-error {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 12px 13px;
+
+  border:
+    1px solid #e5baba;
+
+  border-radius: 10px;
+
+  background: #fff3f3;
+
+  color: #7b3030;
+
+  font-size: 11px;
+}
+
+
+.error-icon {
+  width: 24px;
+
+  height: 24px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #b84b4b;
+
+  color: #ffffff;
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:700px) {
+
+  .behaviour-summary {
+    padding: 13px;
+  }
+
+  .behaviour-summary-main {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+  .details-button {
+    width: 100%;
+  }
+
+  .vaccination-summary {
+    padding: 13px;
+  }
+
+  .vaccination-summary-info {
+    grid-template-columns:
+      1fr;
+
+    gap: 11px;
+  }
+
+  .detail-modal {
+    align-items:
+      flex-start;
+
+    padding: 10px;
+  }
+
+  .detail-modal-card {
+    max-height:
+      calc(100vh - 20px);
+
+    border-radius: 15px;
+  }
+
+  .detail-modal-header {
+    padding:
+      16px 17px;
+  }
+
+  .detail-modal-body {
+    padding:
+      16px 17px 18px;
+  }
+
+  .vaccination-modal-card {
+    width: 100%;
+  }
+
+  .vaccination-table-wrap {
+    max-height: 58vh;
+  }
+
+}
