@@ -441,19 +441,6 @@ if (window.QRCode) {
 
 } // end of renderProfile()
 
-
-// Behaviour popup
-function openBehaviourDetails() {
-    // complete function goes here
-}
-
-
-// Vaccination popup
-function openVaccinationDetails() {
-    // complete function goes here
-}
-
-
 // Close popup
 function closeDetailModal() {
     const modal = document.getElementById("detailModal");
@@ -461,6 +448,21 @@ function closeDetailModal() {
     if (modal) {
         modal.remove();
     }
+}
+
+// Actual Behaviour popup
+function openBehaviourDetails() {
+    const a = getAnimal();
+
+    // rest of your Behaviour code...
+}
+
+
+// Actual Vaccination popup
+function openVaccinationDetails() {
+    const a = getAnimal();
+
+    // rest of your Vaccination code...
 }
 
 function openBehaviourDetails() {
