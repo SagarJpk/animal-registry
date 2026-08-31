@@ -422,24 +422,41 @@ function renderProfile() {
   `;
 
 
-  <!-- QR CODE -->
+ // QR CODE
 
-  if (window.QRCode) {
+if (window.QRCode) {
+  const url =
+    `${location.origin}${location.pathname}?id=${encodeURIComponent(a.id)}`;
 
-    const url =
-      `${location.origin}${location.pathname}?id=${encodeURIComponent(a.id)}`;
+  new QRCode(
+    document.getElementById('qrcode'),
+    {
+      text: url,
+      width: 90,
+      height: 90,
+      correctLevel: QRCode.CorrectLevel.M
+    }
+  );
+}
 
-    new QRCode(
-      document.getElementById('qrcode'),
-      {
-        text: url,
-        width: 90,
-        height: 90,
-        correctLevel: QRCode.CorrectLevel.M
-      }
-    );
+} // end of renderProfile()
 
-  }
+
+// Behaviour popup
+function openBehaviourDetails() {
+    // complete function goes here
+}
+
+
+// Vaccination popup
+function openVaccinationDetails() {
+    // complete function goes here
+}
+
+
+// Close popup
+function closeDetailModal() {
+    // complete function goes here
 }
 
 function openBehaviourDetails() {
