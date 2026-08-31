@@ -22,28 +22,46 @@ function detail(label, value) {
   `;
 }
 
-function behaviourSection(a) {
+function behaviourSummary(a) {
   const traits = Array.isArray(a.traits) ? a.traits : [];
+  const previewTraits = traits.slice(0, 4);
 
-  const traitHTML = traits.length
-    ? traits.map(trait => `
+  const traitHTML = previewTraits.length
+    ? previewTraits.map(trait => `
         <span class="trait-chip">${esc(trait)}</span>
       `).join('')
     : `<span class="trait-empty">No behaviour traits added</span>`;
 
+  const moreCount = traits.length > 4
+    ? `<span class="trait-more">+${traits.length - 4} more</span>`
+    : '';
+
   return `
     <section class="section">
-      <div class="section-title">🧠 Behaviour & Temperament</div>
 
-      <div class="behaviour-box">
+      <div class="section-title">
+        🧠 Behaviour & Temperament
+      </div>
 
-        <div class="behaviour-main">
+      <div class="behaviour-summary">
+
+        <div class="behaviour-summary-main">
+
           <div>
             <span class="label">Overall Behaviour</span>
+
             <strong class="behaviour-value">
               ${esc(a.behaviour || 'Not Added')}
             </strong>
           </div>
+
+          <button
+            type="button"
+            class="details-button"
+            onclick="openBehaviourDetails()">
+            View Details
+          </button>
+
         </div>
 
         <div class="traits-heading">
@@ -52,9 +70,73 @@ function behaviourSection(a) {
 
         <div class="trait-list">
           ${traitHTML}
+          ${moreCount}
         </div>
 
       </div>
+
+    </section>
+  `;
+}
+
+
+function vaccinationSummary(a) {
+
+  const vaccinations =
+    Array.isArray(a.vaccinations)
+      ? a.vaccinations
+      : [];
+
+  const latest =
+    vaccinations.length
+      ? vaccinations[vaccinations.length - 1]
+      : null;
+
+  return `
+    <section class="section">
+
+      <div class="section-title">
+        💉 Vaccination Records
+      </div>
+
+      <div class="vaccination-summary">
+
+        <div class="vaccination-summary-info">
+
+          <div class="summary-stat">
+            <span class="label">Total Records</span>
+            <strong>${vaccinations.length}</strong>
+          </div>
+
+          <div class="summary-stat">
+            <span class="label">Latest Vaccine</span>
+
+            <strong>
+              ${latest ? esc(latest[0]) : 'Not Done'}
+            </strong>
+          </div>
+
+          <div class="summary-stat">
+            <span class="label">Next Due</span>
+
+            <strong>
+              ${latest && latest[2]
+                ? esc(latest[2])
+                : 'Not Added'}
+            </strong>
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="details-button"
+          onclick="openVaccinationDetails()">
+          View Full History
+        </button>
+
+      </div>
+
     </section>
   `;
 }
@@ -219,40 +301,12 @@ function renderProfile() {
         </section>
 
 
-        <!-- BEHAVIOUR -->
-        ${behaviourSection(a)}
+       <!-- BEHAVIOUR SUMMARY -->
+          ${behaviourSummary(a)}
 
 
-        <!-- VACCINATION -->
-        <section class="section">
-
-          <div class="section-title">
-            💉 Vaccination Records
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>Vaccine / Record</th>
-                  <th>Date</th>
-                  <th>Next Due</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                ${vaccineRows}
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </section>
-
+       <!-- VACCINATION SUMMARY -->
+          ${vaccinationSummary(a)}
 
         <!-- LOCATION -->
         <section class="section">
@@ -386,6 +440,375 @@ function renderProfile() {
     );
 
   }
+}
+
+function openBehaviourDetails() {
+
+  const a = getAnimal();
+
+  const existing =
+    document.getElementById("behaviourDetails");
+
+  if (existing) {
+    existing.remove();
+    return;
+  }
+
+  const traits =
+    Array.isArray(a.traits)
+      ? a.traits
+      : [];
+
+  const traitHTML = traits.length
+    ? traits.map(trait => `
+        <span class="trait-chip trait-chip-large">
+          ${esc(trait)}
+        </span>
+      `).join('')
+    : `
+        <div class="trait-empty">
+          No behaviour traits have been added.
+        </div>
+      `;
+
+
+  const notes = a.behaviourNotes
+    ? `
+        <div class="behaviour-notes">
+
+          <span class="label">
+            Additional Notes
+          </span>
+
+          <p>
+            ${esc(a.behaviourNotes)}
+          </p>
+
+        </div>
+      `
+    : '';
+
+
+  const modal = document.createElement("div");
+
+  modal.id = "behaviourDetails";
+  modal.className = "detail-modal";
+
+
+  modal.innerHTML = `
+
+    <div class="detail-modal-card">
+
+      <div class="detail-modal-header">
+
+        <div class="detail-modal-title">
+
+          <div class="detail-modal-icon">
+            🧠
+          </div>
+
+          <div>
+
+            <h3>
+              Behaviour & Temperament
+            </h3>
+
+            <p>
+              ${esc(a.name)}
+              •
+              ${esc(a.animalId)}
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="detail-modal-close"
+          onclick="closeDetailModal('behaviourDetails')">
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="detail-modal-body">
+
+        <div class="behaviour-overall-card">
+
+          <span class="label">
+            Overall Behaviour
+          </span>
+
+          <strong>
+            ${esc(a.behaviour || 'Not Added')}
+          </strong>
+
+        </div>
+
+
+        <div class="modal-subtitle">
+          Behaviour Traits
+        </div>
+
+
+        <div class="modal-trait-list">
+          ${traitHTML}
+        </div>
+
+
+        ${notes}
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(modal);
+
+  setupDetailModal(modal);
+}
+
+function openVaccinationDetails() {
+
+  const a = getAnimal();
+
+  const existing =
+    document.getElementById("vaccinationDetails");
+
+  if (existing) {
+    existing.remove();
+    return;
+  }
+
+
+  const vaccinations =
+    Array.isArray(a.vaccinations)
+      ? a.vaccinations
+      : [];
+
+
+  const vaccineRows = vaccinations.length
+
+    ? vaccinations.map((v, i) => `
+
+        <tr class="${
+          i === vaccinations.length - 1
+            ? 'latest'
+            : ''
+        }">
+
+          <td>${esc(v[0])}</td>
+
+          <td>${esc(v[1])}</td>
+
+          <td>${esc(v[2])}</td>
+
+          <td>
+
+            <span class="vaccine-status">
+              ${esc(v[3])}
+            </span>
+
+          </td>
+
+        </tr>
+
+      `).join('')
+
+    : `
+
+        <tr>
+
+          <td
+            colspan="4"
+            class="empty-row">
+
+            Vaccination: Not Done
+
+          </td>
+
+        </tr>
+
+      `;
+
+
+  const modal =
+    document.createElement("div");
+
+  modal.id = "vaccinationDetails";
+  modal.className = "detail-modal";
+
+
+  modal.innerHTML = `
+
+    <div
+      class="detail-modal-card vaccination-modal-card">
+
+      <div class="detail-modal-header">
+
+        <div class="detail-modal-title">
+
+          <div class="detail-modal-icon">
+            💉
+          </div>
+
+          <div>
+
+            <h3>
+              Vaccination Records
+            </h3>
+
+            <p>
+              ${esc(a.name)}
+              •
+              ${vaccinations.length}
+              record${vaccinations.length === 1 ? '' : 's'}
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="detail-modal-close"
+          onclick="closeDetailModal('vaccinationDetails')">
+          ×
+        </button>
+
+      </div>
+
+
+      <div
+        class="detail-modal-body vaccination-modal-body">
+
+        <div class="vaccination-count">
+
+          <strong>
+            ${vaccinations.length}
+          </strong>
+
+          <span>
+            vaccination record${
+              vaccinations.length === 1
+                ? ''
+                : 's'
+            }
+          </span>
+
+        </div>
+
+
+        <div
+          class="table-wrap vaccination-table-wrap">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Vaccine / Record
+                </th>
+
+                <th>
+                  Date
+                </th>
+
+                <th>
+                  Next Due
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              ${vaccineRows}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+function closeDetailModal(id) {
+
+  const modal =
+    document.getElementById(id);
+
+  if (modal) {
+    modal.remove();
+  }
+}
+
+
+function setupDetailModal(modal) {
+
+  /* Click outside */
+
+  modal.addEventListener(
+    "click",
+    function(e) {
+
+      if (e.target === modal) {
+        modal.remove();
+      }
+
+    }
+  );
+
+
+  /* ESC key */
+
+  function escHandler(e) {
+
+    if (e.key === "Escape") {
+
+      if (
+        document.getElementById(modal.id)
+      ) {
+        modal.remove();
+      }
+
+      document.removeEventListener(
+        "keydown",
+        escHandler
+      );
+
+    }
+
+  }
+
+
+  document.addEventListener(
+    "keydown",
+    escHandler
+  );
+}
+  
+  document.body.appendChild(modal);
+
+  setupDetailModal(modal);
 }
 
 function openChangeRequest() {
