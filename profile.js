@@ -443,11 +443,11 @@ if (window.QRCode) {
 
 // Close popup
 function closeDetailModal() {
-    const modal = document.getElementById("detailModal");
+  const modal = document.querySelector(".detail-modal");
 
-    if (modal) {
-        modal.remove();
-    }
+  if (modal) {
+    modal.remove();
+  }
 }
 
 // =========================================================
@@ -491,7 +491,6 @@ function openBehaviourDetails() {
         <button
           type="button"
           class="detail-modal-close"
-          onclick="closeDetailModal()"
           aria-label="Close">
           ×
         </button>
@@ -531,14 +530,23 @@ function openBehaviourDetails() {
     </div>
   `;
 
-  document.body.appendChild(modal);
+document.body.appendChild(modal);
 
-  modal.addEventListener("click", function(e) {
-    if (e.target === modal) {
-      closeDetailModal();
-    }
+// Close button
+const closeButton = modal.querySelector(".detail-modal-close");
+
+if (closeButton) {
+  closeButton.addEventListener("click", function() {
+    modal.remove();
   });
 }
+
+// Close when clicking outside the popup
+modal.addEventListener("click", function(e) {
+  if (e.target === modal) {
+    modal.remove();
+  }
+});
 
 
 // =========================================================
@@ -597,7 +605,6 @@ function openVaccinationDetails() {
         <button
           type="button"
           class="detail-modal-close"
-          onclick="closeDetailModal()"
           aria-label="Close">
           ×
         </button>
@@ -635,11 +642,22 @@ function openVaccinationDetails() {
 
   document.body.appendChild(modal);
 
-  modal.addEventListener("click", function(e) {
-    if (e.target === modal) {
-      closeDetailModal();
-    }
+// Close button
+const closeButton = modal.querySelector(".detail-modal-close");
+
+if (closeButton) {
+  closeButton.addEventListener("click", function() {
+    modal.remove();
   });
+}
+
+// Close when clicking outside the popup
+modal.addEventListener("click", function(e) {
+  if (e.target === modal) {
+    modal.remove();
+  }
+});
+  
 }
 
 function openBehaviourDetails() {
