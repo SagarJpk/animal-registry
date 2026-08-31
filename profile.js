@@ -450,19 +450,196 @@ function closeDetailModal() {
     }
 }
 
-// Actual Behaviour popup
-function openBehaviourDetails() {
-    const a = getAnimal();
+// =========================================================
+// BEHAVIOUR & TEMPERAMENT POPUP
+// =========================================================
 
-    // rest of your Behaviour code...
+function openBehaviourDetails() {
+  const a = getAnimal();
+
+  const traits = Array.isArray(a.behaviourTraits)
+    ? a.behaviourTraits
+    : [];
+
+  const traitsHtml = traits.length
+    ? traits.map(trait =>
+        `<span class="trait-pill">${esc(trait)}</span>`
+      ).join('')
+    : `<span class="not-added">No behaviour traits added.</span>`;
+
+  const modal = document.createElement("div");
+
+  modal.id = "detailModal";
+  modal.className = "detail-modal";
+
+  modal.innerHTML = `
+    <div class="detail-modal-card">
+
+      <div class="detail-modal-header">
+
+        <div class="detail-modal-title">
+
+          <div class="detail-modal-icon">🧠</div>
+
+          <div>
+            <h3>Behaviour & Temperament</h3>
+            <p>${esc(a.name)} • ${esc(a.animalId)}</p>
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="detail-modal-close"
+          onclick="closeDetailModal()"
+          aria-label="Close">
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="detail-modal-body">
+
+        <div class="behaviour-overall">
+
+          <span class="detail-small-label">
+            OVERALL BEHAVIOUR
+          </span>
+
+          <strong>
+            ${esc(a.behaviour || "Not Added")}
+          </strong>
+
+        </div>
+
+
+        <div class="traits-section">
+
+          <span class="detail-small-label">
+            BEHAVIOUR TRAITS
+          </span>
+
+          <div class="traits-list">
+            ${traitsHtml}
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.addEventListener("click", function(e) {
+    if (e.target === modal) {
+      closeDetailModal();
+    }
+  });
 }
 
 
-// Actual Vaccination popup
-function openVaccinationDetails() {
-    const a = getAnimal();
+// =========================================================
+// VACCINATION DETAILS POPUP
+// =========================================================
 
-    // rest of your Vaccination code...
+function openVaccinationDetails() {
+  const a = getAnimal();
+
+  const vaccinations = Array.isArray(a.vaccinations)
+    ? a.vaccinations
+    : [];
+
+  const rows = vaccinations.length
+    ? vaccinations.map(v => `
+        <tr>
+          <td>${esc(v[0])}</td>
+          <td>${esc(v[1])}</td>
+          <td>${esc(v[2])}</td>
+          <td>
+            <span class="vaccine-status">
+              ${esc(v[3])}
+            </span>
+          </td>
+        </tr>
+      `).join('')
+    : `
+        <tr>
+          <td colspan="4" class="empty-row">
+            No vaccination records added.
+          </td>
+        </tr>
+      `;
+
+  const modal = document.createElement("div");
+
+  modal.id = "detailModal";
+  modal.className = "detail-modal";
+
+  modal.innerHTML = `
+    <div class="detail-modal-card vaccination-modal">
+
+      <div class="detail-modal-header">
+
+        <div class="detail-modal-title">
+
+          <div class="detail-modal-icon">💉</div>
+
+          <div>
+            <h3>Vaccination Records</h3>
+            <p>${esc(a.name)} • ${esc(a.animalId)}</p>
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="detail-modal-close"
+          onclick="closeDetailModal()"
+          aria-label="Close">
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="detail-modal-body">
+
+        <div class="vaccination-table-wrap">
+
+          <table class="vaccination-popup-table">
+
+            <thead>
+              <tr>
+                <th>Vaccine / Record</th>
+                <th>Date</th>
+                <th>Next Due</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${rows}
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.addEventListener("click", function(e) {
+    if (e.target === modal) {
+      closeDetailModal();
+    }
+  });
 }
 
 function openBehaviourDetails() {
