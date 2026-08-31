@@ -456,7 +456,11 @@ function openVaccinationDetails() {
 
 // Close popup
 function closeDetailModal() {
-    // complete function goes here
+    const modal = document.getElementById("detailModal");
+
+    if (modal) {
+        modal.remove();
+    }
 }
 
 function openBehaviourDetails() {
