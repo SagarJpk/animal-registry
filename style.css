@@ -293,6 +293,10 @@ a {
 }
 
 
+/* =========================================================
+   BRAND LOGO
+   ========================================================= */
+
 .logo {
   width: 54px;
   height: 54px;
@@ -302,12 +306,25 @@ a {
 
   flex-shrink: 0;
 
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
+  /* Clean floating logo, no box */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
 
-  font-size: 32px;
+  /* Make the paw clearly visible */
+  font-size: 36px;
+  line-height: 1;
+
+  /* Subtle depth without creating a box */
+  filter:
+    drop-shadow(0 3px 5px rgba(0, 0, 0, 0.28))
+    drop-shadow(0 0 8px rgba(255, 255, 255, 0.12));
+
+  transform: translateY(-1px);
+
+  position: relative;
+  z-index: 2;
 }
 
 .header h1 {
@@ -3102,7 +3119,7 @@ textarea:focus-visible {
    SMALL MOBILE
    ========================================================= */
 
-@media (max-width: 500px) {
+@media (max-width: 720px) {
 
   body {
 
@@ -3127,13 +3144,20 @@ textarea:focus-visible {
 
 
  .logo {
-  width: 44px;
-  height: 44px;
+    width: 44px;
+    height: 44px;
 
-  border-radius: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
 
-  font-size: 26px;
-}
+    font-size: 30px;
+
+    filter:
+      drop-shadow(0 2px 4px rgba(0, 0, 0, 0.28))
+      drop-shadow(0 0 6px rgba(255, 255, 255, 0.12));
+  }
 
   .header h1 {
 
