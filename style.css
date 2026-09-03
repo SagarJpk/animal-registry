@@ -223,6 +223,8 @@ a {
 
   color: #ffffff;
 
+  box-sizing: border-box;
+
 }
 
 
