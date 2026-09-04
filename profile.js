@@ -110,12 +110,13 @@ async function loadAnimalFromSupabase() {
     let query =
       supabaseClient
         .from("animals")
-        .select(`
-          *,
-          owners (*),
-          behaviour_traits (*),
-          vaccinations (*)
-        `);
+       .select(`
+  *,
+  owners (*),
+  behaviour_traits (*),
+  vaccinations (*),
+  weight_history (*)
+`);
 
 
     // UUID from index.html
@@ -214,6 +215,15 @@ async function loadAnimalFromSupabase() {
       Array.isArray(data.vaccinations)
         ? data.vaccinations
         : [];
+
+    // =======================================================
+    // WEIGHT HISTORY
+    // =======================================================
+
+     const weightRecords =
+       Array.isArray(data.weight_history)
+       ? data.weight_history
+       : [];
 
 
     // =======================================================
@@ -341,7 +351,22 @@ async function loadAnimalFromSupabase() {
             v.status ||
               "RECORDED"
 
-          ])
+          ]),
+
+          weightHistory:
+      weightRecords
+        .sort((a, b) =>
+          String(b.recorded_date || "")
+            .localeCompare(
+              String(a.recorded_date || "")
+            )
+        )
+        .map(w => ({
+          date: w.recorded_date || "",
+          weight: w.weight ?? "",
+          unit: w.unit || "kg",
+          notes: w.notes || ""
+        }))
 
     };
 
@@ -2556,6 +2581,188 @@ function openChangeRequest() {
 
 }
 
+// =========================================================
+// WEIGHT HISTORY DISPLAY
+// =========================================================
+
+function renderWeightHistory() {
+
+  if (!currentAnimal) return;
+
+  const content =
+    document.querySelector(".content");
+
+  if (!content) return;
+
+
+  // Prevent duplicate section
+  const existing =
+    document.getElementById(
+      "weightHistorySection"
+    );
+
+  if (existing) {
+    existing.remove();
+  }
+
+
+  const records =
+    Array.isArray(currentAnimal.weightHistory)
+      ? currentAnimal.weightHistory
+      : [];
+
+
+  const section =
+    document.createElement("section");
+
+  section.id =
+    "weightHistorySection";
+
+  section.className =
+    "section";
+
+
+  if (!records.length) {
+
+    section.innerHTML = `
+
+      <div class="section-title">
+        <span>⚖️</span>
+        Weight History
+      </div>
+
+      <div class="panel">
+
+        <div class="muted">
+          No weight records added.
+        </div>
+
+      </div>
+
+    `;
+
+  } else {
+
+    const latest =
+      records[0];
+
+
+    section.innerHTML = `
+
+      <div class="section-title">
+        <span>⚖️</span>
+        Weight History
+      </div>
+
+
+      <div class="panel">
+
+        <div class="weight-latest">
+
+          <div>
+
+            <div class="label">
+              Latest Weight
+            </div>
+
+            <div class="weight-value">
+              ${esc(latest.weight)}
+              ${esc(latest.unit)}
+            </div>
+
+          </div>
+
+
+          <div class="weight-date">
+
+            <div class="label">
+              Recorded
+            </div>
+
+            <strong>
+              ${esc(formatDisplayDate(latest.date))}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        ${
+          records.length > 1
+            ? `
+
+              <div class="weight-history-list">
+
+                ${records.map(record => `
+
+                  <div class="weight-row">
+
+                    <div>
+                      <strong>
+                        ${esc(record.weight)}
+                        ${esc(record.unit)}
+                      </strong>
+
+                      ${
+                        record.notes
+                          ? `<small>${esc(record.notes)}</small>`
+                          : ""
+                      }
+
+                    </div>
+
+                    <span>
+                      ${esc(formatDisplayDate(record.date))}
+                    </span>
+
+                  </div>
+
+                `).join("")}
+
+              </div>
+
+            `
+            : ""
+        }
+
+      </div>
+
+    `;
+
+  }
+
+
+  content.appendChild(section);
+
+}
+
+
+// =========================================================
+// DATE FORMAT
+// =========================================================
+
+function formatDisplayDate(value) {
+
+  if (!value) return "Not Added";
+
+  const date =
+    new Date(value + "T00:00:00");
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString(
+    "en-GB",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }
+  );
+
+}
 
 // =========================================================
 // START PROFILE
