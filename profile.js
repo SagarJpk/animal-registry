@@ -1,18 +1,21 @@
 // =========================================================
 // ANIMAL DIGITAL ID - PROFILE.JS
 // =========================================================
+// Supabase-powered animal profile
+// =========================================================
+
 
 // =========================================================
 // SUPABASE CONFIGURATION
 // =========================================================
 
-const SUPABASE_URL = "https://qnlatfajpbyefxyyehna.supabase.co";
+const SUPABASE_URL =
+  "https://qnlatfajpbyefxyyehna.supabase.co";
 
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_w9-d4xchiCpeOnKRas_u2Q_wrFVPOwf";
 
 let supabaseClient = null;
-
 let currentAnimal = null;
 
 
@@ -47,19 +50,26 @@ function loadSupabaseLibrary() {
 
 }
 
+
 // =========================================================
 // HTML ESCAPE
 // =========================================================
 
-function esc(v = "") {
-  return String(v).replace(/[&<>"']/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[c]));
+function esc(value = "") {
+
+  return String(value).replace(
+    /[&<>"']/g,
+    character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[character])
+  );
+
 }
+
 
 // =========================================================
 // GET CURRENT ANIMAL
@@ -71,6 +81,7 @@ function getAnimal() {
 
 }
 
+
 // =========================================================
 // LOAD ANIMAL FROM SUPABASE
 // =========================================================
@@ -78,6 +89,10 @@ function getAnimal() {
 async function loadAnimalFromSupabase() {
 
   try {
+
+    // -------------------------------------------------------
+    // Load Supabase
+    // -------------------------------------------------------
 
     await loadSupabaseLibrary();
 
@@ -87,6 +102,10 @@ async function loadAnimalFromSupabase() {
         SUPABASE_PUBLISHABLE_KEY
       );
 
+
+    // -------------------------------------------------------
+    // Get requested ID
+    // -------------------------------------------------------
 
     const requestedId =
       new URLSearchParams(location.search).get("id");
@@ -103,28 +122,30 @@ async function loadAnimalFromSupabase() {
     }
 
 
-    // =======================================================
-    // LOAD ANIMAL
-    // =======================================================
+    // -------------------------------------------------------
+    // Load animal
+    // -------------------------------------------------------
 
     let query =
       supabaseClient
         .from("animals")
-       .select(`
-  *,
-  owners (*),
-  behaviour_traits (*),
-  vaccinations (*),
-  weight_history (*)
-`);
+        .select(`
+          *,
+          owners (*),
+          behaviour_traits (*),
+          vaccinations (*)
+        `);
 
 
-    // UUID from index.html
-    if (
-      requestedId.match(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-      )
-    ) {
+    // -------------------------------------------------------
+    // UUID
+    // -------------------------------------------------------
+
+    const uuidPattern =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+
+    if (uuidPattern.test(requestedId)) {
 
       query =
         query.eq(
@@ -132,10 +153,13 @@ async function loadAnimalFromSupabase() {
           requestedId
         );
 
-    } else {
+    }
 
-      // Also allow Animal ID such as:
-      // ANM-KA-2024-0016503
+    // -------------------------------------------------------
+    // Animal ID
+    // -------------------------------------------------------
+
+    else {
 
       query =
         query.eq(
@@ -146,15 +170,19 @@ async function loadAnimalFromSupabase() {
     }
 
 
+    // -------------------------------------------------------
+    // Execute animal query
+    // -------------------------------------------------------
+
     const {
       data,
       error
     } = await query.maybeSingle();
 
 
-    // =======================================================
-    // ERROR
-    // =======================================================
+    // -------------------------------------------------------
+    // Handle error
+    // -------------------------------------------------------
 
     if (error) {
 
@@ -172,9 +200,9 @@ async function loadAnimalFromSupabase() {
     }
 
 
-    // =======================================================
-    // ANIMAL NOT FOUND
-    // =======================================================
+    // -------------------------------------------------------
+    // Animal not found
+    // -------------------------------------------------------
 
     if (!data) {
 
@@ -185,6 +213,12 @@ async function loadAnimalFromSupabase() {
       return;
 
     }
+
+
+    console.log(
+      "Animal loaded from Supabase:",
+      data
+    );
 
 
     // =======================================================
@@ -213,17 +247,79 @@ async function loadAnimalFromSupabase() {
 
     const vaccinationRecords =
       Array.isArray(data.vaccinations)
-        ? data.vaccinations
+        ? [...data.vaccinations]
         : [];
+
+
+    // Sort vaccinations oldest to newest
+    vaccinationRecords.sort(
+      (a, b) =>
+        String(a.vaccination_date || "")
+          .localeCompare(
+            String(b.vaccination_date || "")
+          )
+    );
+
 
     // =======================================================
     // WEIGHT HISTORY
     // =======================================================
+    // IMPORTANT:
+    // Weight history is intentionally queried separately.
+    // This avoids relying on the nested Supabase relationship.
+    // =======================================================
 
-     const weightRecords =
-       Array.isArray(data.weight_history)
-       ? data.weight_history
-       : [];
+    let weightRecords = [];
+
+    try {
+
+      const {
+        data: weightData,
+        error: weightError
+      } =
+        await supabaseClient
+          .from("weight_history")
+          .select("*")
+          .eq("animal_id", data.id)
+          .order(
+            "recorded_date",
+            {
+              ascending: false
+            }
+          );
+
+      if (weightError) {
+
+        console.error(
+          "Weight history loading error:",
+          weightError
+        );
+
+      }
+      else {
+
+        weightRecords =
+          Array.isArray(weightData)
+            ? weightData
+            : [];
+
+      }
+
+    }
+    catch (weightError) {
+
+      console.error(
+        "Weight history exception:",
+        weightError
+      );
+
+    }
+
+
+    console.log(
+      "Weight records loaded:",
+      weightRecords
+    );
 
 
     // =======================================================
@@ -255,9 +351,33 @@ async function loadAnimalFromSupabase() {
     }
 
 
+    // Add additional trait fields if present
+    if (
+      behaviourRecord &&
+      Array.isArray(behaviourRecord.traits)
+    ) {
+
+      behaviourRecord.traits.forEach(
+        trait => {
+
+          if (
+            trait &&
+            !traits.includes(trait)
+          ) {
+
+            traits.push(trait);
+
+          }
+
+        }
+      );
+
+    }
+
+
     // =======================================================
     // CONVERT SUPABASE DATA
-    // TO EXISTING PROFILE FORMAT
+    // TO PROFILE FORMAT
     // =======================================================
 
     currentAnimal = {
@@ -327,46 +447,41 @@ async function loadAnimalFromSupabase() {
         "ACTIVE RECORD",
 
       vaccinations:
-        vaccinationRecords
-          .sort((a, b) =>
-            String(
-              a.vaccination_date || ""
-            ).localeCompare(
-              String(
-                b.vaccination_date || ""
-              )
-            )
-          )
-          .map(v => [
+        vaccinationRecords.map(
+          vaccination => [
 
-            v.vaccine_name ||
+            vaccination.vaccine_name ||
               "Not Added",
 
-            v.vaccination_date ||
+            vaccination.vaccination_date ||
               "",
 
-            v.next_due_date ||
+            vaccination.next_due_date ||
               "",
 
-            v.status ||
+            vaccination.status ||
               "RECORDED"
 
-          ]),
+          ]
+        ),
 
-          weightHistory:
-      weightRecords
-        .sort((a, b) =>
-          String(b.recorded_date || "")
-            .localeCompare(
-              String(a.recorded_date || "")
-            )
-        )
-        .map(w => ({
-          date: w.recorded_date || "",
-          weight: w.weight ?? "",
-          unit: w.unit || "kg",
-          notes: w.notes || ""
-        }))
+      weightHistory:
+        weightRecords
+          .map(weight => ({
+
+            date:
+              weight.recorded_date || "",
+
+            weight:
+              weight.weight ?? "",
+
+            unit:
+              weight.unit || "kg",
+
+            notes:
+              weight.notes || ""
+
+          }))
 
     };
 
@@ -376,9 +491,9 @@ async function loadAnimalFromSupabase() {
     // =======================================================
 
     renderProfile();
-    renderWeightHistory();
 
-  } catch (error) {
+  }
+  catch (error) {
 
     console.error(
       "Profile initialization error:",
@@ -413,10 +528,18 @@ function showProfileError(message) {
 
         <main
           class="content"
-          style="text-align:center;padding:60px 30px;"
+          style="
+            text-align:center;
+            padding:60px 30px;
+          "
         >
 
-          <div style="font-size:42px;margin-bottom:15px;">
+          <div
+            style="
+              font-size:42px;
+              margin-bottom:15px;
+            "
+          >
             🐾
           </div>
 
@@ -424,7 +547,11 @@ function showProfileError(message) {
             Animal Profile
           </h2>
 
-          <p style="color:var(--muted);">
+          <p
+            style="
+              color:var(--muted);
+            "
+          >
             ${esc(message)}
           </p>
 
@@ -445,6 +572,7 @@ function showProfileError(message) {
 
 }
 
+
 // =========================================================
 // DETAIL FIELD
 // =========================================================
@@ -452,15 +580,19 @@ function showProfileError(message) {
 function detail(label, value) {
 
   return `
+
     <div class="detail">
+
       <span class="label">
         ${esc(label)}
       </span>
 
       <span class="value">
-        ${esc(value || 'Not Added')}
+        ${esc(value || "Not Added")}
       </span>
+
     </div>
+
   `;
 
 }
@@ -468,19 +600,24 @@ function detail(label, value) {
 
 // =========================================================
 // GET BEHAVIOUR TRAITS
-// Supports both:
-// traits
-// behaviourTraits
 // =========================================================
 
 function getBehaviourTraits(a) {
 
-  if (Array.isArray(a.behaviourTraits)) {
+  if (
+    Array.isArray(a.behaviourTraits)
+  ) {
+
     return a.behaviourTraits;
+
   }
 
-  if (Array.isArray(a.traits)) {
+  if (
+    Array.isArray(a.traits)
+  ) {
+
     return a.traits;
+
   }
 
   return [];
@@ -494,7 +631,8 @@ function getBehaviourTraits(a) {
 
 function behaviourSummary(a) {
 
-  const traits = getBehaviourTraits(a);
+  const traits =
+    getBehaviourTraits(a);
 
   const previewTraits =
     traits.slice(0, 4);
@@ -503,16 +641,24 @@ function behaviourSummary(a) {
   const traitHTML =
     previewTraits.length
 
-      ? previewTraits.map(trait => `
-          <span class="trait-chip">
-            ${esc(trait)}
-          </span>
-        `).join('')
+      ? previewTraits
+          .map(
+            trait => `
+
+              <span class="trait-chip">
+                ${esc(trait)}
+              </span>
+
+            `
+          )
+          .join("")
 
       : `
+
           <span class="trait-empty">
             No behaviour traits added
           </span>
+
         `;
 
 
@@ -520,12 +666,14 @@ function behaviourSummary(a) {
     traits.length > 4
 
       ? `
+
           <span class="trait-more">
             +${traits.length - 4} more
           </span>
+
         `
 
-      : '';
+      : "";
 
 
   return `
@@ -535,7 +683,6 @@ function behaviourSummary(a) {
       <div class="section-title">
         🧠 Behaviour & Temperament
       </div>
-
 
       <div class="behaviour-summary">
 
@@ -549,29 +696,26 @@ function behaviourSummary(a) {
 
             <strong class="behaviour-value">
               ${esc(
-                a.behaviour || 'Not Added'
+                a.behaviour ||
+                "Not Added"
               )}
             </strong>
 
           </div>
 
-
           <button
             type="button"
             class="details-button"
-            onclick="openBehaviourDetails()">
-
+            onclick="openBehaviourDetails()"
+          >
             View Details
-
           </button>
 
         </div>
 
-
         <div class="traits-heading">
           Behaviour Traits
         </div>
-
 
         <div class="trait-list">
 
@@ -604,7 +748,9 @@ function vaccinationSummary(a) {
 
   const latest =
     vaccinations.length
-      ? vaccinations[vaccinations.length - 1]
+      ? vaccinations[
+          vaccinations.length - 1
+        ]
       : null;
 
 
@@ -616,11 +762,9 @@ function vaccinationSummary(a) {
         💉 Vaccination Records
       </div>
 
-
       <div class="vaccination-summary">
 
         <div class="vaccination-summary-info">
-
 
           <div class="summary-stat">
 
@@ -634,7 +778,6 @@ function vaccinationSummary(a) {
 
           </div>
 
-
           <div class="summary-stat">
 
             <span class="label">
@@ -645,12 +788,11 @@ function vaccinationSummary(a) {
               ${
                 latest
                   ? esc(latest[0])
-                  : 'Not Done'
+                  : "Not Done"
               }
             </strong>
 
           </div>
-
 
           <div class="summary-stat">
 
@@ -659,30 +801,283 @@ function vaccinationSummary(a) {
             </span>
 
             <strong>
-
               ${
                 latest && latest[2]
                   ? esc(latest[2])
-                  : 'Not Added'
+                  : "Not Added"
               }
-
             </strong>
 
           </div>
 
-
         </div>
-
 
         <button
           type="button"
           class="details-button"
-          onclick="openVaccinationDetails()">
-
+          onclick="openVaccinationDetails()"
+        >
           View Full History
-
         </button>
 
+      </div>
+
+    </section>
+
+  `;
+
+}
+
+
+// =========================================================
+// WEIGHT HISTORY SUMMARY
+// =========================================================
+
+function weightHistorySummary(a) {
+
+  const records =
+    Array.isArray(a.weightHistory)
+      ? a.weightHistory
+      : [];
+
+
+  // -------------------------------------------------------
+  // No records
+  // -------------------------------------------------------
+
+  if (!records.length) {
+
+    return `
+
+      <section
+        class="section"
+        id="weightHistorySection"
+      >
+
+        <div class="section-title">
+          ⚖️ Weight History
+        </div>
+
+        <div
+          class="panel"
+          style="
+            padding:20px;
+            border-radius:16px;
+          "
+        >
+
+          <div
+            class="muted"
+            style="color:var(--muted);"
+          >
+            No weight records added.
+          </div>
+
+        </div>
+
+      </section>
+
+    `;
+
+  }
+
+
+  // -------------------------------------------------------
+  // Latest record
+  // -------------------------------------------------------
+
+  const latest =
+    records[0];
+
+
+  // -------------------------------------------------------
+  // History rows
+  // -------------------------------------------------------
+
+  const historyRows =
+    records
+      .map(
+        record => `
+
+          <div
+            class="weight-row"
+            style="
+              display:flex;
+              justify-content:space-between;
+              align-items:center;
+              gap:15px;
+              padding:12px 0;
+              border-bottom:1px solid rgba(0,0,0,0.06);
+            "
+          >
+
+            <div>
+
+              <strong>
+                ${esc(record.weight)}
+                ${esc(record.unit)}
+              </strong>
+
+              ${
+                record.notes
+                  ? `
+
+                      <small
+                        style="
+                          display:block;
+                          margin-top:4px;
+                          color:var(--muted);
+                        "
+                      >
+                        ${esc(record.notes)}
+                      </small>
+
+                    `
+                  : ""
+              }
+
+            </div>
+
+            <span
+              style="
+                font-size:12px;
+                color:var(--muted);
+                white-space:nowrap;
+              "
+            >
+              ${esc(
+                formatDisplayDate(
+                  record.date
+                )
+              )}
+            </span>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  // -------------------------------------------------------
+  // Weight section
+  // -------------------------------------------------------
+
+  return `
+
+    <section
+      class="section"
+      id="weightHistorySection"
+    >
+
+      <div class="section-title">
+        ⚖️ Weight History
+      </div>
+
+      <div
+        class="panel"
+        style="
+          padding:20px;
+          border-radius:16px;
+        "
+      >
+
+        <!-- Latest Weight -->
+
+        <div
+          class="weight-latest"
+          style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:20px;
+            margin-bottom:16px;
+            padding-bottom:16px;
+            border-bottom:1px solid rgba(0,0,0,0.08);
+          "
+        >
+
+          <div>
+
+            <div
+              class="label"
+              style="color:var(--muted);"
+            >
+              Latest Weight
+            </div>
+
+            <div
+              class="weight-value"
+              style="
+                font-size:28px;
+                font-weight:800;
+                margin-top:4px;
+              "
+            >
+              ${esc(latest.weight)}
+              ${esc(latest.unit)}
+            </div>
+
+          </div>
+
+          <div
+            class="weight-date"
+            style="text-align:right;"
+          >
+
+            <div
+              class="label"
+              style="color:var(--muted);"
+            >
+              Recorded
+            </div>
+
+            <strong>
+              ${esc(
+                formatDisplayDate(
+                  latest.date
+                )
+              )}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- Historical Records -->
+
+        ${
+          records.length > 1
+
+            ? `
+
+                <div
+                  class="weight-history-list"
+                >
+
+                  <div
+                    style="
+                      font-size:11px;
+                      font-weight:700;
+                      color:var(--muted);
+                      margin-bottom:6px;
+                      text-transform:uppercase;
+                      letter-spacing:.05em;
+                    "
+                  >
+                    Previous Records
+                  </div>
+
+                  ${historyRows}
+
+                </div>
+
+              `
+
+            : ""
+
+        }
 
       </div>
 
@@ -699,8 +1094,24 @@ function vaccinationSummary(a) {
 
 function renderProfile() {
 
-  const a = getAnimal();
+  const a =
+    getAnimal();
 
+
+  if (!a) {
+
+    showProfileError(
+      "Animal profile not available."
+    );
+
+    return;
+
+  }
+
+
+  // -------------------------------------------------------
+  // Browser title
+  // -------------------------------------------------------
 
   document.title =
     `${a.name} | Animal Digital ID`;
@@ -710,72 +1121,89 @@ function renderProfile() {
   // LOCATION BUTTON
   // =======================================================
 
-  const map = a.mapUrl
+  const map =
 
-    ? `
-        <a
-          class="button"
-          href="${esc(a.mapUrl)}"
-          target="_blank"
-          rel="noopener">
+    a.mapUrl
 
-          📍 View Location
+      ? `
 
-        </a>
-      `
+          <a
+            class="button"
+            href="${esc(a.mapUrl)}"
+            target="_blank"
+            rel="noopener"
+          >
+            📍 View Location
+          </a>
 
-    : `
-        <span class="button disabled">
+        `
 
-          📍 Location not added
+      : `
 
-        </span>
-      `;
+          <span
+            class="button disabled"
+          >
+            📍 Location not added
+          </span>
+
+        `;
 
 
   // =======================================================
   // PHONE
   // =======================================================
 
-  const phone = a.phone
+  const phone =
 
-    ? `
-        <a href="tel:${esc(a.phone)}">
-          ${esc(a.phone)}
-        </a>
-      `
+    a.phone
 
-    : `
-        <span>
-          Not Added
-        </span>
-      `;
+      ? `
+
+          <a href="tel:${esc(a.phone)}">
+            ${esc(a.phone)}
+          </a>
+
+        `
+
+      : `
+
+          <span>
+            Not Added
+          </span>
+
+        `;
 
 
   // =======================================================
   // ALTERNATE PHONE
   // =======================================================
 
-  const alternate = a.alternatePhone
+  const alternate =
 
-    ? `
-        <a href="tel:${esc(a.alternatePhone)}">
-          ${esc(a.alternatePhone)}
-        </a>
-      `
+    a.alternatePhone
 
-    : `
-        <span>
-          Not Added
-        </span>
-      `;
+      ? `
+
+          <a href="tel:${esc(a.alternatePhone)}">
+            ${esc(a.alternatePhone)}
+          </a>
+
+        `
+
+      : `
+
+          <span>
+            Not Added
+          </span>
+
+        `;
 
 
   // =======================================================
   // MAIN PROFILE HTML
   // =======================================================
 
-  document.getElementById('app').innerHTML = `
+  document.getElementById("app").innerHTML = `
 
     <div class="page">
 
@@ -788,13 +1216,11 @@ function renderProfile() {
 
         <header class="header">
 
-
           <div class="brand">
 
             <div class="logo">
               🐾
             </div>
-
 
             <div>
 
@@ -817,25 +1243,20 @@ function renderProfile() {
 
           <nav class="profile-actions">
 
-
             <a
               href="./index.html"
-              class="back-registry">
-
+              class="back-registry"
+            >
               ← Back to Registry
-
             </a>
-
 
             <button
               type="button"
               class="request-change-btn"
-              onclick="openChangeRequest()">
-
+              onclick="openChangeRequest()"
+            >
               📝 Request a Change
-
             </button>
-
 
           </nav>
 
@@ -846,13 +1267,11 @@ function renderProfile() {
 
           <div class="id-panel">
 
-
             <div>
 
               <div class="id-label">
                 Animal Identification Number
               </div>
-
 
               <div class="id-number">
                 ${esc(a.animalId)}
@@ -860,14 +1279,11 @@ function renderProfile() {
 
             </div>
 
-
             <div class="status">
               ✓ REGISTERED
             </div>
 
-
           </div>
-
 
         </header>
 
@@ -888,7 +1304,6 @@ function renderProfile() {
             <span>
               🛡️
             </span>
-
 
             <span>
 
@@ -911,27 +1326,23 @@ function renderProfile() {
           <section class="profile">
 
 
+            <!-- PHOTO -->
+
             <div class="photo-wrap">
 
-
               <div class="photo-frame">
-
 
                 <img
                   src="${esc(a.photo)}"
                   alt="${esc(a.name)}'s photograph"
-                  class="photo">
-
+                  class="photo"
+                >
 
                 <div class="registered">
-
                   ✓ ${esc(a.status)}
-
                 </div>
 
-
               </div>
-
 
               <div class="caption">
 
@@ -940,79 +1351,64 @@ function renderProfile() {
 
               </div>
 
-
             </div>
 
 
-            <!-- =================================================
-                 DETAILS
-            ================================================== -->
+            <!-- DETAILS -->
 
             <div class="details">
 
-
               ${detail(
-                'Animal Name',
+                "Animal Name",
                 a.name
               )}
 
-
               ${detail(
-                'Animal ID',
+                "Animal ID",
                 a.animalId
               )}
 
-
               ${detail(
-                'Type',
+                "Type",
                 a.type
               )}
 
-
               ${detail(
-                'Breed',
+                "Breed",
                 a.breed
               )}
 
-
               ${detail(
-                'Gender',
+                "Gender",
                 a.gender
               )}
 
-
               ${detail(
-                'Date of Birth',
+                "Date of Birth",
                 a.dob
               )}
 
-
               ${detail(
-                'Pet Parent',
+                "Pet Parent",
                 a.parent
               )}
 
-
               ${detail(
-                'Behaviour',
+                "Behaviour",
                 a.behaviour
               )}
 
-
               ${detail(
-                'Neutering Status',
+                "Neutering Status",
                 a.neutering
               )}
 
-
               ${detail(
-                'Record Status',
+                "Record Status",
                 a.status
               )}
 
-
             </div>
-
 
           </section>
 
@@ -1032,46 +1428,40 @@ function renderProfile() {
 
 
           <!-- =================================================
+               WEIGHT HISTORY
+          ================================================== -->
+
+          ${weightHistorySummary(a)}
+
+
+          <!-- =================================================
                LOCATION
           ================================================== -->
 
           <section class="section">
 
-
             <div class="section-title">
-
               📍 Registered Location
-
             </div>
 
-
             <div class="location-box">
-
 
               <div>
 
                 <div class="location-name">
-
                   ${esc(a.location)}
-
                 </div>
 
-
                 <div class="location-sub">
-
                   Registered location for
                   ${esc(a.name)}
-
                 </div>
 
               </div>
 
-
               ${map}
 
-
             </div>
-
 
           </section>
 
@@ -1082,16 +1472,11 @@ function renderProfile() {
 
           <section class="section">
 
-
             <div class="section-title">
-
               📞 Pet Parent & Emergency Information
-
             </div>
 
-
             <div class="owner-grid">
-
 
               <div class="contact">
 
@@ -1140,9 +1525,7 @@ function renderProfile() {
 
               </div>
 
-
             </div>
-
 
           </section>
 
@@ -1153,42 +1536,31 @@ function renderProfile() {
 
           <section class="verification">
 
-
             <div>
 
               <div class="verify-title">
-
                 🔎 Digital ID Verification
-
               </div>
 
-
               <div class="verify-text">
-
                 Scan the QR code to open this animal's
                 live profile.
-
               </div>
 
             </div>
-
 
             <div>
 
               <div
                 id="qrcode"
-                class="qrcode">
-              </div>
-
+                class="qrcode"
+              ></div>
 
               <div class="mini-id">
-
                 ${esc(a.animalId)}
-
               </div>
 
             </div>
-
 
           </section>
 
@@ -1202,27 +1574,21 @@ function renderProfile() {
 
         <footer class="footer">
 
-
           <strong>
             ANIMAL DIGITAL ID
           </strong>
 
           • ${esc(a.animalId)}
 
-
           <br>
-
 
           Please contact the pet parent if
           ${esc(a.name)} is found.
 
-
           <br>
-
 
           Private owner-maintained record
           • Not a government-issued identity document
-
 
         </footer>
 
@@ -1245,10 +1611,12 @@ function renderProfile() {
 
 
     const qrElement =
-      document.getElementById('qrcode');
+      document.getElementById("qrcode");
 
 
     if (qrElement) {
+
+      qrElement.innerHTML = "";
 
       new QRCode(
         qrElement,
@@ -1256,7 +1624,8 @@ function renderProfile() {
           text: url,
           width: 90,
           height: 90,
-          correctLevel: QRCode.CorrectLevel.M
+          correctLevel:
+            QRCode.CorrectLevel.M
         }
       );
 
@@ -1268,14 +1637,15 @@ function renderProfile() {
 
 
 // =========================================================
-// CLOSE DETAIL POPUP
+// CLOSE DETAIL MODAL
 // =========================================================
 
 function closeDetailModal() {
 
   const modal =
-    document.getElementById("detailModal");
-
+    document.getElementById(
+      "detailModal"
+    );
 
   if (modal) {
 
@@ -1292,29 +1662,40 @@ function closeDetailModal() {
 
 function openBehaviourDetails() {
 
-  // Remove any existing popup first
   closeDetailModal();
 
 
-  const a = getAnimal();
+  const a =
+    getAnimal();
+
 
   const traits =
     getBehaviourTraits(a);
 
 
-  const traitsHtml = traits.length
+  const traitsHtml =
 
-    ? traits.map(trait => `
-        <span class="trait-pill">
-          ${esc(trait)}
-        </span>
-      `).join('')
+    traits.length
 
-    : `
-        <span class="not-added">
-          No behaviour traits added.
-        </span>
-      `;
+      ? traits
+          .map(
+            trait => `
+
+              <span class="trait-pill">
+                ${esc(trait)}
+              </span>
+
+            `
+          )
+          .join("")
+
+      : `
+
+          <span class="not-added">
+            No behaviour traits added.
+          </span>
+
+        `;
 
 
   const modal =
@@ -1324,7 +1705,6 @@ function openBehaviourDetails() {
   modal.id =
     "detailModal";
 
-
   modal.className =
     "detail-modal";
 
@@ -1333,26 +1713,19 @@ function openBehaviourDetails() {
 
     <div class="detail-modal-card">
 
-
-      <!-- HEADER -->
-
       <div class="detail-modal-header">
 
-
         <div class="detail-modal-title">
-
 
           <div class="detail-modal-icon">
             🧠
           </div>
-
 
           <div>
 
             <h3>
               Behaviour & Temperament
             </h3>
-
 
             <p>
               ${esc(a.name)}
@@ -1362,73 +1735,55 @@ function openBehaviourDetails() {
 
           </div>
 
-
         </div>
-
 
         <button
           type="button"
           class="detail-modal-close"
-          aria-label="Close">
-
+          aria-label="Close"
+        >
           ×
-
         </button>
-
 
       </div>
 
 
-      <!-- BODY -->
-
       <div class="detail-modal-body">
-
 
         <div class="behaviour-overall">
 
-
           <span class="detail-small-label">
-
             OVERALL BEHAVIOUR
-
           </span>
 
-
           <strong>
-
             ${esc(
-              a.behaviour || "Not Added"
+              a.behaviour ||
+              "Not Added"
             )}
-
           </strong>
-
 
         </div>
 
 
         <div class="traits-section">
 
-
           <span class="detail-small-label">
-
             BEHAVIOUR TRAITS
-
           </span>
 
-
           <div class="traits-list">
-
             ${traitsHtml}
-
           </div>
-
 
         </div>
 
 
         ${
           a.behaviourNotes
+
             ? `
+
                 <div class="behaviour-notes">
 
                   <span class="detail-small-label">
@@ -1440,13 +1795,13 @@ function openBehaviourDetails() {
                   </p>
 
                 </div>
+
               `
-            : ''
+
+            : ""
         }
 
-
       </div>
-
 
     </div>
 
@@ -1456,9 +1811,9 @@ function openBehaviourDetails() {
   document.body.appendChild(modal);
 
 
-  // =======================================================
-  // CLOSE BUTTON
-  // =======================================================
+  // -------------------------------------------------------
+  // Close button
+  // -------------------------------------------------------
 
   const closeButton =
     modal.querySelector(
@@ -1480,15 +1835,17 @@ function openBehaviourDetails() {
   }
 
 
-  // =======================================================
-  // CLICK OUTSIDE
-  // =======================================================
+  // -------------------------------------------------------
+  // Click outside
+  // -------------------------------------------------------
 
   modal.addEventListener(
     "click",
-    function (e) {
+    function (event) {
 
-      if (e.target === modal) {
+      if (
+        event.target === modal
+      ) {
 
         closeDetailModal();
 
@@ -1498,14 +1855,16 @@ function openBehaviourDetails() {
   );
 
 
-  // =======================================================
-  // ESC KEY
-  // =======================================================
+  // -------------------------------------------------------
+  // Escape key
+  // -------------------------------------------------------
 
   const escHandler =
-    function (e) {
+    function (event) {
 
-      if (e.key === "Escape") {
+      if (
+        event.key === "Escape"
+      ) {
 
         closeDetailModal();
 
@@ -1533,11 +1892,11 @@ function openBehaviourDetails() {
 
 function openVaccinationDetails() {
 
-  // Remove any existing popup first
   closeDetailModal();
 
 
-  const a = getAnimal();
+  const a =
+    getAnimal();
 
 
   const vaccinations =
@@ -1547,48 +1906,49 @@ function openVaccinationDetails() {
 
 
   const rows =
+
     vaccinations.length
 
+      ? vaccinations
+          .map(
+            (vaccination, index) => `
 
-      ? vaccinations.map((v, i) => `
+              <tr
+                class="${
+                  index ===
+                  vaccinations.length - 1
+                    ? "latest"
+                    : ""
+                }"
+              >
 
-          <tr class="${
-            i === vaccinations.length - 1
-              ? 'latest'
-              : ''
-          }">
+                <td>
+                  ${esc(vaccination[0])}
+                </td>
 
+                <td>
+                  ${esc(vaccination[1])}
+                </td>
 
-            <td>
-              ${esc(v[0])}
-            </td>
+                <td>
+                  ${esc(vaccination[2])}
+                </td>
 
+                <td>
 
-            <td>
-              ${esc(v[1])}
-            </td>
+                  <span
+                    class="vaccine-status"
+                  >
+                    ${esc(vaccination[3])}
+                  </span>
 
+                </td>
 
-            <td>
-              ${esc(v[2])}
-            </td>
+              </tr>
 
-
-            <td>
-
-              <span class="vaccine-status">
-
-                ${esc(v[3])}
-
-              </span>
-
-            </td>
-
-
-          </tr>
-
-        `).join('')
-
+            `
+          )
+          .join("")
 
       : `
 
@@ -1596,10 +1956,9 @@ function openVaccinationDetails() {
 
             <td
               colspan="4"
-              class="empty-row">
-
+              class="empty-row"
+            >
               Vaccination: Not Done
-
             </td>
 
           </tr>
@@ -1614,7 +1973,6 @@ function openVaccinationDetails() {
   modal.id =
     "detailModal";
 
-
   modal.className =
     "detail-modal";
 
@@ -1622,98 +1980,75 @@ function openVaccinationDetails() {
   modal.innerHTML = `
 
     <div
-      class="detail-modal-card vaccination-modal">
-
-
-      <!-- HEADER -->
+      class="detail-modal-card vaccination-modal"
+    >
 
       <div class="detail-modal-header">
 
-
         <div class="detail-modal-title">
 
-
           <div class="detail-modal-icon">
-
             💉
-
           </div>
-
 
           <div>
 
             <h3>
-
               Vaccination Records
-
             </h3>
 
-
             <p>
-
               ${esc(a.name)}
               •
               ${vaccinations.length}
-              record${vaccinations.length === 1 ? '' : 's'}
-
+              record${
+                vaccinations.length === 1
+                  ? ""
+                  : "s"
+              }
             </p>
 
           </div>
 
-
         </div>
-
 
         <button
           type="button"
           class="detail-modal-close"
-          aria-label="Close">
-
+          aria-label="Close"
+        >
           ×
-
         </button>
-
 
       </div>
 
 
-      <!-- BODY -->
-
       <div
-        class="detail-modal-body vaccination-modal-body">
-
+        class="detail-modal-body vaccination-modal-body"
+      >
 
         <div class="vaccination-count">
 
-
           <strong>
-
             ${vaccinations.length}
-
           </strong>
 
-
           <span>
-
             vaccination record${
               vaccinations.length === 1
-                ? ''
-                : 's'
+                ? ""
+                : "s"
             }
-
           </span>
-
 
         </div>
 
 
-        <div
-          class="vaccination-table-wrap">
-
+        <div class="vaccination-table-wrap">
 
           <table
-            class="vaccination-popup-table">
-
+            class="vaccination-popup-table"
+          >
 
             <thead>
 
@@ -1739,22 +2074,17 @@ function openVaccinationDetails() {
 
             </thead>
 
-
             <tbody>
 
               ${rows}
 
             </tbody>
 
-
           </table>
-
 
         </div>
 
-
       </div>
-
 
     </div>
 
@@ -1764,9 +2094,9 @@ function openVaccinationDetails() {
   document.body.appendChild(modal);
 
 
-  // =======================================================
-  // CLOSE BUTTON
-  // =======================================================
+  // -------------------------------------------------------
+  // Close button
+  // -------------------------------------------------------
 
   const closeButton =
     modal.querySelector(
@@ -1788,15 +2118,17 @@ function openVaccinationDetails() {
   }
 
 
-  // =======================================================
-  // CLICK OUTSIDE
-  // =======================================================
+  // -------------------------------------------------------
+  // Click outside
+  // -------------------------------------------------------
 
   modal.addEventListener(
     "click",
-    function (e) {
+    function (event) {
 
-      if (e.target === modal) {
+      if (
+        event.target === modal
+      ) {
 
         closeDetailModal();
 
@@ -1806,14 +2138,16 @@ function openVaccinationDetails() {
   );
 
 
-  // =======================================================
-  // ESC KEY
-  // =======================================================
+  // -------------------------------------------------------
+  // Escape
+  // -------------------------------------------------------
 
   const escHandler =
-    function (e) {
+    function (event) {
 
-      if (e.key === "Escape") {
+      if (
+        event.key === "Escape"
+      ) {
 
         closeDetailModal();
 
@@ -1841,12 +2175,14 @@ function openVaccinationDetails() {
 
 function openChangeRequest() {
 
-
   const a =
     getAnimal();
 
 
+  // -------------------------------------------------------
   // Remove existing form
+  // -------------------------------------------------------
+
   const existing =
     document.getElementById(
       "changeRequest"
@@ -1862,6 +2198,10 @@ function openChangeRequest() {
   }
 
 
+  // -------------------------------------------------------
+  // Create modal
+  // -------------------------------------------------------
+
   const modal =
     document.createElement("div");
 
@@ -1869,40 +2209,30 @@ function openChangeRequest() {
   modal.id =
     "changeRequest";
 
-
   modal.className =
     "change-request";
 
 
   modal.innerHTML = `
 
-
     <div class="change-request-card">
 
 
-      <!-- =================================================
-           HEADER
-      ================================================== -->
+      <!-- HEADER -->
 
       <div class="change-request-header">
 
-
         <div class="request-title-area">
 
-
           <div class="request-icon">
-
             📝
-
           </div>
-
 
           <div>
 
             <h3>
               Request a Change
             </h3>
-
 
             <p>
 
@@ -1916,34 +2246,26 @@ function openChangeRequest() {
 
           </div>
 
-
         </div>
-
 
         <button
           type="button"
           class="close-request"
-          aria-label="Close">
-
+          aria-label="Close"
+        >
           ×
-
         </button>
-
 
       </div>
 
 
-      <!-- =================================================
-           NOTICE
-      ================================================== -->
+      <!-- NOTICE -->
 
       <div class="request-notice">
-
 
         <span>
           🔎
         </span>
-
 
         <div>
 
@@ -1951,313 +2273,261 @@ function openChangeRequest() {
             Information review
           </strong>
 
-
           <p>
-
             Submitted changes are reviewed by
             the registry owner before the
             animal profile is updated.
-
           </p>
 
         </div>
 
-
       </div>
 
 
-      <!-- =================================================
-           FORM
-      ================================================== -->
+      <!-- FORM -->
 
       <form
         id="animalChangeForm"
         class="change-form"
         action="https://formspree.io/f/xrpgegka"
-        method="POST">
+        method="POST"
+      >
 
 
-        <!-- Hidden Formspree subject -->
+        <!-- SUBJECT -->
 
         <input
           type="hidden"
           name="_subject"
-          value="Animal Registry Change Request">
+          value="Animal Registry Change Request"
+        >
 
 
-        <!-- Animal information -->
+        <!-- ANIMAL NAME -->
 
         <input
           type="hidden"
           name="Animal Name"
-          value="${esc(a.name)}">
+          value="${esc(a.name)}"
+        >
 
+
+        <!-- ANIMAL ID -->
 
         <input
           type="hidden"
           name="Animal ID"
-          value="${esc(a.animalId)}">
+          value="${esc(a.animalId)}"
+        >
 
+
+        <!-- SOURCE -->
 
         <input
           type="hidden"
           name="Request Source"
-          value="Animal Digital ID Registry">
+          value="Animal Digital ID Registry"
+        >
 
 
-        <!-- =================================================
-             FIELD TO CHANGE
-        ================================================== -->
+        <!-- FIELD -->
 
         <div class="form-group">
 
-
           <label for="requestedField">
-
             Information to change
-
           </label>
-
 
           <select
             id="requestedField"
             name="Requested Field"
-            required>
-
+            required
+          >
 
             <option value="">
               Select a field
             </option>
 
-
             <option value="Animal Name">
               Animal Name
             </option>
-
 
             <option value="Breed">
               Breed
             </option>
 
-
             <option value="Gender">
               Gender
             </option>
-
 
             <option value="Date of Birth">
               Date of Birth
             </option>
 
-
             <option value="Pet Parent">
               Pet Parent
             </option>
-
 
             <option value="Phone">
               Phone
             </option>
 
-
             <option value="Alternate Phone">
               Alternate Phone
             </option>
-
 
             <option value="Location">
               Location
             </option>
 
-
             <option value="Behaviour">
               Behaviour
             </option>
-
 
             <option value="Behaviour Traits">
               Behaviour Traits
             </option>
 
-
             <option value="Neutering Status">
               Neutering Status
             </option>
-
 
             <option value="Vaccination">
               Vaccination
             </option>
 
-
             <option value="Photo">
               Photo
             </option>
 
-
           </select>
-
 
         </div>
 
 
-        <!-- =================================================
-             CURRENT INFORMATION
-        ================================================== -->
+        <!-- CURRENT INFORMATION -->
 
         <div class="form-group">
 
-
           <label for="currentInformation">
-
             Current information
-
           </label>
-
 
           <input
             id="currentInformation"
             type="text"
             name="Current Information"
             placeholder="What is currently shown?"
-            required>
-
+            required
+          >
 
         </div>
 
 
-        <!-- =================================================
-             REQUESTED INFORMATION
-        ================================================== -->
+        <!-- REQUESTED INFORMATION -->
 
         <div class="form-group">
 
-
           <label for="requestedInformation">
-
             Requested information
-
           </label>
-
 
           <input
             id="requestedInformation"
             type="text"
             name="Requested Information"
             placeholder="What should it be changed to?"
-            required>
-
+            required
+          >
 
         </div>
 
 
-        <!-- =================================================
-             REASON
-        ================================================== -->
+        <!-- REASON -->
 
         <div class="form-group">
 
-
           <label for="reason">
-
             Reason / additional details
-
           </label>
-
 
           <textarea
             id="reason"
             name="Reason"
             rows="4"
             placeholder="Please explain the requested change..."
-            required></textarea>
-
+            required
+          ></textarea>
 
         </div>
 
 
-        <!-- =================================================
-             REQUESTER
-        ================================================== -->
+        <!-- REQUESTER -->
 
         <div class="form-row">
 
-
           <div class="form-group">
 
-
             <label for="requesterName">
-
               Your name
-
             </label>
-
 
             <input
               id="requesterName"
               type="text"
               name="Requester Name"
               placeholder="Your name"
-              required>
-
+              required
+            >
 
           </div>
 
 
           <div class="form-group">
 
-
             <label for="requesterContact">
-
               Your contact
-
             </label>
-
 
             <input
               id="requesterContact"
               type="text"
               name="Requester Contact"
               placeholder="Phone or email"
-              required>
-
+              required
+            >
 
           </div>
-
 
         </div>
 
 
-        <!-- =================================================
-             FORMSPREE SETTINGS
-        ================================================== -->
+        <!-- FORMSPREE -->
 
         <input
           type="hidden"
           name="_captcha"
-          value="true">
-
+          value="true"
+        >
 
         <input
           type="hidden"
           name="_template"
-          value="table">
+          value="table"
+        >
 
 
-        <!-- =================================================
-             SUCCESS MESSAGE
-        ================================================== -->
+        <!-- SUCCESS -->
 
         <div
           id="changeRequestSuccess"
           class="request-success"
-          style="display:none;">
-
+          style="display:none;"
+        >
 
           <span class="success-icon">
             ✓
           </span>
-
 
           <div>
 
@@ -2265,34 +2535,27 @@ function openChangeRequest() {
               Request submitted successfully
             </strong>
 
-
             <p>
-
               Your change request has been received
               and will be reviewed by the registry owner.
-
             </p>
 
           </div>
 
-
         </div>
 
 
-        <!-- =================================================
-             ERROR MESSAGE
-        ================================================== -->
+        <!-- ERROR -->
 
         <div
           id="changeRequestError"
           class="request-error"
-          style="display:none;">
-
+          style="display:none;"
+        >
 
           <span class="error-icon">
             !
           </span>
-
 
           <div>
 
@@ -2300,50 +2563,37 @@ function openChangeRequest() {
               Unable to submit request
             </strong>
 
-
             <p>
-
               Something went wrong while sending
               the request. Please try again.
-
             </p>
 
           </div>
 
-
         </div>
 
 
-        <!-- =================================================
-             BUTTONS
-        ================================================== -->
+        <!-- BUTTONS -->
 
         <div class="request-actions">
 
-
           <button
             type="button"
-            class="cancel-request">
-
+            class="cancel-request"
+          >
             Cancel
-
           </button>
-
 
           <button
             type="submit"
-            class="submit-change">
-
+            class="submit-change"
+          >
             ✓ Submit Request
-
           </button>
-
 
         </div>
 
-
       </form>
-
 
     </div>
 
@@ -2394,7 +2644,7 @@ function openChangeRequest() {
 
 
   // =======================================================
-  // CLOSE BUTTON
+  // CLOSE
   // =======================================================
 
   closeButton.addEventListener(
@@ -2408,7 +2658,7 @@ function openChangeRequest() {
 
 
   // =======================================================
-  // CANCEL BUTTON
+  // CANCEL
   // =======================================================
 
   cancelButton.addEventListener(
@@ -2427,9 +2677,11 @@ function openChangeRequest() {
 
   modal.addEventListener(
     "click",
-    function (e) {
+    function (event) {
 
-      if (e.target === modal) {
+      if (
+        event.target === modal
+      ) {
 
         modal.remove();
 
@@ -2444,9 +2696,11 @@ function openChangeRequest() {
   // =======================================================
 
   const escHandler =
-    function (e) {
+    function (event) {
 
-      if (e.key === "Escape") {
+      if (
+        event.key === "Escape"
+      ) {
 
         if (
           document.getElementById(
@@ -2457,7 +2711,6 @@ function openChangeRequest() {
           modal.remove();
 
         }
-
 
         document.removeEventListener(
           "keydown",
@@ -2481,16 +2734,15 @@ function openChangeRequest() {
 
   form.addEventListener(
     "submit",
-    async function (e) {
+    async function (event) {
 
-      e.preventDefault();
+      event.preventDefault();
 
 
       // Hide previous messages
 
       successBox.style.display =
         "none";
-
 
       errorBox.style.display =
         "none";
@@ -2501,7 +2753,6 @@ function openChangeRequest() {
       submitButton.disabled =
         true;
 
-
       submitButton.textContent =
         "Submitting...";
 
@@ -2511,7 +2762,6 @@ function openChangeRequest() {
 
 
       try {
-
 
         const response =
           await fetch(
@@ -2525,6 +2775,7 @@ function openChangeRequest() {
                 Accept:
                   "application/json"
               }
+
             }
           );
 
@@ -2549,9 +2800,8 @@ function openChangeRequest() {
         successBox.style.display =
           "flex";
 
-
-      } catch (error) {
-
+      }
+      catch (error) {
 
         console.error(
           "Change request submission failed:",
@@ -2563,7 +2813,6 @@ function openChangeRequest() {
 
         submitButton.disabled =
           false;
-
 
         submitButton.textContent =
           "✓ Submit Request";
@@ -2581,162 +2830,6 @@ function openChangeRequest() {
 
 }
 
-// =========================================================
-// WEIGHT HISTORY DISPLAY
-// =========================================================
-
-function renderWeightHistory() {
-
-  if (!currentAnimal) return;
-
-  const content =
-    document.querySelector(".content");
-
-  if (!content) return;
-
-
-  // Prevent duplicate section
-  const existing =
-    document.getElementById(
-      "weightHistorySection"
-    );
-
-  if (existing) {
-    existing.remove();
-  }
-
-
-  const records =
-    Array.isArray(currentAnimal.weightHistory)
-      ? currentAnimal.weightHistory
-      : [];
-
-
-  const section =
-    document.createElement("section");
-
-  section.id =
-    "weightHistorySection";
-
-  section.className =
-    "section";
-
-
-  if (!records.length) {
-
-    section.innerHTML = `
-
-      <div class="section-title">
-        <span>⚖️</span>
-        Weight History
-      </div>
-
-      <div class="panel">
-
-        <div class="muted">
-          No weight records added.
-        </div>
-
-      </div>
-
-    `;
-
-  } else {
-
-    const latest =
-      records[0];
-
-
-    section.innerHTML = `
-
-      <div class="section-title">
-        <span>⚖️</span>
-        Weight History
-      </div>
-
-
-      <div class="panel">
-
-        <div class="weight-latest">
-
-          <div>
-
-            <div class="label">
-              Latest Weight
-            </div>
-
-            <div class="weight-value">
-              ${esc(latest.weight)}
-              ${esc(latest.unit)}
-            </div>
-
-          </div>
-
-
-          <div class="weight-date">
-
-            <div class="label">
-              Recorded
-            </div>
-
-            <strong>
-              ${esc(formatDisplayDate(latest.date))}
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        ${
-          records.length > 1
-            ? `
-
-              <div class="weight-history-list">
-
-                ${records.map(record => `
-
-                  <div class="weight-row">
-
-                    <div>
-                      <strong>
-                        ${esc(record.weight)}
-                        ${esc(record.unit)}
-                      </strong>
-
-                      ${
-                        record.notes
-                          ? `<small>${esc(record.notes)}</small>`
-                          : ""
-                      }
-
-                    </div>
-
-                    <span>
-                      ${esc(formatDisplayDate(record.date))}
-                    </span>
-
-                  </div>
-
-                `).join("")}
-
-              </div>
-
-            `
-            : ""
-        }
-
-      </div>
-
-    `;
-
-  }
-
-
-  content.appendChild(section);
-
-}
-
 
 // =========================================================
 // DATE FORMAT
@@ -2744,14 +2837,29 @@ function renderWeightHistory() {
 
 function formatDisplayDate(value) {
 
-  if (!value) return "Not Added";
+  if (!value) {
+
+    return "Not Added";
+
+  }
+
 
   const date =
-    new Date(value + "T00:00:00");
+    new Date(
+      value + "T00:00:00"
+    );
 
-  if (Number.isNaN(date.getTime())) {
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
     return value;
+
   }
+
 
   return date.toLocaleDateString(
     "en-GB",
@@ -2763,6 +2871,7 @@ function formatDisplayDate(value) {
   );
 
 }
+
 
 // =========================================================
 // START PROFILE
