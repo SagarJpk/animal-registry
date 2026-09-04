@@ -376,7 +376,7 @@ async function loadAnimalFromSupabase() {
     // =======================================================
 
     renderProfile();
-
+    renderWeightHistory();
 
   } catch (error) {
 
