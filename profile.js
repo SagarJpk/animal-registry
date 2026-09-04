@@ -2,6 +2,50 @@
 // ANIMAL DIGITAL ID - PROFILE.JS
 // =========================================================
 
+// =========================================================
+// SUPABASE CONFIGURATION
+// =========================================================
+
+const SUPABASE_URL = "https://qnlatfajpbyefxyyehna.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_w9-d4xchiCpeOnKRas_u2Q_wrFVPOwf";
+
+let supabaseClient = null;
+
+let currentAnimal = null;
+
+
+// =========================================================
+// LOAD SUPABASE LIBRARY
+// =========================================================
+
+function loadSupabaseLibrary() {
+
+  return new Promise((resolve, reject) => {
+
+    if (window.supabase) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement("script");
+
+    script.src =
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+
+    script.onload = () => resolve();
+
+    script.onerror = () =>
+      reject(
+        new Error("Unable to load Supabase library")
+      );
+
+    document.head.appendChild(script);
+
+  });
+
+}
 
 // =========================================================
 // HTML ESCAPE
@@ -17,25 +61,364 @@ function esc(v = "") {
   }[c]));
 }
 
-
 // =========================================================
 // GET CURRENT ANIMAL
 // =========================================================
 
 function getAnimal() {
 
-  const id =
-    new URLSearchParams(location.search).get('id');
-
-  return (
-    animals.find(
-      a => a.id === id || a.animalId === id
-    )
-    || animals[0]
-  );
+  return currentAnimal;
 
 }
 
+// =========================================================
+// LOAD ANIMAL FROM SUPABASE
+// =========================================================
+
+async function loadAnimalFromSupabase() {
+
+  try {
+
+    await loadSupabaseLibrary();
+
+    supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+
+    const requestedId =
+      new URLSearchParams(location.search).get("id");
+
+
+    if (!requestedId) {
+
+      showProfileError(
+        "No animal ID was provided."
+      );
+
+      return;
+
+    }
+
+
+    // =======================================================
+    // LOAD ANIMAL
+    // =======================================================
+
+    let query =
+      supabaseClient
+        .from("animals")
+        .select(`
+          *,
+          owners (*),
+          behaviour_traits (*),
+          vaccinations (*)
+        `);
+
+
+    // UUID from index.html
+    if (
+      requestedId.match(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      )
+    ) {
+
+      query =
+        query.eq(
+          "id",
+          requestedId
+        );
+
+    } else {
+
+      // Also allow Animal ID such as:
+      // ANM-KA-2024-0016503
+
+      query =
+        query.eq(
+          "animal_id",
+          requestedId
+        );
+
+    }
+
+
+    const {
+      data,
+      error
+    } = await query.maybeSingle();
+
+
+    // =======================================================
+    // ERROR
+    // =======================================================
+
+    if (error) {
+
+      console.error(
+        "Supabase profile loading error:",
+        error
+      );
+
+      showProfileError(
+        "Unable to load this animal profile."
+      );
+
+      return;
+
+    }
+
+
+    // =======================================================
+    // ANIMAL NOT FOUND
+    // =======================================================
+
+    if (!data) {
+
+      showProfileError(
+        "Animal profile not found."
+      );
+
+      return;
+
+    }
+
+
+    // =======================================================
+    // OWNER
+    // =======================================================
+
+    const owner =
+      Array.isArray(data.owners)
+        ? data.owners[0]
+        : data.owners;
+
+
+    // =======================================================
+    // BEHAVIOUR
+    // =======================================================
+
+    const behaviourRecord =
+      Array.isArray(data.behaviour_traits)
+        ? data.behaviour_traits[0]
+        : data.behaviour_traits;
+
+
+    // =======================================================
+    // VACCINATIONS
+    // =======================================================
+
+    const vaccinationRecords =
+      Array.isArray(data.vaccinations)
+        ? data.vaccinations
+        : [];
+
+
+    // =======================================================
+    // LOCATION
+    // =======================================================
+
+    const locationParts = [
+      data.location_city,
+      data.location_state,
+      data.location_country
+    ].filter(Boolean);
+
+
+    // =======================================================
+    // BEHAVIOUR TRAITS
+    // =======================================================
+
+    const traits = [];
+
+    if (
+      behaviourRecord &&
+      behaviourRecord.temperament
+    ) {
+
+      traits.push(
+        behaviourRecord.temperament
+      );
+
+    }
+
+
+    // =======================================================
+    // CONVERT SUPABASE DATA
+    // TO EXISTING PROFILE FORMAT
+    // =======================================================
+
+    currentAnimal = {
+
+      id:
+        data.id,
+
+      animalId:
+        data.animal_id,
+
+      name:
+        data.name,
+
+      type:
+        data.type,
+
+      breed:
+        data.breed,
+
+      gender:
+        data.gender,
+
+      dob:
+        data.date_of_birth,
+
+      photo:
+        data.photo_url,
+
+      parent:
+        owner?.name || "Not Added",
+
+      phone:
+        owner?.phone || "",
+
+      alternatePhone:
+        owner?.alternate_phone || "",
+
+      location:
+        locationParts.join(", ") ||
+        "Not Added",
+
+      mapUrl:
+        data.map_url || "",
+
+      behaviour:
+        behaviourRecord?.temperament ||
+        "Not Added",
+
+      behaviourTraits:
+        traits,
+
+      traits:
+        traits,
+
+      behaviourNotes:
+        behaviourRecord?.behaviour_notes ||
+        behaviourRecord?.notes ||
+        "",
+
+      neutering:
+        data.neutering_status ||
+        data.neutering ||
+        "Not Added",
+
+      status:
+        data.status ||
+        "ACTIVE RECORD",
+
+      vaccinations:
+        vaccinationRecords
+          .sort((a, b) =>
+            String(
+              a.vaccination_date || ""
+            ).localeCompare(
+              String(
+                b.vaccination_date || ""
+              )
+            )
+          )
+          .map(v => [
+
+            v.vaccine_name ||
+              "Not Added",
+
+            v.vaccination_date ||
+              "",
+
+            v.next_due_date ||
+              "",
+
+            v.status ||
+              "RECORDED"
+
+          ])
+
+    };
+
+
+    // =======================================================
+    // RENDER PROFILE
+    // =======================================================
+
+    renderProfile();
+
+
+  } catch (error) {
+
+    console.error(
+      "Profile initialization error:",
+      error
+    );
+
+    showProfileError(
+      "Unable to load this animal profile."
+    );
+
+  }
+
+}
+
+
+// =========================================================
+// PROFILE ERROR
+// =========================================================
+
+function showProfileError(message) {
+
+  const app =
+    document.getElementById("app");
+
+  if (!app) return;
+
+  app.innerHTML = `
+
+    <div class="page">
+
+      <div class="card">
+
+        <main
+          class="content"
+          style="text-align:center;padding:60px 30px;"
+        >
+
+          <div style="font-size:42px;margin-bottom:15px;">
+            🐾
+          </div>
+
+          <h2>
+            Animal Profile
+          </h2>
+
+          <p style="color:var(--muted);">
+            ${esc(message)}
+          </p>
+
+          <a
+            href="./index.html"
+            class="button"
+          >
+            ← Back to Registry
+          </a>
+
+        </main>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
 
 // =========================================================
 // DETAIL FIELD
@@ -2178,4 +2561,4 @@ function openChangeRequest() {
 // START PROFILE
 // =========================================================
 
-renderProfile();
+loadAnimalFromSupabase();
