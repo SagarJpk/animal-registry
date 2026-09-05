@@ -1,13 +1,13 @@
-// =========================================================
-// ANIMAL DIGITAL ID - PROFILE.JS
-// =========================================================
-// Supabase-powered animal profile
-// =========================================================
+/* ============================================================
+   ANIMAL DIGITAL ID
+   PROFILE PAGE
+   SUPABASE + RESPONSIVE UI
+   ============================================================ */
 
 
-// =========================================================
-// SUPABASE CONFIGURATION
-// =========================================================
+/* ============================================================
+   SUPABASE CONFIGURATION
+   ============================================================ */
 
 const SUPABASE_URL =
   "https://qnlatfajpbyefxyyehna.supabase.co";
@@ -15,480 +15,680 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_w9-d4xchiCpeOnKRas_u2Q_wrFVPOwf";
 
-let supabaseClient = null;
+const {
+  createClient
+} = window.supabase;
+
+const supabaseClient =
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
 let currentAnimal = null;
 
 
-// =========================================================
-// LOAD SUPABASE LIBRARY
-// =========================================================
+/* ============================================================
+   ESCAPE HTML
+   ============================================================ */
 
-function loadSupabaseLibrary() {
+function esc(value) {
 
-  return new Promise((resolve, reject) => {
-
-    if (window.supabase) {
-      resolve();
-      return;
-    }
-
-    const script = document.createElement("script");
-
-    script.src =
-      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-
-    script.onload = () => resolve();
-
-    script.onerror = () =>
-      reject(
-        new Error("Unable to load Supabase library")
-      );
-
-    document.head.appendChild(script);
-
-  });
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#39;"
+    );
 
 }
 
 
-// =========================================================
-// HTML ESCAPE
-// =========================================================
+/* ============================================================
+   FORMAT DATE
+   ============================================================ */
 
-function esc(value = "") {
+function formatDate(value) {
 
-  return String(value).replace(
-    /[&<>"']/g,
-    character => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[character])
+  if (!value) {
+    return "Not Added";
+  }
+
+  const date =
+    new Date(
+      value + "T00:00:00"
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return value;
+  }
+
+  return date.toLocaleDateString(
+    "en-GB",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }
   );
 
 }
 
 
-// =========================================================
-// GET CURRENT ANIMAL
-// =========================================================
+/* ============================================================
+   GET PROFILE ID
+   ============================================================ */
 
-function getAnimal() {
+function getProfileId() {
 
-  return currentAnimal;
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  return (
+    params.get("id") ||
+    params.get("animal_id") ||
+    ""
+  ).trim();
 
 }
 
 
-// =========================================================
-// LOAD ANIMAL FROM SUPABASE
-// =========================================================
+/* ============================================================
+   NORMALIZE OWNER
+   ============================================================ */
 
-async function loadAnimalFromSupabase() {
+function normalizeOwner(
+  owner
+) {
 
-  try {
+  if (!owner) {
 
-    // -------------------------------------------------------
-    // Load Supabase
-    // -------------------------------------------------------
+    return {
+      name: "Not Added",
+      phone: "",
+      alternatePhone: ""
+    };
 
-    await loadSupabaseLibrary();
+  }
 
-    supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-      );
+  if (
+    Array.isArray(owner)
+  ) {
+    owner =
+      owner[0] || null;
+  }
 
+  return {
 
-    // -------------------------------------------------------
-    // Get requested ID
-    // -------------------------------------------------------
+    name:
+      owner?.name ||
+      "Not Added",
 
-    const requestedId =
-      new URLSearchParams(location.search).get("id");
+    phone:
+      owner?.phone ||
+      owner?.mobile ||
+      "",
 
+    alternatePhone:
+      owner?.alternate_phone ||
+      owner?.alternatePhone ||
+      ""
 
-    if (!requestedId) {
+  };
 
-      showProfileError(
-        "No animal ID was provided."
-      );
-
-      return;
-
-    }
-
-
-    // -------------------------------------------------------
-    // Load animal
-    // -------------------------------------------------------
-
-    let query =
-      supabaseClient
-        .from("animals")
-        .select(`
-          *,
-          owners (*),
-          behaviour_traits (*),
-          vaccinations (*)
-        `);
+}
 
 
-    // -------------------------------------------------------
-    // UUID
-    // -------------------------------------------------------
+/* ============================================================
+   NORMALIZE BEHAVIOUR
+   ============================================================ */
 
-    const uuidPattern =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+function normalizeBehaviour(
+  behaviour
+) {
 
+  if (!behaviour) {
 
-    if (uuidPattern.test(requestedId)) {
+    return {
+      temperament: "Not Added",
+      traits: [],
+      notes: ""
+    };
 
-      query =
-        query.eq(
-          "id",
-          requestedId
-        );
+  }
 
-    }
+  if (
+    Array.isArray(behaviour)
+  ) {
+    behaviour =
+      behaviour[0] || null;
+  }
 
-    // -------------------------------------------------------
-    // Animal ID
-    // -------------------------------------------------------
+  const traits = [];
 
-    else {
+  if (
+    behaviour?.traits &&
+    Array.isArray(
+      behaviour.traits
+    )
+  ) {
 
-      query =
-        query.eq(
-          "animal_id",
-          requestedId
-        );
-
-    }
-
-
-    // -------------------------------------------------------
-    // Execute animal query
-    // -------------------------------------------------------
-
-    const {
-      data,
-      error
-    } = await query.maybeSingle();
-
-
-    // -------------------------------------------------------
-    // Handle error
-    // -------------------------------------------------------
-
-    if (error) {
-
-      console.error(
-        "Supabase profile loading error:",
-        error
-      );
-
-      showProfileError(
-        "Unable to load this animal profile."
-      );
-
-      return;
-
-    }
-
-
-    // -------------------------------------------------------
-    // Animal not found
-    // -------------------------------------------------------
-
-    if (!data) {
-
-      showProfileError(
-        "Animal profile not found."
-      );
-
-      return;
-
-    }
-
-
-    console.log(
-      "Animal loaded from Supabase:",
-      data
+    traits.push(
+      ...behaviour.traits
     );
 
+  }
 
-    // =======================================================
-    // OWNER
-    // =======================================================
+  if (
+    behaviour?.temperament
+  ) {
 
-    const owner =
-      Array.isArray(data.owners)
-        ? data.owners[0]
-        : data.owners;
+    return {
 
+      temperament:
+        behaviour.temperament,
 
-    // =======================================================
-    // BEHAVIOUR
-    // =======================================================
+      traits,
 
-    const behaviourRecord =
-      Array.isArray(data.behaviour_traits)
-        ? data.behaviour_traits[0]
-        : data.behaviour_traits;
-
-
-    // =======================================================
-    // VACCINATIONS
-    // =======================================================
-
-    const vaccinationRecords =
-      Array.isArray(data.vaccinations)
-        ? [...data.vaccinations]
-        : [];
-
-
-    // Sort vaccinations oldest to newest
-    vaccinationRecords.sort(
-      (a, b) =>
-        String(a.vaccination_date || "")
-          .localeCompare(
-            String(b.vaccination_date || "")
-          )
-    );
-
-
-    // =======================================================
-    // WEIGHT HISTORY
-    // =======================================================
-    // IMPORTANT:
-    // Weight history is intentionally queried separately.
-    // This avoids relying on the nested Supabase relationship.
-    // =======================================================
-
-    let weightRecords = [];
-
-    try {
-
-      const {
-        data: weightData,
-        error: weightError
-      } =
-        await supabaseClient
-          .from("weight_history")
-          .select("*")
-          .eq("animal_id", data.id)
-          .order(
-            "recorded_date",
-            {
-              ascending: false
-            }
-          );
-
-      if (weightError) {
-
-        console.error(
-          "Weight history loading error:",
-          weightError
-        );
-
-      }
-      else {
-
-        weightRecords =
-          Array.isArray(weightData)
-            ? weightData
-            : [];
-
-      }
-
-    }
-    catch (weightError) {
-
-      console.error(
-        "Weight history exception:",
-        weightError
-      );
-
-    }
-
-
-    console.log(
-      "Weight records loaded:",
-      weightRecords
-    );
-
-
-    // =======================================================
-    // LOCATION
-    // =======================================================
-
-    const locationParts = [
-      data.location_city,
-      data.location_state,
-      data.location_country
-    ].filter(Boolean);
-
-
-    // =======================================================
-    // BEHAVIOUR TRAITS
-    // =======================================================
-
-    const traits = [];
-
-    if (
-      behaviourRecord &&
-      behaviourRecord.temperament
-    ) {
-
-      traits.push(
-        behaviourRecord.temperament
-      );
-
-    }
-
-
-    // Add additional trait fields if present
-    if (
-      behaviourRecord &&
-      Array.isArray(behaviourRecord.traits)
-    ) {
-
-      behaviourRecord.traits.forEach(
-        trait => {
-
-          if (
-            trait &&
-            !traits.includes(trait)
-          ) {
-
-            traits.push(trait);
-
-          }
-
-        }
-      );
-
-    }
-
-
-    // =======================================================
-    // CONVERT SUPABASE DATA
-    // TO PROFILE FORMAT
-    // =======================================================
-
-    currentAnimal = {
-
-      id:
-        data.id,
-
-      animalId:
-        data.animal_id,
-
-      name:
-        data.name,
-
-      type:
-        data.type,
-
-      breed:
-        data.breed,
-
-      gender:
-        data.gender,
-
-      dob:
-        data.date_of_birth,
-
-      photo:
-        data.photo_url,
-
-      parent:
-        owner?.name || "Not Added",
-
-      phone:
-        owner?.phone || "",
-
-      alternatePhone:
-        owner?.alternate_phone || "",
-
-      location:
-        locationParts.join(", ") ||
-        "Not Added",
-
-      mapUrl:
-        data.map_url || "",
-
-      behaviour:
-        behaviourRecord?.temperament ||
-        "Not Added",
-
-      behaviourTraits:
-        traits,
-
-      traits:
-        traits,
-
-      behaviourNotes:
-        behaviourRecord?.behaviour_notes ||
-        behaviourRecord?.notes ||
-        "",
-
-      neutering:
-        data.neutering_status ||
-        data.neutering ||
-        "Not Added",
-
-      status:
-        data.status ||
-        "ACTIVE RECORD",
-
-      vaccinations:
-        vaccinationRecords.map(
-          vaccination => [
-
-            vaccination.vaccine_name ||
-              "Not Added",
-
-            vaccination.vaccination_date ||
-              "",
-
-            vaccination.next_due_date ||
-              "",
-
-            vaccination.status ||
-              "RECORDED"
-
-          ]
-        ),
-
-      weightHistory:
-        weightRecords
-          .map(weight => ({
-
-            date:
-              weight.recorded_date || "",
-
-            weight:
-              weight.weight ?? "",
-
-            unit:
-              weight.unit || "kg",
-
-            notes:
-              weight.notes || ""
-
-          }))
+      notes:
+        behaviour.notes ||
+        behaviour.description ||
+        ""
 
     };
 
+  }
 
-    // =======================================================
-    // RENDER PROFILE
-    // =======================================================
+  return {
+
+    temperament:
+      behaviour?.temperament ||
+      behaviour?.behaviour ||
+      "Not Added",
+
+    traits,
+
+    notes:
+      behaviour?.notes ||
+      ""
+
+  };
+
+}
+
+
+/* ============================================================
+   NORMALIZE VACCINATIONS
+   ============================================================ */
+
+function normalizeVaccinations(
+  vaccinations
+) {
+
+  if (
+    !Array.isArray(
+      vaccinations
+    )
+  ) {
+    return [];
+  }
+
+  return vaccinations
+    .map(
+      vaccination => {
+
+        if (
+          Array.isArray(
+            vaccination
+          )
+        ) {
+
+          return vaccination;
+
+        }
+
+        return [
+
+          vaccination?.vaccine_name ||
+          vaccination?.name ||
+          vaccination?.vaccine ||
+          "Not Added",
+
+          vaccination?.vaccination_date ||
+          vaccination?.date ||
+          "",
+
+          vaccination?.next_due_date ||
+          vaccination?.next_due ||
+          "",
+
+          vaccination?.status ||
+          "RECORDED"
+
+        ];
+
+      }
+    );
+
+}
+
+
+/* ============================================================
+   NORMALIZE WEIGHT HISTORY
+   ============================================================ */
+
+function normalizeWeightHistory(
+  records
+) {
+
+  if (
+    !Array.isArray(
+      records
+    )
+  ) {
+    return [];
+  }
+
+  return records
+    .map(
+      record => {
+
+        if (
+          Array.isArray(
+            record
+          )
+        ) {
+
+          return {
+
+            weight:
+              record[0],
+
+            unit:
+              record[1] ||
+              "kg",
+
+            date:
+              record[2],
+
+            notes:
+              record[3] ||
+              ""
+
+          };
+
+        }
+
+        return {
+
+          weight:
+            record?.weight,
+
+          unit:
+            record?.unit ||
+            "kg",
+
+          date:
+            record?.recorded_date ||
+            record?.date,
+
+          notes:
+            record?.notes ||
+            ""
+
+        };
+
+      }
+    )
+    .filter(
+      record =>
+        record.weight !==
+        undefined &&
+        record.weight !==
+        null
+    );
+
+}
+
+
+/* ============================================================
+   NORMALIZE ANIMAL
+   ============================================================ */
+
+function normalizeAnimal(
+  animal
+) {
+
+  const owner =
+    normalizeOwner(
+      animal?.owners
+    );
+
+  const behaviour =
+    normalizeBehaviour(
+      animal?.behaviour_traits
+    );
+
+  return {
+
+    id:
+      animal?.id ||
+      "",
+
+    animalId:
+      animal?.animal_id ||
+      "Not Added",
+
+    name:
+      animal?.name ||
+      "Unnamed Animal",
+
+    type:
+      animal?.type ||
+      "Not Added",
+
+    breed:
+      animal?.breed ||
+      "Not Added",
+
+    gender:
+      animal?.gender ||
+      "Not Added",
+
+    dob:
+      animal?.date_of_birth ||
+      "",
+
+    photo:
+      animal?.photo_url ||
+      "",
+
+    colour:
+      animal?.colour ||
+      "Not Added",
+
+    markings:
+      animal?.markings ||
+      "Not Added",
+
+    microchipNumber:
+      animal?.microchip_number ||
+      "Not Added",
+
+    microchipProvider:
+      animal?.microchip_provider ||
+      "Not Added",
+
+    governmentReference:
+      animal?.government_reference ||
+      "Not Added",
+
+    identificationNotes:
+      animal?.identification_notes ||
+      "",
+
+    neutering:
+      animal?.neutering_status ||
+      animal?.neutered_status ||
+      "Not Added",
+
+    status:
+      animal?.status ||
+      "ACTIVE",
+
+    isLost:
+      Boolean(
+        animal?.is_lost
+      ),
+
+    parent:
+      owner.name,
+
+    phone:
+      owner.phone,
+
+    alternatePhone:
+      owner.alternatePhone,
+
+    behaviour:
+      behaviour.temperament,
+
+    behaviourTraits:
+      behaviour.traits,
+
+    behaviourNotes:
+      behaviour.notes,
+
+    location:
+      [
+        animal?.location_city,
+        animal?.location_state,
+        animal?.location_country
+      ]
+        .filter(Boolean)
+        .join(", ") ||
+      "Not Added",
+
+    mapUrl:
+      animal?.map_url ||
+      "",
+
+    vaccinations:
+      normalizeVaccinations(
+        animal?.vaccinations
+      ),
+
+    weightHistory:
+      normalizeWeightHistory(
+        animal?.weight_history
+      )
+
+  };
+
+}
+
+
+/* ============================================================
+   LOAD ANIMAL FROM SUPABASE
+   ============================================================ */
+
+async function loadAnimalFromSupabase() {
+
+  const profileId =
+    getProfileId();
+
+  if (!profileId) {
+
+    showProfileError(
+      "No animal profile ID was provided."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    let animal = null;
+
+
+    /* ========================================================
+       FIRST TRY UUID
+       ======================================================== */
+
+    let result =
+      await supabaseClient
+        .from("animals")
+        .select(`
+          *,
+          owners (
+            name,
+            phone,
+            alternate_phone
+          ),
+          behaviour_traits (
+            temperament,
+            traits,
+            notes
+          ),
+          vaccinations (
+            id,
+            vaccine_name,
+            vaccination_date,
+            next_due_date,
+            status
+          ),
+          weight_history (
+            id,
+            recorded_date,
+            weight,
+            unit,
+            notes
+          )
+        `)
+        .eq(
+          "id",
+          profileId
+        )
+        .maybeSingle();
+
+
+    if (
+      result.error
+    ) {
+
+      console.error(
+        "UUID profile lookup error:",
+        result.error
+      );
+
+    }
+
+
+    animal =
+      result.data ||
+      null;
+
+
+    /* ========================================================
+       SECOND TRY ANIMAL ID
+       ======================================================== */
+
+    if (!animal) {
+
+      result =
+        await supabaseClient
+          .from("animals")
+          .select(`
+            *,
+            owners (
+              name,
+              phone,
+              alternate_phone
+            ),
+            behaviour_traits (
+              temperament,
+              traits,
+              notes
+            ),
+            vaccinations (
+              id,
+              vaccine_name,
+              vaccination_date,
+              next_due_date,
+              status
+            ),
+            weight_history (
+              id,
+              recorded_date,
+              weight,
+              unit,
+              notes
+            )
+          `)
+          .eq(
+            "animal_id",
+            profileId
+          )
+          .maybeSingle();
+
+
+      if (
+        result.error
+      ) {
+
+        console.error(
+          "Animal ID profile lookup error:",
+          result.error
+        );
+
+      }
+
+
+      animal =
+        result.data ||
+        null;
+
+    }
+
+
+    /* ========================================================
+       HANDLE NOT FOUND
+       ======================================================== */
+
+    if (!animal) {
+
+      showProfileError(
+        "The requested animal profile could not be found."
+      );
+
+      return;
+
+    }
+
+
+    /* ========================================================
+       NORMALIZE
+       ======================================================== */
+
+    currentAnimal =
+      normalizeAnimal(
+        animal
+      );
+
+
+    /* ========================================================
+       RENDER
+       ======================================================== */
 
     renderProfile();
 
@@ -496,12 +696,12 @@ async function loadAnimalFromSupabase() {
   catch (error) {
 
     console.error(
-      "Profile initialization error:",
+      "Profile loading failed:",
       error
     );
 
     showProfileError(
-      "Unable to load this animal profile."
+      "Unable to load this animal profile right now."
     );
 
   }
@@ -509,16 +709,22 @@ async function loadAnimalFromSupabase() {
 }
 
 
-// =========================================================
-// PROFILE ERROR
-// =========================================================
+/* ============================================================
+   ERROR SCREEN
+   ============================================================ */
 
-function showProfileError(message) {
+function showProfileError(
+  message
+) {
 
   const app =
-    document.getElementById("app");
+    document.getElementById(
+      "app"
+    );
 
-  if (!app) return;
+  if (!app) {
+    return;
+  }
 
   app.innerHTML = `
 
@@ -526,20 +732,9 @@ function showProfileError(message) {
 
       <div class="card">
 
-        <main
-          class="content"
-          style="
-            text-align:center;
-            padding:60px 30px;
-          "
-        >
+        <main class="content profile-v2-error">
 
-          <div
-            style="
-              font-size:42px;
-              margin-bottom:15px;
-            "
-          >
+          <div class="profile-v2-error-icon">
             🐾
           </div>
 
@@ -547,19 +742,16 @@ function showProfileError(message) {
             Animal Profile
           </h2>
 
-          <p
-            style="
-              color:var(--muted);
-            "
-          >
+          <p>
             ${esc(message)}
           </p>
 
           <a
             href="./index.html"
-            class="button"
-          >
+            class="profile-v2-button primary">
+
             ← Back to Registry
+
           </a>
 
         </main>
@@ -573,23 +765,40 @@ function showProfileError(message) {
 }
 
 
-// =========================================================
-// DETAIL FIELD
-// =========================================================
+/* ============================================================
+   DETAIL FIELD
+   ============================================================ */
 
-function detail(label, value) {
+function detail(
+  label,
+  value,
+  icon = ""
+) {
 
   return `
 
-    <div class="detail">
+    <div class="profile-v2-detail">
 
-      <span class="label">
+      <span class="profile-v2-detail-label">
+
+        ${
+          icon
+            ? `<span>${icon}</span>`
+            : ""
+        }
+
         ${esc(label)}
+
       </span>
 
-      <span class="value">
-        ${esc(value || "Not Added")}
-      </span>
+      <strong class="profile-v2-detail-value">
+
+        ${esc(
+          value ||
+          "Not Added"
+        )}
+
+      </strong>
 
     </div>
 
@@ -598,25 +807,27 @@ function detail(label, value) {
 }
 
 
-// =========================================================
-// GET BEHAVIOUR TRAITS
-// =========================================================
+/* ============================================================
+   GET BEHAVIOUR TRAITS
+   ============================================================ */
 
-function getBehaviourTraits(a) {
+function getBehaviourTraits(
+  animal
+) {
 
   if (
-    Array.isArray(a.behaviourTraits)
+    !animal
   ) {
-
-    return a.behaviourTraits;
-
+    return [];
   }
 
   if (
-    Array.isArray(a.traits)
+    Array.isArray(
+      animal.behaviourTraits
+    )
   ) {
 
-    return a.traits;
+    return animal.behaviourTraits;
 
   }
 
@@ -625,28 +836,325 @@ function getBehaviourTraits(a) {
 }
 
 
-// =========================================================
-// BEHAVIOUR SUMMARY
-// =========================================================
+/* ============================================================
+   GET LATEST VACCINATION
+   ============================================================ */
 
-function behaviourSummary(a) {
+function getLatestVaccination(
+  animal
+) {
+
+  const records =
+    Array.isArray(
+      animal?.vaccinations
+    )
+      ? animal.vaccinations
+      : [];
+
+  if (
+    !records.length
+  ) {
+    return null;
+  }
+
+  return records[
+    records.length - 1
+  ];
+
+}
+
+
+/* ============================================================
+   THEME
+   ============================================================ */
+
+function applyProfileTheme(
+  theme
+) {
+
+  const isDark =
+    theme === "dark";
+
+
+  document.body.classList.toggle(
+    "dark-mode",
+    isDark
+  );
+
+
+  const button =
+    document.getElementById(
+      "profileThemeToggle"
+    );
+
+
+  if (!button) {
+    return;
+  }
+
+
+  const icon =
+    button.querySelector(
+      ".profile-theme-icon"
+    );
+
+
+  const text =
+    button.querySelector(
+      ".profile-theme-text"
+    );
+
+
+  if (icon) {
+
+    icon.textContent =
+      isDark
+        ? "☀️"
+        : "🌙";
+
+  }
+
+
+  if (text) {
+
+    text.textContent =
+      isDark
+        ? "Light"
+        : "Dark";
+
+  }
+
+
+  button.setAttribute(
+    "aria-label",
+    isDark
+      ? "Switch to light mode"
+      : "Switch to dark mode"
+  );
+
+}
+
+
+/* ============================================================
+   SETUP THEME
+   ============================================================ */
+
+function setupProfileTheme() {
+
+  const savedTheme =
+    localStorage.getItem(
+      "animalDigitalIdTheme"
+    );
+
+
+  applyProfileTheme(
+    savedTheme === "dark"
+      ? "dark"
+      : "light"
+  );
+
+
+  const button =
+    document.getElementById(
+      "profileThemeToggle"
+    );
+
+
+  if (
+    !button ||
+    button.dataset.bound
+  ) {
+    return;
+  }
+
+
+  button.dataset.bound =
+    "true";
+
+
+  button.addEventListener(
+    "click",
+    function () {
+
+      const nextTheme =
+        document.body.classList.contains(
+          "dark-mode"
+        )
+          ? "light"
+          : "dark";
+
+
+      localStorage.setItem(
+        "animalDigitalIdTheme",
+        nextTheme
+      );
+
+
+      applyProfileTheme(
+        nextTheme
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   PART 1 END
+   ============================================================ */
+   /* ============================================================
+   RENDER PROFILE
+   ============================================================ */
+
+function renderProfile() {
+
+  const a = currentAnimal;
+
+  if (!a) {
+
+    showProfileError(
+      "Animal profile could not be loaded."
+    );
+
+    return;
+
+  }
+
+
+  document.title =
+    `${a.name} | Animal Digital ID`;
+
 
   const traits =
     getBehaviourTraits(a);
 
-  const previewTraits =
-    traits.slice(0, 4);
+
+  const vaccinations =
+    Array.isArray(a.vaccinations)
+      ? a.vaccinations
+      : [];
 
 
-  const traitHTML =
-    previewTraits.length
+  const weights =
+    Array.isArray(a.weightHistory)
+      ? a.weightHistory
+      : [];
 
-      ? previewTraits
+
+  const latestWeight =
+    weights.length
+      ? weights[0]
+      : null;
+
+
+  const latestVaccine =
+    getLatestVaccination(a);
+
+
+  const location =
+    a.location &&
+    a.location !== "Not Added"
+      ? a.location
+      : "Location not added";
+
+
+  const isLost =
+    Boolean(a.isLost) ||
+    /lost/i.test(
+      String(a.status || "")
+    );
+
+
+  const statusLabel =
+    isLost
+      ? "LOST"
+      : "ACTIVE RECORD";
+
+
+  const statusClass =
+    isLost
+      ? "lost"
+      : "active";
+
+
+  const phoneHtml =
+    a.phone
+
+      ? `
+        <a
+          href="tel:${esc(a.phone)}"
+          class="profile-v2-contact-link">
+
+          ${esc(a.phone)}
+
+        </a>
+      `
+
+      : `
+        <span>
+          Not Added
+        </span>
+      `;
+
+
+  const alternateHtml =
+    a.alternatePhone
+
+      ? `
+        <a
+          href="tel:${esc(a.alternatePhone)}"
+          class="profile-v2-contact-link">
+
+          ${esc(a.alternatePhone)}
+
+        </a>
+      `
+
+      : `
+        <span>
+          Not Added
+        </span>
+      `;
+
+
+  const mapHtml =
+    a.mapUrl
+
+      ? `
+        <a
+          href="${esc(a.mapUrl)}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="profile-v2-location-button">
+
+          📍 Open Map
+
+        </a>
+      `
+
+      : `
+        <span
+          class="profile-v2-location-button disabled">
+
+          📍 Map not added
+
+        </span>
+      `;
+
+
+  const traitHtml =
+    traits.length
+
+      ? traits
           .map(
             trait => `
 
-              <span class="trait-chip">
+              <span
+                class="profile-v2-trait">
+
                 ${esc(trait)}
+
               </span>
 
             `
@@ -655,453 +1163,127 @@ function behaviourSummary(a) {
 
       : `
 
-          <span class="trait-empty">
+          <span
+            class="profile-v2-muted">
+
             No behaviour traits added
+
           </span>
 
         `;
 
 
-  const moreCount =
-    traits.length > 4
+  let vaccineName =
+    "Not Done";
 
-      ? `
+  let vaccineDue =
+    "Not Added";
 
-          <span class="trait-more">
-            +${traits.length - 4} more
-          </span>
 
-        `
+  if (latestVaccine) {
 
-      : "";
+    vaccineName =
+      latestVaccine[0] ||
+      "Not Added";
 
-
-  return `
-
-    <section class="section">
-
-      <div class="section-title">
-        🧠 Behaviour & Temperament
-      </div>
-
-      <div class="behaviour-summary">
-
-        <div class="behaviour-summary-main">
-
-          <div>
-
-            <span class="label">
-              Overall Behaviour
-            </span>
-
-            <strong class="behaviour-value">
-              ${esc(
-                a.behaviour ||
-                "Not Added"
-              )}
-            </strong>
-
-          </div>
-
-          <button
-            type="button"
-            class="details-button"
-            onclick="openBehaviourDetails()"
-          >
-            View Details
-          </button>
-
-        </div>
-
-        <div class="traits-heading">
-          Behaviour Traits
-        </div>
-
-        <div class="trait-list">
-
-          ${traitHTML}
-
-          ${moreCount}
-
-        </div>
-
-      </div>
-
-    </section>
-
-  `;
-
-}
-
-
-// =========================================================
-// VACCINATION SUMMARY
-// =========================================================
-
-function vaccinationSummary(a) {
-
-  const vaccinations =
-    Array.isArray(a.vaccinations)
-      ? a.vaccinations
-      : [];
-
-
-  const latest =
-    vaccinations.length
-      ? vaccinations[
-          vaccinations.length - 1
-        ]
-      : null;
-
-
-  return `
-
-    <section class="section">
-
-      <div class="section-title">
-        💉 Vaccination Records
-      </div>
-
-      <div class="vaccination-summary">
-
-        <div class="vaccination-summary-info">
-
-          <div class="summary-stat">
-
-            <span class="label">
-              Total Records
-            </span>
-
-            <strong>
-              ${vaccinations.length}
-            </strong>
-
-          </div>
-
-          <div class="summary-stat">
-
-            <span class="label">
-              Latest Vaccine
-            </span>
-
-            <strong>
-              ${
-                latest
-                  ? esc(latest[0])
-                  : "Not Done"
-              }
-            </strong>
-
-          </div>
-
-          <div class="summary-stat">
-
-            <span class="label">
-              Next Due
-            </span>
-
-            <strong>
-              ${
-                latest && latest[2]
-                  ? esc(latest[2])
-                  : "Not Added"
-              }
-            </strong>
-
-          </div>
-
-        </div>
-
-        <button
-          type="button"
-          class="details-button"
-          onclick="openVaccinationDetails()"
-        >
-          View Full History
-        </button>
-
-      </div>
-
-    </section>
-
-  `;
-
-}
-
-
-// =========================================================
-// WEIGHT HISTORY SUMMARY
-// =========================================================
-
-function weightHistorySummary(a) {
-
-  const records =
-    Array.isArray(a.weightHistory)
-      ? a.weightHistory
-      : [];
-
-
-  // -------------------------------------------------------
-  // No records
-  // -------------------------------------------------------
-
-  if (!records.length) {
-
-    return `
-
-      <section
-        class="section"
-        id="weightHistorySection"
-      >
-
-        <div class="section-title">
-          ⚖️ Weight History
-        </div>
-
-        <div
-          class="panel"
-          style="
-            padding:20px;
-            border-radius:16px;
-          "
-        >
-
-          <div
-            class="muted"
-            style="color:var(--muted);"
-          >
-            No weight records added.
-          </div>
-
-        </div>
-
-      </section>
-
-    `;
+    vaccineDue =
+      latestVaccine[2] ||
+      "Not Added";
 
   }
 
 
-  // -------------------------------------------------------
-  // Latest record
-  // -------------------------------------------------------
+  const vaccineRows =
+    vaccinations.length
 
-  const latest =
-    records[0];
+      ? vaccinations
+          .map(
+            (v, index) => `
 
+              <tr
+                class="${
+                  index ===
+                  vaccinations.length - 1
+                    ? "latest"
+                    : ""
+                }">
 
-  // -------------------------------------------------------
-  // History rows
-  // -------------------------------------------------------
+                <td>
+                  ${esc(
+                    v[0] ||
+                    "Not Added"
+                  )}
+                </td>
 
-  const historyRows =
-    records
-      .map(
-        record => `
+                <td>
+                  ${esc(
+                    formatDisplayDate(
+                      v[1]
+                    )
+                  )}
+                </td>
 
-          <div
-            class="weight-row"
-            style="
-              display:flex;
-              justify-content:space-between;
-              align-items:center;
-              gap:15px;
-              padding:12px 0;
-              border-bottom:1px solid rgba(0,0,0,0.06);
-            "
-          >
+                <td>
+                  ${esc(
+                    formatDisplayDate(
+                      v[2]
+                    )
+                  )}
+                </td>
 
-            <div>
+                <td>
 
-              <strong>
-                ${esc(record.weight)}
-                ${esc(record.unit)}
-              </strong>
+                  <span
+                    class="profile-v2-table-status">
 
-              ${
-                record.notes
-                  ? `
+                    ${esc(
+                      v[3] ||
+                      "RECORDED"
+                    )}
 
-                      <small
-                        style="
-                          display:block;
-                          margin-top:4px;
-                          color:var(--muted);
-                        "
-                      >
-                        ${esc(record.notes)}
-                      </small>
+                  </span>
 
-                    `
-                  : ""
-              }
+                </td>
 
-            </div>
+              </tr>
 
-            <span
-              style="
-                font-size:12px;
-                color:var(--muted);
-                white-space:nowrap;
-              "
-            >
-              ${esc(
-                formatDisplayDate(
-                  record.date
-                )
-              )}
-            </span>
+            `
+          )
+          .join("")
 
-          </div>
+      : `
 
-        `
-      )
-      .join("");
+          <tr>
+
+            <td
+              colspan="4"
+              class="profile-v2-empty-row">
+
+              Vaccination: Not Done
+
+            </td>
+
+          </tr>
+
+        `;
 
 
-  // -------------------------------------------------------
-  // Weight section
-  // -------------------------------------------------------
-
-  return `
-
-    <section
-      class="section"
-      id="weightHistorySection"
-    >
-
-      <div class="section-title">
-        ⚖️ Weight History
-      </div>
-
-      <div
-        class="panel"
-        style="
-          padding:20px;
-          border-radius:16px;
-        "
-      >
-
-        <!-- Latest Weight -->
-
-        <div
-          class="weight-latest"
-          style="
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            gap:20px;
-            margin-bottom:16px;
-            padding-bottom:16px;
-            border-bottom:1px solid rgba(0,0,0,0.08);
-          "
-        >
-
-          <div>
-
-            <div
-              class="label"
-              style="color:var(--muted);"
-            >
-              Latest Weight
-            </div>
-
-            <div
-              class="weight-value"
-              style="
-                font-size:28px;
-                font-weight:800;
-                margin-top:4px;
-              "
-            >
-              ${esc(latest.weight)}
-              ${esc(latest.unit)}
-            </div>
-
-          </div>
-
-          <div
-            class="weight-date"
-            style="text-align:right;"
-          >
-
-            <div
-              class="label"
-              style="color:var(--muted);"
-            >
-              Recorded
-            </div>
-
-            <strong>
-              ${esc(
-                formatDisplayDate(
-                  latest.date
-                )
-              )}
-            </strong>
-
-          </div>
-
-        </div>
+  const qrUrl =
+    `${location.origin}${location.pathname}?id=${encodeURIComponent(a.id)}`;
 
 
-        <!-- Historical Records -->
+  /* ==========================================================
+     PROFILE HTML
+     ========================================================== */
 
-        ${
-          records.length > 1
-
-            ? `
-
-                <div
-                  class="weight-history-list"
-                >
-
-                  <div
-                    style="
-                      font-size:11px;
-                      font-weight:700;
-                      color:var(--muted);
-                      margin-bottom:6px;
-                      text-transform:uppercase;
-                      letter-spacing:.05em;
-                    "
-                  >
-                    Previous Records
-                  </div>
-
-                  ${historyRows}
-
-                </div>
-
-              `
-
-            : ""
-
-        }
-
-      </div>
-
-    </section>
-
-  `;
-
-}
+  const app =
+    document.getElementById("app");
 
 
-// =========================================================
-// RENDER PROFILE
-// =========================================================
+  if (!app) {
 
-function renderProfile() {
-
-  const a =
-    getAnimal();
-
-
-  if (!a) {
-
-    showProfileError(
-      "Animal profile not available."
+    console.error(
+      "Profile app container not found."
     );
 
     return;
@@ -1109,108 +1291,14 @@ function renderProfile() {
   }
 
 
-  // -------------------------------------------------------
-  // Browser title
-  // -------------------------------------------------------
+  app.innerHTML = `
 
-  document.title =
-    `${a.name} | Animal Digital ID`;
+    <div class="page profile-v2-page">
 
-
-  // =======================================================
-  // LOCATION BUTTON
-  // =======================================================
-
-  const map =
-
-    a.mapUrl
-
-      ? `
-
-          <a
-            class="button"
-            href="${esc(a.mapUrl)}"
-            target="_blank"
-            rel="noopener"
-          >
-            📍 View Location
-          </a>
-
-        `
-
-      : `
-
-          <span
-            class="button disabled"
-          >
-            📍 Location not added
-          </span>
-
-        `;
+      <div class="card profile-v2-card">
 
 
-  // =======================================================
-  // PHONE
-  // =======================================================
-
-  const phone =
-
-    a.phone
-
-      ? `
-
-          <a href="tel:${esc(a.phone)}">
-            ${esc(a.phone)}
-          </a>
-
-        `
-
-      : `
-
-          <span>
-            Not Added
-          </span>
-
-        `;
-
-
-  // =======================================================
-  // ALTERNATE PHONE
-  // =======================================================
-
-  const alternate =
-
-    a.alternatePhone
-
-      ? `
-
-          <a href="tel:${esc(a.alternatePhone)}">
-            ${esc(a.alternatePhone)}
-          </a>
-
-        `
-
-      : `
-
-          <span>
-            Not Added
-          </span>
-
-        `;
-
-
-  // =======================================================
-  // MAIN PROFILE HTML
-  // =======================================================
-
-  document.getElementById("app").innerHTML = `
-
-    <div class="page">
-
-      <div class="card">
-
-
-        <!-- =================================================
+        <!-- ==================================================
              HEADER
         ================================================== -->
 
@@ -1229,7 +1317,7 @@ function renderProfile() {
               </h1>
 
               <p>
-                Digital identity record for a healthy & happy life
+                Private animal registry • individual digital profiles
               </p>
 
             </div>
@@ -1237,69 +1325,53 @@ function renderProfile() {
           </div>
 
 
-          <!-- =================================================
-               PROFILE ACTIONS
-          ================================================== -->
+          <nav class="nav">
 
-          <nav class="profile-actions">
-
-            <a
-              href="./index.html"
-              class="back-registry"
-            >
-              ← Back to Registry
+            <a href="./index.html">
+              Home
             </a>
 
-            <button
-              type="button"
-              class="request-change-btn"
-              onclick="openChangeRequest()"
-            >
-              📝 Request a Change
-            </button>
-
           </nav>
-
-
-          <!-- =================================================
-               ID PANEL
-          ================================================== -->
-
-          <div class="id-panel">
-
-            <div>
-
-              <div class="id-label">
-                Animal Identification Number
-              </div>
-
-              <div class="id-number">
-                ${esc(a.animalId)}
-              </div>
-
-            </div>
-
-            <div class="status">
-              ✓ REGISTERED
-            </div>
-
-          </div>
 
         </header>
 
 
-        <!-- =================================================
-             MAIN CONTENT
-        ================================================== -->
-
-        <main class="content">
+        <main class="content profile-v2-content">
 
 
-          <!-- =================================================
+          <!-- ==================================================
+               ACTION BAR
+          ================================================== -->
+
+          <div class="profile-v2-topbar">
+
+            <a
+              href="./index.html"
+              class="profile-v2-back">
+
+              ← Back to Registry
+
+            </a>
+
+
+            <button
+              type="button"
+              class="profile-v2-change"
+              onclick="openChangeRequest()">
+
+              📝 Request a Change
+
+            </button>
+
+          </div>
+
+
+          <!-- ==================================================
                PRIVATE NOTICE
           ================================================== -->
 
-          <div class="notice">
+          <div
+            class="notice profile-v2-notice">
 
             <span>
               🛡️
@@ -1308,365 +1380,1205 @@ function renderProfile() {
             <span>
 
               <strong>
-                Private Animal Digital ID:
+                Private Animal Digital ID
               </strong>
 
-              This record is privately maintained by the owner
-              and is not a government-issued identity document.
+              This record is privately maintained
+              by the owner and is not a
+              government-issued identity document.
 
             </span>
 
           </div>
 
 
-          <!-- =================================================
-               PROFILE
+          <!-- ==================================================
+               PROFILE HERO
           ================================================== -->
 
-          <section class="profile">
+          <section class="profile-v2-hero">
 
 
             <!-- PHOTO -->
 
-            <div class="photo-wrap">
+            <div class="profile-v2-photo-area">
 
-              <div class="photo-frame">
+              <div
+                class="profile-v2-photo-frame">
 
-                <img
-                  src="${esc(a.photo)}"
-                  alt="${esc(a.name)}'s photograph"
-                  class="photo"
-                >
+                ${
+                  a.photo
 
-                <div class="registered">
-                  ✓ ${esc(a.status)}
+                    ? `
+
+                      <img
+                        src="${esc(a.photo)}"
+                        alt="${esc(a.name)}"
+                        class="profile-v2-photo">
+
+                    `
+
+                    : `
+
+                      <div
+                        class="profile-v2-photo-empty">
+
+                        🐾
+
+                        <span>
+                          No photo uploaded
+                        </span>
+
+                      </div>
+
+                    `
+                }
+
+
+                <div
+                  class="profile-v2-status ${statusClass}">
+
+                  ✓ ${esc(statusLabel)}
+
                 </div>
 
               </div>
 
-              <div class="caption">
 
-                Registered photograph •
-                ${esc(a.name)}
+              <div
+                class="profile-v2-photo-caption">
+
+                Registered photograph
 
               </div>
 
             </div>
 
 
-            <!-- DETAILS -->
+            <!-- PROFILE INFORMATION -->
 
-            <div class="details">
+            <div
+              class="profile-v2-hero-info">
+
+
+              <div
+                class="profile-v2-eyebrow">
+
+                ANIMAL DIGITAL PROFILE
+
+              </div>
+
+
+              <h2>
+                ${esc(a.name)}
+              </h2>
+
+
+              <div
+                class="profile-v2-id">
+
+                ${esc(a.animalId)}
+
+              </div>
+
+
+              <p
+                class="profile-v2-intro">
+
+                A live digital identity record containing
+                registered identity, behaviour, health,
+                location and contact information.
+
+              </p>
+
+
+              <div
+                class="profile-v2-quick-grid">
+
+
+                ${detail(
+                  "Type",
+                  a.type,
+                  "🐾"
+                )}
+
+
+                ${detail(
+                  "Breed",
+                  a.breed,
+                  "🧬"
+                )}
+
+
+                ${detail(
+                  "Gender",
+                  a.gender,
+                  "⚥"
+                )}
+
+
+                ${detail(
+                  "Date of Birth",
+                  formatDate(a.dob),
+                  "🎂"
+                )}
+
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- ==================================================
+               OVERVIEW
+          ================================================== -->
+
+          <section
+            class="profile-v2-overview">
+
+
+            <div
+              class="profile-v2-overview-item">
+
+              <span>
+                BEHAVIOUR
+              </span>
+
+              <strong>
+                ${esc(a.behaviour)}
+              </strong>
+
+            </div>
+
+
+            <div
+              class="profile-v2-overview-item">
+
+              <span>
+                PET PARENT
+              </span>
+
+              <strong>
+                ${esc(a.parent)}
+              </strong>
+
+            </div>
+
+
+            <div
+              class="profile-v2-overview-item">
+
+              <span>
+                LOCATION
+              </span>
+
+              <strong>
+                ${esc(location)}
+              </strong>
+
+            </div>
+
+
+            <div
+              class="profile-v2-overview-item">
+
+              <span>
+                RECORD
+              </span>
+
+              <strong>
+                ${esc(statusLabel)}
+              </strong>
+
+            </div>
+
+
+          </section>
+
+
+          <!-- ==================================================
+               IDENTITY SECTION
+          ================================================== -->
+
+          <section
+            class="profile-v2-section">
+
+
+            <div
+              class="profile-v2-section-heading">
+
+              <div>
+
+                <span
+                  class="profile-v2-section-kicker">
+
+                  IDENTITY
+
+                </span>
+
+                <h3>
+                  Registered Information
+                </h3>
+
+              </div>
+
+
+              <span
+                class="profile-v2-section-icon">
+
+                🪪
+
+              </span>
+
+            </div>
+
+
+            <div
+              class="profile-v2-detail-grid">
+
 
               ${detail(
                 "Animal Name",
                 a.name
               )}
 
+
               ${detail(
                 "Animal ID",
                 a.animalId
               )}
+
 
               ${detail(
                 "Type",
                 a.type
               )}
 
+
               ${detail(
                 "Breed",
                 a.breed
               )}
+
 
               ${detail(
                 "Gender",
                 a.gender
               )}
 
+
               ${detail(
                 "Date of Birth",
-                a.dob
+                formatDate(a.dob)
               )}
 
-              ${detail(
-                "Pet Parent",
-                a.parent
-              )}
-
-              ${detail(
-                "Behaviour",
-                a.behaviour
-              )}
 
               ${detail(
                 "Neutering Status",
                 a.neutering
               )}
 
+
               ${detail(
                 "Record Status",
-                a.status
+                statusLabel
               )}
+
 
             </div>
 
           </section>
 
 
-          <!-- =================================================
-               BEHAVIOUR SUMMARY
+          <!-- ==================================================
+               BEHAVIOUR
           ================================================== -->
 
-          ${behaviourSummary(a)}
+          <section
+            class="profile-v2-section">
 
 
-          <!-- =================================================
-               VACCINATION SUMMARY
-          ================================================== -->
-
-          ${vaccinationSummary(a)}
-
-
-          <!-- =================================================
-               WEIGHT HISTORY
-          ================================================== -->
-
-          ${weightHistorySummary(a)}
-
-
-          <!-- =================================================
-               LOCATION
-          ================================================== -->
-
-          <section class="section">
-
-            <div class="section-title">
-              📍 Registered Location
-            </div>
-
-            <div class="location-box">
+            <div
+              class="profile-v2-section-heading">
 
               <div>
 
-                <div class="location-name">
-                  ${esc(a.location)}
-                </div>
+                <span
+                  class="profile-v2-section-kicker">
 
-                <div class="location-sub">
-                  Registered location for
-                  ${esc(a.name)}
-                </div>
+                  PERSONALITY
+
+                </span>
+
+                <h3>
+                  Behaviour & Temperament
+                </h3>
 
               </div>
 
-              ${map}
+
+              <span
+                class="profile-v2-section-icon">
+
+                🧠
+
+              </span>
 
             </div>
 
-          </section>
+
+            <div
+              class="profile-v2-behaviour-card">
 
 
-          <!-- =================================================
-               OWNER INFORMATION
-          ================================================== -->
+              <div
+                class="profile-v2-behaviour-main">
 
-          <section class="section">
-
-            <div class="section-title">
-              📞 Pet Parent & Emergency Information
-            </div>
-
-            <div class="owner-grid">
-
-              <div class="contact">
-
-                <span class="label">
-                  Pet Parent
-                </span>
-
-                <strong>
-                  ${esc(a.parent)}
-                </strong>
-
-              </div>
-
-
-              <div class="contact">
-
-                <span class="label">
-                  Phone
-                </span>
-
-                ${phone}
-
-              </div>
-
-
-              <div class="contact">
-
-                <span class="label">
-                  Alternate Phone
-                </span>
-
-                ${alternate}
-
-              </div>
-
-
-              <div class="contact">
-
-                <span class="label">
-                  Behaviour
+                <span>
+                  OVERALL BEHAVIOUR
                 </span>
 
                 <strong>
                   ${esc(a.behaviour)}
                 </strong>
 
+
+                <button
+                  type="button"
+                  class="profile-v2-outline-button"
+                  onclick="openBehaviourDetails()">
+
+                  View Details
+
+                </button>
+
               </div>
+
+
+              <div
+                class="profile-v2-traits-area">
+
+                <span>
+                  BEHAVIOUR TRAITS
+                </span>
+
+
+                <div
+                  class="profile-v2-traits">
+
+                  ${traitHtml}
+
+                </div>
+
+              </div>
+
 
             </div>
 
           </section>
 
 
-          <!-- =================================================
-               QR VERIFICATION
+          <!-- ==================================================
+               HEALTH
           ================================================== -->
 
-          <section class="verification">
+          <section
+            class="profile-v2-health-grid">
 
-            <div>
 
-              <div class="verify-title">
-                🔎 Digital ID Verification
+            <!-- VACCINATION -->
+
+            <div
+              class="profile-v2-section profile-v2-health-card">
+
+
+              <div
+                class="profile-v2-section-heading">
+
+                <div>
+
+                  <span
+                    class="profile-v2-section-kicker">
+
+                    HEALTH
+
+                  </span>
+
+                  <h3>
+                    Vaccinations
+                  </h3>
+
+                </div>
+
+
+                <span
+                  class="profile-v2-section-icon">
+
+                  💉
+
+                </span>
+
               </div>
 
-              <div class="verify-text">
-                Scan the QR code to open this animal's
-                live profile.
+
+              <div
+                class="profile-v2-health-stat-grid">
+
+
+                <div>
+
+                  <span>
+                    TOTAL RECORDS
+                  </span>
+
+                  <strong>
+                    ${vaccinations.length}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    LATEST VACCINE
+                  </span>
+
+                  <strong>
+                    ${esc(vaccineName)}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    NEXT DUE
+                  </span>
+
+                  <strong>
+                    ${esc(
+                      formatDate(
+                        vaccineDue
+                      )
+                    )}
+                  </strong>
+
+                </div>
+
+
               </div>
+
+
+              <button
+                type="button"
+                class="profile-v2-full-button"
+                onclick="openVaccinationDetails()">
+
+                View Vaccination History →
+
+              </button>
+
 
             </div>
 
-            <div>
+
+            <!-- WEIGHT -->
+
+            <div
+              class="profile-v2-section profile-v2-health-card">
+
+
+              <div
+                class="profile-v2-section-heading">
+
+                <div>
+
+                  <span
+                    class="profile-v2-section-kicker">
+
+                    HEALTH
+
+                  </span>
+
+                  <h3>
+                    Weight
+                  </h3>
+
+                </div>
+
+
+                <span
+                  class="profile-v2-section-icon">
+
+                  ⚖️
+
+                </span>
+
+              </div>
+
+
+              ${
+                latestWeight
+
+                  ? `
+
+                    <div
+                      class="profile-v2-weight-highlight">
+
+
+                      <div>
+
+                        <span>
+                          LATEST WEIGHT
+                        </span>
+
+                        <strong>
+
+                          ${esc(
+                            latestWeight.weight
+                          )}
+
+                          ${esc(
+                            latestWeight.unit
+                          )}
+
+                        </strong>
+
+                      </div>
+
+
+                      <div>
+
+                        <span>
+                          RECORDED
+                        </span>
+
+                        <strong>
+
+                          ${esc(
+                            formatDate(
+                              latestWeight.date
+                            )
+                          )}
+
+                        </strong>
+
+                      </div>
+
+
+                    </div>
+
+                  `
+
+                  : `
+
+                    <div
+                      class="profile-v2-empty-health">
+
+                      No weight records added.
+
+                    </div>
+
+                  `
+              }
+
+
+              <button
+                type="button"
+                class="profile-v2-full-button"
+                onclick="openWeightDetails()">
+
+                View Weight History →
+
+              </button>
+
+
+            </div>
+
+
+          </section>
+
+
+          <!-- ==================================================
+               LOCATION + CONTACT
+          ================================================== -->
+
+          <section
+            class="profile-v2-two-column">
+
+
+            <!-- LOCATION -->
+
+            <div
+              class="profile-v2-section">
+
+
+              <div
+                class="profile-v2-section-heading">
+
+                <div>
+
+                  <span
+                    class="profile-v2-section-kicker">
+
+                    LOCATION
+
+                  </span>
+
+                  <h3>
+                    Registered Location
+                  </h3>
+
+                </div>
+
+
+                <span
+                  class="profile-v2-section-icon">
+
+                  📍
+
+                </span>
+
+              </div>
+
+
+              <div
+                class="profile-v2-location-card">
+
+
+                <div>
+
+                  <strong>
+                    ${esc(location)}
+                  </strong>
+
+                  <span>
+
+                    Registered location for
+                    ${esc(a.name)}
+
+                  </span>
+
+                </div>
+
+
+                ${mapHtml}
+
+
+              </div>
+
+
+            </div>
+
+
+            <!-- CONTACT -->
+
+            <div
+              class="profile-v2-section">
+
+
+              <div
+                class="profile-v2-section-heading">
+
+                <div>
+
+                  <span
+                    class="profile-v2-section-kicker">
+
+                    CONTACT
+
+                  </span>
+
+                  <h3>
+                    Pet Parent
+                  </h3>
+
+                </div>
+
+
+                <span
+                  class="profile-v2-section-icon">
+
+                  📞
+
+                </span>
+
+              </div>
+
+
+              <div
+                class="profile-v2-contact-grid">
+
+
+                <div>
+
+                  <span>
+                    NAME
+                  </span>
+
+                  <strong>
+                    ${esc(a.parent)}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    PHONE
+                  </span>
+
+                  ${phoneHtml}
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    ALTERNATE
+                  </span>
+
+                  ${alternateHtml}
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    BEHAVIOUR
+                  </span>
+
+                  <strong>
+                    ${esc(a.behaviour)}
+                  </strong>
+
+                </div>
+
+
+              </div>
+
+
+            </div>
+
+
+          </section>
+
+
+          <!-- ==================================================
+               VERIFICATION
+          ================================================== -->
+
+          <section
+            class="profile-v2-verification">
+
+
+            <div
+              class="profile-v2-verification-copy">
+
+
+              <span
+                class="profile-v2-section-kicker">
+
+                VERIFY THIS RECORD
+
+              </span>
+
+
+              <h3>
+                Digital ID Verification
+              </h3>
+
+
+              <p>
+
+                Scan this QR code to open the live
+                profile for ${esc(a.name)}.
+
+              </p>
+
+
+              <div
+                class="profile-v2-verify-id">
+
+                ${esc(a.animalId)}
+
+              </div>
+
+
+            </div>
+
+
+            <div
+              class="profile-v2-qr-wrap">
+
 
               <div
                 id="qrcode"
-                class="qrcode"
-              ></div>
-
-              <div class="mini-id">
-                ${esc(a.animalId)}
+                class="profile-v2-qr">
               </div>
+
+
+              <span>
+                Scan to verify
+              </span>
+
 
             </div>
 
+
           </section>
+
+
+          <!-- ==================================================
+               FOOTER
+          ================================================== -->
+
+          <footer
+            class="footer profile-v2-footer">
+
+
+            <div>
+
+              <strong>
+                ANIMAL DIGITAL ID
+              </strong>
+
+              <span>
+                Every animal matters
+              </span>
+
+            </div>
+
+
+            <div
+              class="profile-v2-footer-note">
+
+              Private owner-maintained record
+              • Not a government-issued identity document
+
+            </div>
+
+
+          </footer>
 
 
         </main>
 
+      </div>
 
-        <!-- =================================================
-             FOOTER
-        ================================================== -->
+    </div>
 
-        <footer class="footer">
 
-          <strong>
-            ANIMAL DIGITAL ID
-          </strong>
+    <!-- ======================================================
+         THEME TOGGLE
+    ======================================================= -->
 
-          • ${esc(a.animalId)}
+    <button
+      id="profileThemeToggle"
+      class="theme-toggle"
+      type="button"
+      aria-label="Switch to dark mode"
+      title="Switch to dark mode">
 
-          <br>
 
-          Please contact the pet parent if
-          ${esc(a.name)} is found.
+      <span
+        class="profile-theme-icon">
 
-          <br>
+        🌙
 
-          Private owner-maintained record
-          • Not a government-issued identity document
+      </span>
 
-        </footer>
 
+      <span
+        class="profile-theme-text">
+
+        Dark
+
+      </span>
+
+
+    </button>
+
+  `;
+
+
+  /* ==========================================================
+     QR CODE
+     ========================================================== */
+
+  const qrElement =
+    document.getElementById(
+      "qrcode"
+    );
+
+
+  if (
+    qrElement &&
+    window.QRCode
+  ) {
+
+    qrElement.innerHTML = "";
+
+
+    new QRCode(
+      qrElement,
+      {
+        text: qrUrl,
+        width: 128,
+        height: 128,
+        correctLevel:
+          QRCode.CorrectLevel.M
+      }
+    );
+
+  }
+
+
+  /* ==========================================================
+     THEME
+     ========================================================== */
+
+  setupProfileTheme();
+
+}
+
+
+/* ============================================================
+   PART 2 END
+   ============================================================ */
+   /* ============================================================
+   DATE DISPLAY HELPER
+   ============================================================ */
+
+function formatDisplayDate(value) {
+
+  if (!value) {
+    return "Not Added";
+  }
+
+  const date =
+    new Date(
+      value + "T00:00:00"
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return String(value);
+  }
+
+  return date.toLocaleDateString(
+    "en-GB",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }
+  );
+
+}
+
+
+/* ============================================================
+   CLOSE MODAL
+   ============================================================ */
+
+function closeProfileModal() {
+
+  const modal =
+    document.querySelector(
+      ".profile-v2-modal"
+    );
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove(
+    "show"
+  );
+
+  setTimeout(
+    () => {
+
+      if (modal.parentNode) {
+
+        modal.parentNode.removeChild(
+          modal
+        );
+
+      }
+
+    },
+    180
+  );
+
+}
+
+
+/* ============================================================
+   CREATE MODAL
+   ============================================================ */
+
+function createProfileModal(
+  content
+) {
+
+  closeProfileModal();
+
+
+  const modal =
+    document.createElement(
+      "div"
+    );
+
+
+  modal.className =
+    "profile-v2-modal";
+
+
+  modal.innerHTML = `
+
+    <div
+      class="profile-v2-modal-backdrop">
+    </div>
+
+
+    <div
+      class="profile-v2-modal-dialog"
+      role="dialog"
+      aria-modal="true">
+
+
+      <button
+        type="button"
+        class="profile-v2-modal-close"
+        aria-label="Close">
+
+        ×
+
+      </button>
+
+
+      <div
+        class="profile-v2-modal-content">
+
+        ${content}
 
       </div>
+
 
     </div>
 
   `;
 
 
-  // =======================================================
-  // QR CODE
-  // =======================================================
-
-  if (window.QRCode) {
-
-    const url =
-      `${location.origin}${location.pathname}?id=${encodeURIComponent(a.id)}`;
+  document.body.appendChild(
+    modal
+  );
 
 
-    const qrElement =
-      document.getElementById("qrcode");
+  const closeButton =
+    modal.querySelector(
+      ".profile-v2-modal-close"
+    );
 
 
-    if (qrElement) {
+  const backdrop =
+    modal.querySelector(
+      ".profile-v2-modal-backdrop"
+    );
 
-      qrElement.innerHTML = "";
 
-      new QRCode(
-        qrElement,
-        {
-          text: url,
-          width: 90,
-          height: 90,
-          correctLevel:
-            QRCode.CorrectLevel.M
-        }
+  if (closeButton) {
+
+    closeButton.addEventListener(
+      "click",
+      closeProfileModal
+    );
+
+  }
+
+
+  if (backdrop) {
+
+    backdrop.addEventListener(
+      "click",
+      closeProfileModal
+    );
+
+  }
+
+
+  document.addEventListener(
+    "keydown",
+    handleProfileEscape
+  );
+
+
+  requestAnimationFrame(
+    () => {
+
+      modal.classList.add(
+        "show"
       );
 
     }
+  );
 
-  }
+
+  return modal;
 
 }
 
 
-// =========================================================
-// CLOSE DETAIL MODAL
-// =========================================================
+/* ============================================================
+   ESCAPE KEY
+   ============================================================ */
 
-function closeDetailModal() {
+function handleProfileEscape(
+  event
+) {
 
-  const modal =
-    document.getElementById(
-      "detailModal"
+  if (
+    event.key ===
+    "Escape"
+  ) {
+
+    closeProfileModal();
+
+    document.removeEventListener(
+      "keydown",
+      handleProfileEscape
     );
 
-  if (modal) {
-
-    modal.remove();
-
   }
 
 }
 
 
-// =========================================================
-// BEHAVIOUR & TEMPERAMENT POPUP
-// =========================================================
+/* ============================================================
+   BEHAVIOUR DETAILS
+   ============================================================ */
 
 function openBehaviourDetails() {
 
-  closeDetailModal();
-
-
   const a =
-    getAnimal();
+    currentAnimal;
+
+
+  if (!a) {
+    return;
+  }
 
 
   const traits =
@@ -1674,15 +2586,17 @@ function openBehaviourDetails() {
 
 
   const traitsHtml =
-
     traits.length
 
       ? traits
           .map(
             trait => `
 
-              <span class="trait-pill">
+              <span
+                class="profile-v2-trait">
+
                 ${esc(trait)}
+
               </span>
 
             `
@@ -1691,255 +2605,362 @@ function openBehaviourDetails() {
 
       : `
 
-          <span class="not-added">
-            No behaviour traits added.
-          </span>
+          <p
+            class="profile-v2-modal-muted">
+
+            No behaviour traits have been added.
+
+          </p>
 
         `;
 
 
-  const modal =
-    document.createElement("div");
+  createProfileModal(`
+
+    <div
+      class="profile-v2-modal-kicker">
+
+      PERSONALITY
+
+    </div>
 
 
-  modal.id =
-    "detailModal";
-
-  modal.className =
-    "detail-modal";
+    <h2>
+      ${esc(a.name)}'s Behaviour
+    </h2>
 
 
-  modal.innerHTML = `
+    <div
+      class="profile-v2-modal-highlight">
 
-    <div class="detail-modal-card">
+      <span>
+        OVERALL TEMPERAMENT
+      </span>
 
-      <div class="detail-modal-header">
+      <strong>
+        ${esc(a.behaviour)}
+      </strong>
 
-        <div class="detail-modal-title">
-
-          <div class="detail-modal-icon">
-            🧠
-          </div>
-
-          <div>
-
-            <h3>
-              Behaviour & Temperament
-            </h3>
-
-            <p>
-              ${esc(a.name)}
-              •
-              ${esc(a.animalId)}
-            </p>
-
-          </div>
-
-        </div>
-
-        <button
-          type="button"
-          class="detail-modal-close"
-          aria-label="Close"
-        >
-          ×
-        </button>
-
-      </div>
+    </div>
 
 
-      <div class="detail-modal-body">
+    <div
+      class="profile-v2-modal-section">
 
-        <div class="behaviour-overall">
+      <span
+        class="profile-v2-modal-label">
 
-          <span class="detail-small-label">
-            OVERALL BEHAVIOUR
-          </span>
+        BEHAVIOUR TRAITS
 
-          <strong>
-            ${esc(
-              a.behaviour ||
-              "Not Added"
-            )}
-          </strong>
-
-        </div>
+      </span>
 
 
-        <div class="traits-section">
+      <div
+        class="profile-v2-traits">
 
-          <span class="detail-small-label">
-            BEHAVIOUR TRAITS
-          </span>
-
-          <div class="traits-list">
-            ${traitsHtml}
-          </div>
-
-        </div>
-
-
-        ${
-          a.behaviourNotes
-
-            ? `
-
-                <div class="behaviour-notes">
-
-                  <span class="detail-small-label">
-                    ADDITIONAL NOTES
-                  </span>
-
-                  <p>
-                    ${esc(a.behaviourNotes)}
-                  </p>
-
-                </div>
-
-              `
-
-            : ""
-        }
+        ${traitsHtml}
 
       </div>
 
     </div>
 
-  `;
+
+    ${
+      a.behaviourNotes
+
+        ? `
+
+          <div
+            class="profile-v2-modal-section">
+
+            <span
+              class="profile-v2-modal-label">
+
+              NOTES
+
+            </span>
+
+            <p
+              class="profile-v2-modal-text">
+
+              ${esc(
+                a.behaviourNotes
+              )}
+
+            </p>
+
+          </div>
+
+        `
+
+        : ""
+    }
+
+  `);
+
+}
 
 
-  document.body.appendChild(modal);
+/* ============================================================
+   WEIGHT HISTORY
+   ============================================================ */
+
+function openWeightDetails() {
+
+  const a =
+    currentAnimal;
 
 
-  // -------------------------------------------------------
-  // Close button
-  // -------------------------------------------------------
-
-  const closeButton =
-    modal.querySelector(
-      ".detail-modal-close"
-    );
-
-
-  if (closeButton) {
-
-    closeButton.addEventListener(
-      "click",
-      function () {
-
-        closeDetailModal();
-
-      }
-    );
-
+  if (!a) {
+    return;
   }
 
 
-  // -------------------------------------------------------
-  // Click outside
-  // -------------------------------------------------------
+  const records =
+    Array.isArray(
+      a.weightHistory
+    )
+      ? [...a.weightHistory]
+      : [];
 
-  modal.addEventListener(
-    "click",
-    function (event) {
 
-      if (
-        event.target === modal
-      ) {
+  records.sort(
+    (x, y) => {
 
-        closeDetailModal();
+      const xDate =
+        new Date(
+          x.date ||
+          0
+        ).getTime();
 
-      }
+
+      const yDate =
+        new Date(
+          y.date ||
+          0
+        ).getTime();
+
+
+      return yDate - xDate;
 
     }
   );
 
 
-  // -------------------------------------------------------
-  // Escape key
-  // -------------------------------------------------------
+  const rows =
+    records.length
 
-  const escHandler =
-    function (event) {
+      ? records
+          .map(
+            record => `
 
-      if (
-        event.key === "Escape"
-      ) {
+              <tr>
 
-        closeDetailModal();
+                <td>
 
-        document.removeEventListener(
-          "keydown",
-          escHandler
-        );
+                  ${esc(
+                    formatDisplayDate(
+                      record.date
+                    )
+                  )}
 
-      }
-
-    };
+                </td>
 
 
-  document.addEventListener(
-    "keydown",
-    escHandler
-  );
+                <td>
+
+                  <strong>
+
+                    ${esc(
+                      record.weight
+                    )}
+
+                    ${esc(
+                      record.unit ||
+                      "kg"
+                    )}
+
+                  </strong>
+
+                </td>
+
+
+                <td>
+
+                  ${esc(
+                    record.notes ||
+                    "No notes"
+                  )}
+
+                </td>
+
+              </tr>
+
+            `
+          )
+          .join("")
+
+      : `
+
+          <tr>
+
+            <td
+              colspan="3"
+              class="profile-v2-empty-row">
+
+              No weight records available.
+
+            </td>
+
+          </tr>
+
+        `;
+
+
+  createProfileModal(`
+
+    <div
+      class="profile-v2-modal-kicker">
+
+      HEALTH
+
+    </div>
+
+
+    <h2>
+      ${esc(a.name)}'s Weight History
+    </h2>
+
+
+    <p
+      class="profile-v2-modal-description">
+
+      Recorded weight measurements maintained
+      as part of the animal's digital health record.
+
+    </p>
+
+
+    <div
+      class="profile-v2-modal-table-wrap">
+
+      <table
+        class="profile-v2-modal-table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Date
+            </th>
+
+            <th>
+              Weight
+            </th>
+
+            <th>
+              Notes
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${rows}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `);
 
 }
 
 
-// =========================================================
-// VACCINATION DETAILS POPUP
-// =========================================================
+/* ============================================================
+   VACCINATION HISTORY
+   ============================================================ */
 
 function openVaccinationDetails() {
 
-  closeDetailModal();
-
-
   const a =
-    getAnimal();
+    currentAnimal;
 
 
-  const vaccinations =
-    Array.isArray(a.vaccinations)
+  if (!a) {
+    return;
+  }
+
+
+  const records =
+    Array.isArray(
+      a.vaccinations
+    )
       ? a.vaccinations
       : [];
 
 
   const rows =
+    records.length
 
-    vaccinations.length
-
-      ? vaccinations
+      ? records
           .map(
-            (vaccination, index) => `
+            record => `
 
-              <tr
-                class="${
-                  index ===
-                  vaccinations.length - 1
-                    ? "latest"
-                    : ""
-                }"
-              >
+              <tr>
 
                 <td>
-                  ${esc(vaccination[0])}
+
+                  <strong>
+
+                    ${esc(
+                      record[0] ||
+                      "Not Added"
+                    )}
+
+                  </strong>
+
                 </td>
 
-                <td>
-                  ${esc(vaccination[1])}
-                </td>
 
                 <td>
-                  ${esc(vaccination[2])}
+
+                  ${esc(
+                    formatDisplayDate(
+                      record[1]
+                    )
+                  )}
+
                 </td>
+
+
+                <td>
+
+                  ${esc(
+                    formatDisplayDate(
+                      record[2]
+                    )
+                  )}
+
+                </td>
+
 
                 <td>
 
                   <span
-                    class="vaccine-status"
-                  >
-                    ${esc(vaccination[3])}
+                    class="profile-v2-table-status">
+
+                    ${esc(
+                      record[3] ||
+                      "RECORDED"
+                    )}
+
                   </span>
 
                 </td>
@@ -1956,9 +2977,10 @@ function openVaccinationDetails() {
 
             <td
               colspan="4"
-              class="empty-row"
-            >
-              Vaccination: Not Done
+              class="profile-v2-empty-row">
+
+              No vaccination records available.
+
             </td>
 
           </tr>
@@ -1966,915 +2988,474 @@ function openVaccinationDetails() {
         `;
 
 
-  const modal =
-    document.createElement("div");
-
-
-  modal.id =
-    "detailModal";
-
-  modal.className =
-    "detail-modal";
-
-
-  modal.innerHTML = `
+  createProfileModal(`
 
     <div
-      class="detail-modal-card vaccination-modal"
-    >
+      class="profile-v2-modal-kicker">
 
-      <div class="detail-modal-header">
+      HEALTH
 
-        <div class="detail-modal-title">
+    </div>
 
-          <div class="detail-modal-icon">
-            💉
-          </div>
 
-          <div>
+    <h2>
+      ${esc(a.name)}'s Vaccination History
+    </h2>
 
-            <h3>
-              Vaccination Records
-            </h3>
 
-            <p>
-              ${esc(a.name)}
-              •
-              ${vaccinations.length}
-              record${
-                vaccinations.length === 1
-                  ? ""
-                  : "s"
-              }
-            </p>
+    <p
+      class="profile-v2-modal-description">
 
-          </div>
+      Vaccination records associated with
+      this animal profile.
 
-        </div>
+    </p>
 
-        <button
-          type="button"
-          class="detail-modal-close"
-          aria-label="Close"
-        >
-          ×
-        </button>
+
+    <div
+      class="profile-v2-modal-table-wrap">
+
+      <table
+        class="profile-v2-modal-table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Vaccine
+            </th>
+
+            <th>
+              Date
+            </th>
+
+            <th>
+              Next Due
+            </th>
+
+            <th>
+              Status
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${rows}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `);
+
+}
+
+
+/* ============================================================
+   PART 3 END
+   ============================================================ */
+   /* ============================================================
+   REQUEST A CHANGE
+   ============================================================ */
+
+function openChangeRequest() {
+
+  const a =
+    currentAnimal;
+
+
+  if (!a) {
+    return;
+  }
+
+
+  createProfileModal(`
+
+    <div
+      class="profile-v2-modal-kicker">
+
+      PROFILE UPDATE
+
+    </div>
+
+
+    <h2>
+      Request a Change
+    </h2>
+
+
+    <p
+      class="profile-v2-modal-description">
+
+      If any information in this animal profile
+      needs to be corrected or updated, submit
+      the request below.
+
+    </p>
+
+
+    <form
+      id="profileChangeForm"
+      class="profile-v2-change-form">
+
+
+      <input
+        type="hidden"
+        name="animal_id"
+        value="${esc(a.animalId)}">
+
+
+      <input
+        type="hidden"
+        name="animal_name"
+        value="${esc(a.name)}">
+
+
+      <div
+        class="profile-v2-form-group">
+
+        <label
+          for="changeName">
+
+          Your Name
+
+        </label>
+
+        <input
+          id="changeName"
+          name="name"
+          type="text"
+          required
+          placeholder="Enter your name">
 
       </div>
 
 
       <div
-        class="detail-modal-body vaccination-modal-body"
-      >
+        class="profile-v2-form-group">
 
-        <div class="vaccination-count">
+        <label
+          for="changeEmail">
 
-          <strong>
-            ${vaccinations.length}
-          </strong>
+          Email Address
 
-          <span>
-            vaccination record${
-              vaccinations.length === 1
-                ? ""
-                : "s"
-            }
-          </span>
+        </label>
 
-        </div>
-
-
-        <div class="vaccination-table-wrap">
-
-          <table
-            class="vaccination-popup-table"
-          >
-
-            <thead>
-
-              <tr>
-
-                <th>
-                  Vaccine / Record
-                </th>
-
-                <th>
-                  Date
-                </th>
-
-                <th>
-                  Next Due
-                </th>
-
-                <th>
-                  Status
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              ${rows}
-
-            </tbody>
-
-          </table>
-
-        </div>
+        <input
+          id="changeEmail"
+          name="email"
+          type="email"
+          required
+          placeholder="Enter your email">
 
       </div>
 
-    </div>
 
-  `;
+      <div
+        class="profile-v2-form-group">
 
+        <label
+          for="changeType">
 
-  document.body.appendChild(modal);
+          What needs to be changed?
 
+        </label>
 
-  // -------------------------------------------------------
-  // Close button
-  // -------------------------------------------------------
+        <select
+          id="changeType"
+          name="change_type"
+          required>
 
-  const closeButton =
-    modal.querySelector(
-      ".detail-modal-close"
-    );
+          <option value="">
+            Select an option
+          </option>
 
+          <option value="Identity">
+            Identity Information
+          </option>
 
-  if (closeButton) {
+          <option value="Contact">
+            Owner / Contact Information
+          </option>
 
-    closeButton.addEventListener(
-      "click",
-      function () {
+          <option value="Behaviour">
+            Behaviour Information
+          </option>
 
-        closeDetailModal();
+          <option value="Health">
+            Health Information
+          </option>
 
-      }
-    );
+          <option value="Location">
+            Location
+          </option>
 
-  }
+          <option value="Photo">
+            Profile Photo
+          </option>
 
+          <option value="Other">
+            Other
+          </option>
 
-  // -------------------------------------------------------
-  // Click outside
-  // -------------------------------------------------------
+        </select>
 
-  modal.addEventListener(
-    "click",
-    function (event) {
+      </div>
 
-      if (
-        event.target === modal
-      ) {
 
-        closeDetailModal();
+      <div
+        class="profile-v2-form-group">
 
-      }
+        <label
+          for="changeMessage">
 
-    }
-  );
+          Details
 
+        </label>
 
-  // -------------------------------------------------------
-  // Escape
-  // -------------------------------------------------------
+        <textarea
+          id="changeMessage"
+          name="message"
+          rows="5"
+          required
+          placeholder="Describe the information that needs to be changed..."></textarea>
 
-  const escHandler =
-    function (event) {
+      </div>
 
-      if (
-        event.key === "Escape"
-      ) {
 
-        closeDetailModal();
+      <div
+        id="changeFormStatus"
+        class="profile-v2-form-status">
 
-        document.removeEventListener(
-          "keydown",
-          escHandler
-        );
+      </div>
 
-      }
 
-    };
-
-
-  document.addEventListener(
-    "keydown",
-    escHandler
-  );
-
-}
-
-
-// =========================================================
-// REQUEST A CHANGE
-// =========================================================
-
-function openChangeRequest() {
-
-  const a =
-    getAnimal();
-
-
-  // -------------------------------------------------------
-  // Remove existing form
-  // -------------------------------------------------------
-
-  const existing =
-    document.getElementById(
-      "changeRequest"
-    );
-
-
-  if (existing) {
-
-    existing.remove();
-
-    return;
-
-  }
-
-
-  // -------------------------------------------------------
-  // Create modal
-  // -------------------------------------------------------
-
-  const modal =
-    document.createElement("div");
-
-
-  modal.id =
-    "changeRequest";
-
-  modal.className =
-    "change-request";
-
-
-  modal.innerHTML = `
-
-    <div class="change-request-card">
-
-
-      <!-- HEADER -->
-
-      <div class="change-request-header">
-
-        <div class="request-title-area">
-
-          <div class="request-icon">
-            📝
-          </div>
-
-          <div>
-
-            <h3>
-              Request a Change
-            </h3>
-
-            <p>
-
-              ${esc(a.name)}
-
-              <span>•</span>
-
-              ${esc(a.animalId)}
-
-            </p>
-
-          </div>
-
-        </div>
+      <div
+        class="profile-v2-form-actions">
 
         <button
           type="button"
-          class="close-request"
-          aria-label="Close"
-        >
-          ×
+          class="profile-v2-outline-button"
+          onclick="closeProfileModal()">
+
+          Cancel
+
+        </button>
+
+
+        <button
+          type="submit"
+          class="profile-v2-full-button">
+
+          Submit Request
+
         </button>
 
       </div>
 
 
-      <!-- NOTICE -->
+    </form>
 
-      <div class="request-notice">
+  `);
 
-        <span>
-          🔎
-        </span>
-
-        <div>
-
-          <strong>
-            Information review
-          </strong>
-
-          <p>
-            Submitted changes are reviewed by
-            the registry owner before the
-            animal profile is updated.
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <!-- FORM -->
-
-      <form
-        id="animalChangeForm"
-        class="change-form"
-        action="https://formspree.io/f/xrpgegka"
-        method="POST"
-      >
-
-
-        <!-- SUBJECT -->
-
-        <input
-          type="hidden"
-          name="_subject"
-          value="Animal Registry Change Request"
-        >
-
-
-        <!-- ANIMAL NAME -->
-
-        <input
-          type="hidden"
-          name="Animal Name"
-          value="${esc(a.name)}"
-        >
-
-
-        <!-- ANIMAL ID -->
-
-        <input
-          type="hidden"
-          name="Animal ID"
-          value="${esc(a.animalId)}"
-        >
-
-
-        <!-- SOURCE -->
-
-        <input
-          type="hidden"
-          name="Request Source"
-          value="Animal Digital ID Registry"
-        >
-
-
-        <!-- FIELD -->
-
-        <div class="form-group">
-
-          <label for="requestedField">
-            Information to change
-          </label>
-
-          <select
-            id="requestedField"
-            name="Requested Field"
-            required
-          >
-
-            <option value="">
-              Select a field
-            </option>
-
-            <option value="Animal Name">
-              Animal Name
-            </option>
-
-            <option value="Breed">
-              Breed
-            </option>
-
-            <option value="Gender">
-              Gender
-            </option>
-
-            <option value="Date of Birth">
-              Date of Birth
-            </option>
-
-            <option value="Pet Parent">
-              Pet Parent
-            </option>
-
-            <option value="Phone">
-              Phone
-            </option>
-
-            <option value="Alternate Phone">
-              Alternate Phone
-            </option>
-
-            <option value="Location">
-              Location
-            </option>
-
-            <option value="Behaviour">
-              Behaviour
-            </option>
-
-            <option value="Behaviour Traits">
-              Behaviour Traits
-            </option>
-
-            <option value="Neutering Status">
-              Neutering Status
-            </option>
-
-            <option value="Vaccination">
-              Vaccination
-            </option>
-
-            <option value="Photo">
-              Photo
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <!-- CURRENT INFORMATION -->
-
-        <div class="form-group">
-
-          <label for="currentInformation">
-            Current information
-          </label>
-
-          <input
-            id="currentInformation"
-            type="text"
-            name="Current Information"
-            placeholder="What is currently shown?"
-            required
-          >
-
-        </div>
-
-
-        <!-- REQUESTED INFORMATION -->
-
-        <div class="form-group">
-
-          <label for="requestedInformation">
-            Requested information
-          </label>
-
-          <input
-            id="requestedInformation"
-            type="text"
-            name="Requested Information"
-            placeholder="What should it be changed to?"
-            required
-          >
-
-        </div>
-
-
-        <!-- REASON -->
-
-        <div class="form-group">
-
-          <label for="reason">
-            Reason / additional details
-          </label>
-
-          <textarea
-            id="reason"
-            name="Reason"
-            rows="4"
-            placeholder="Please explain the requested change..."
-            required
-          ></textarea>
-
-        </div>
-
-
-        <!-- REQUESTER -->
-
-        <div class="form-row">
-
-          <div class="form-group">
-
-            <label for="requesterName">
-              Your name
-            </label>
-
-            <input
-              id="requesterName"
-              type="text"
-              name="Requester Name"
-              placeholder="Your name"
-              required
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="requesterContact">
-              Your contact
-            </label>
-
-            <input
-              id="requesterContact"
-              type="text"
-              name="Requester Contact"
-              placeholder="Phone or email"
-              required
-            >
-
-          </div>
-
-        </div>
-
-
-        <!-- FORMSPREE -->
-
-        <input
-          type="hidden"
-          name="_captcha"
-          value="true"
-        >
-
-        <input
-          type="hidden"
-          name="_template"
-          value="table"
-        >
-
-
-        <!-- SUCCESS -->
-
-        <div
-          id="changeRequestSuccess"
-          class="request-success"
-          style="display:none;"
-        >
-
-          <span class="success-icon">
-            ✓
-          </span>
-
-          <div>
-
-            <strong>
-              Request submitted successfully
-            </strong>
-
-            <p>
-              Your change request has been received
-              and will be reviewed by the registry owner.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <!-- ERROR -->
-
-        <div
-          id="changeRequestError"
-          class="request-error"
-          style="display:none;"
-        >
-
-          <span class="error-icon">
-            !
-          </span>
-
-          <div>
-
-            <strong>
-              Unable to submit request
-            </strong>
-
-            <p>
-              Something went wrong while sending
-              the request. Please try again.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <!-- BUTTONS -->
-
-        <div class="request-actions">
-
-          <button
-            type="button"
-            class="cancel-request"
-          >
-            Cancel
-          </button>
-
-          <button
-            type="submit"
-            class="submit-change"
-          >
-            ✓ Submit Request
-          </button>
-
-        </div>
-
-      </form>
-
-    </div>
-
-  `;
-
-
-  document.body.appendChild(modal);
-
-
-  // =======================================================
-  // ELEMENTS
-  // =======================================================
 
   const form =
     document.getElementById(
-      "animalChangeForm"
+      "profileChangeForm"
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  form.addEventListener(
+    "submit",
+    submitChangeRequest
+  );
+
+}
+
+
+/* ============================================================
+   SUBMIT CHANGE REQUEST
+   ============================================================ */
+
+async function submitChangeRequest(
+  event
+) {
+
+  event.preventDefault();
+
+
+  const form =
+    event.currentTarget;
+
+
+  const status =
+    document.getElementById(
+      "changeFormStatus"
     );
 
 
   const submitButton =
     form.querySelector(
-      ".submit-change"
+      'button[type="submit"]'
     );
 
 
-  const successBox =
-    document.getElementById(
-      "changeRequestSuccess"
-    );
+  if (submitButton) {
+
+    submitButton.disabled =
+      true;
+
+    submitButton.textContent =
+      "Submitting...";
+
+  }
 
 
-  const errorBox =
-    document.getElementById(
-      "changeRequestError"
-    );
+  if (status) {
+
+    status.className =
+      "profile-v2-form-status";
+
+    status.textContent =
+      "Submitting your request...";
+
+  }
 
 
-  const closeButton =
-    modal.querySelector(
-      ".close-request"
-    );
+  try {
+
+    const formData =
+      new FormData(form);
 
 
-  const cancelButton =
-    modal.querySelector(
-      ".cancel-request"
-    );
+    const response =
+      await fetch(
+        "https://formspree.io/f/xrpgegka",
+        {
+          method: "POST",
 
+          body: formData,
 
-  // =======================================================
-  // CLOSE
-  // =======================================================
-
-  closeButton.addEventListener(
-    "click",
-    function () {
-
-      modal.remove();
-
-    }
-  );
-
-
-  // =======================================================
-  // CANCEL
-  // =======================================================
-
-  cancelButton.addEventListener(
-    "click",
-    function () {
-
-      modal.remove();
-
-    }
-  );
-
-
-  // =======================================================
-  // CLICK OUTSIDE
-  // =======================================================
-
-  modal.addEventListener(
-    "click",
-    function (event) {
-
-      if (
-        event.target === modal
-      ) {
-
-        modal.remove();
-
-      }
-
-    }
-  );
-
-
-  // =======================================================
-  // ESC KEY
-  // =======================================================
-
-  const escHandler =
-    function (event) {
-
-      if (
-        event.key === "Escape"
-      ) {
-
-        if (
-          document.getElementById(
-            "changeRequest"
-          )
-        ) {
-
-          modal.remove();
-
+          headers: {
+            Accept:
+              "application/json"
+          }
         }
-
-        document.removeEventListener(
-          "keydown",
-          escHandler
-        );
-
-      }
-
-    };
+      );
 
 
-  document.addEventListener(
-    "keydown",
-    escHandler
-  );
+    if (
+      !response.ok
+    ) {
+
+      throw new Error(
+        "Request could not be submitted."
+      );
+
+    }
 
 
-  // =======================================================
-  // FORMSPREE SUBMISSION
-  // =======================================================
+    if (status) {
 
-  form.addEventListener(
-    "submit",
-    async function (event) {
+      status.className =
+        "profile-v2-form-status success";
 
-      event.preventDefault();
+      status.textContent =
+        "✓ Your change request has been submitted successfully.";
 
-
-      // Hide previous messages
-
-      successBox.style.display =
-        "none";
-
-      errorBox.style.display =
-        "none";
+    }
 
 
-      // Disable button
+    form.reset();
 
-      submitButton.disabled =
-        true;
+
+    if (submitButton) {
 
       submitButton.textContent =
-        "Submitting...";
-
-
-      const formData =
-        new FormData(form);
-
-
-      try {
-
-        const response =
-          await fetch(
-            "https://formspree.io/f/xrpgegka",
-            {
-              method: "POST",
-
-              body: formData,
-
-              headers: {
-                Accept:
-                  "application/json"
-              }
-
-            }
-          );
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Form submission failed"
-          );
-
-        }
-
-
-        // Hide form
-
-        form.style.display =
-          "none";
-
-
-        // Show success
-
-        successBox.style.display =
-          "flex";
-
-      }
-      catch (error) {
-
-        console.error(
-          "Change request submission failed:",
-          error
-        );
-
-
-        // Re-enable button
-
-        submitButton.disabled =
-          false;
-
-        submitButton.textContent =
-          "✓ Submit Request";
-
-
-        // Show error
-
-        errorBox.style.display =
-          "flex";
-
-      }
+        "Submitted ✓";
 
     }
-  );
 
-}
-
-
-// =========================================================
-// DATE FORMAT
-// =========================================================
-
-function formatDisplayDate(value) {
-
-  if (!value) {
-
-    return "Not Added";
 
   }
+  catch (error) {
 
-
-  const date =
-    new Date(
-      value + "T00:00:00"
+    console.error(
+      "Change request failed:",
+      error
     );
 
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
+    if (status) {
 
-    return value;
+      status.className =
+        "profile-v2-form-status error";
+
+      status.textContent =
+        "Unable to submit the request. Please try again.";
+
+    }
+
+
+    if (submitButton) {
+
+      submitButton.disabled =
+        false;
+
+      submitButton.textContent =
+        "Submit Request";
+
+    }
 
   }
-
-
-  return date.toLocaleDateString(
-    "en-GB",
-    {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    }
-  );
 
 }
 
 
-// =========================================================
-// START PROFILE
-// =========================================================
+/* ============================================================
+   INITIALIZE PROFILE
+   ============================================================ */
 
-loadAnimalFromSupabase();
+document.addEventListener(
+  "DOMContentLoaded",
+  function () {
+
+    loadAnimalFromSupabase();
+
+  }
+);
+
+
+/* ============================================================
+   GLOBAL ERROR HANDLING
+   ============================================================ */
+
+window.addEventListener(
+  "error",
+  function (event) {
+
+    console.error(
+      "Profile page error:",
+      event.error ||
+      event.message
+    );
+
+  }
+);
+
+
+/* ============================================================
+   FINAL PROFILE.JS
+   ============================================================ */
