@@ -6582,1564 +6582,586 @@ body .footer {
 
 }
 
+
 /* ============================================================
-   BUJJI HOMEPAGE
-   DESKTOP POLISH
+   ANIMAL DIGITAL ID
+   CLEAN HOMEPAGE RESPONSIVE + THEME LAYER
    ------------------------------------------------------------
-   Desktop only.
-   Mobile/tablet styles remain unchanged.
-   Header is intentionally NOT modified.
+   Header is intentionally untouched.
+   Mobile layout is preserved.
    ============================================================ */
 
-@media (min-width: 1001px) {
+/* ------------------------------------------------------------
+   THEME VARIABLES
+   ------------------------------------------------------------ */
 
-  /* ==========================================================
-     MAIN HOMEPAGE SPACING
-     ========================================================== */
+:root {
+  color-scheme: light;
+  --theme-page-bg: #e8edf1;
+  --theme-surface: #e8edf1;
+  --theme-surface-2: #f7fafb;
+  --theme-card: #ffffff;
+  --theme-text: #0d2e46;
+  --theme-text-soft: #536b7b;
+  --theme-muted: #718795;
+  --theme-border: rgba(28,65,84,.08);
+  --theme-shadow: rgba(25,54,70,.10);
+}
+
+body.dark-mode,
+html[data-theme="dark"] body {
+  color-scheme: dark;
+  --theme-page-bg: #0b1822;
+  --theme-surface: #122531;
+  --theme-surface-2: #172d3a;
+  --theme-card: #172b38;
+  --theme-text: #edf7fb;
+  --theme-text-soft: #b7cbd5;
+  --theme-muted: #91aab7;
+  --theme-border: rgba(255,255,255,.08);
+  --theme-shadow: rgba(0,0,0,.28);
+}
+
+/* ------------------------------------------------------------
+   LIGHT MODE BASE
+   ------------------------------------------------------------ */
+
+body {
+  background:
+    linear-gradient(
+      135deg,
+      var(--theme-page-bg) 0%,
+      #e4eaee 50%,
+      var(--theme-page-bg) 100%
+    );
+}
+
+/* ------------------------------------------------------------
+   DARK MODE
+   Header deliberately remains the existing header design.
+   ------------------------------------------------------------ */
+
+body.dark-mode,
+html[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(42,151,112,.08), transparent 28%),
+    linear-gradient(135deg, #091720 0%, #0d1d28 52%, #0a1720 100%);
+  color: var(--theme-text);
+}
+
+body.dark-mode .card,
+html[data-theme="dark"] .card {
+  background: var(--theme-surface);
+  box-shadow:
+    10px 14px 30px rgba(0,0,0,.30),
+    -6px -6px 18px rgba(255,255,255,.025);
+}
+
+body.dark-mode .content,
+html[data-theme="dark"] .content {
+  color: var(--theme-text);
+}
+
+body.dark-mode .home-hero,
+html[data-theme="dark"] .home-hero {
+  background:
+    radial-gradient(circle at 78% 45%, rgba(34,197,126,.13), transparent 30%),
+    radial-gradient(circle at 95% 0%, rgba(36,88,120,.20), transparent 35%),
+    linear-gradient(135deg, #142c36 0%, #172f38 50%, #122932 100%);
+  box-shadow:
+    10px 14px 30px rgba(0,0,0,.28),
+    -7px -7px 18px rgba(255,255,255,.025);
+}
+
+body.dark-mode .hero-title,
+html[data-theme="dark"] .hero-title,
+body.dark-mode .mission-copy h2,
+html[data-theme="dark"] .mission-copy h2,
+body.dark-mode .registry-section-head h2,
+html[data-theme="dark"] .registry-section-head h2 {
+  color: #eff8fb;
+}
+
+body.dark-mode .hero-description,
+html[data-theme="dark"] .hero-description,
+body.dark-mode .mission-copy p,
+html[data-theme="dark"] .mission-copy p,
+body.dark-mode .registry-section-head p,
+html[data-theme="dark"] .registry-section-head p {
+  color: #b0c5cf;
+}
+
+body.dark-mode .hero-button-secondary,
+html[data-theme="dark"] .hero-button-secondary {
+  color: #eaf7fb;
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.12);
+  box-shadow: 5px 7px 15px rgba(0,0,0,.20);
+}
+
+body.dark-mode .hero-button-secondary:hover,
+html[data-theme="dark"] .hero-button-secondary:hover {
+  background: rgba(255,255,255,.13);
+}
+
+body.dark-mode .hero-trust-item,
+html[data-theme="dark"] .hero-trust-item {
+  color: #a6bbc5;
+}
+
+body.dark-mode .feature-card,
+html[data-theme="dark"] .feature-card,
+body.dark-mode .stats-section,
+html[data-theme="dark"] .stats-section {
+  background: linear-gradient(145deg, #172d39, #132732);
+  border-color: rgba(255,255,255,.06);
+  box-shadow:
+    7px 10px 22px rgba(0,0,0,.24),
+    -5px -5px 13px rgba(255,255,255,.025);
+}
+
+body.dark-mode .feature-content h3,
+html[data-theme="dark"] .feature-content h3,
+body.dark-mode .stat-item strong,
+html[data-theme="dark"] .stat-item strong,
+body.dark-mode .mission-value strong,
+html[data-theme="dark"] .mission-value strong,
+body.dark-mode .pet-name,
+html[data-theme="dark"] .pet-name {
+  color: #edf7fb;
+}
+
+body.dark-mode .feature-content p,
+html[data-theme="dark"] .feature-content p,
+body.dark-mode .stat-item span,
+html[data-theme="dark"] .stat-item span,
+body.dark-mode .mission-value > span,
+html[data-theme="dark"] .mission-value > span {
+  color: #91aab7;
+}
+
+body.dark-mode .stat-divider,
+html[data-theme="dark"] .stat-divider {
+  background: rgba(255,255,255,.10);
+}
+
+body.dark-mode .mission-section,
+html[data-theme="dark"] .mission-section {
+  background:
+    radial-gradient(circle at 80% 20%, rgba(25,200,130,.10), transparent 30%),
+    linear-gradient(135deg, #122d2d, #152b32);
+  box-shadow: 7px 11px 25px rgba(0,0,0,.22);
+}
+
+body.dark-mode .mission-value-icon,
+html[data-theme="dark"] .mission-value-icon {
+  background: rgba(255,255,255,.07);
+  box-shadow: 5px 8px 18px rgba(0,0,0,.22);
+}
+
+body.dark-mode .registry-live-count,
+html[data-theme="dark"] .registry-live-count {
+  background: rgba(26,193,123,.13);
+  color: #58dba8;
+}
+
+body.dark-mode .registry-search-wrap .search,
+html[data-theme="dark"] .registry-search-wrap .search,
+body.dark-mode .search,
+html[data-theme="dark"] .search {
+  background: #142934;
+  color: #edf7fb;
+  box-shadow:
+    inset 4px 5px 11px rgba(0,0,0,.24),
+    inset -4px -4px 9px rgba(255,255,255,.025);
+}
+
+body.dark-mode .registry-section .notice,
+html[data-theme="dark"] .registry-section .notice {
+  background: linear-gradient(135deg, #352f20, #30291b);
+  color: #d8c796;
+  border-color: rgba(208,170,74,.20);
+}
+
+body.dark-mode .registry-section .notice strong,
+html[data-theme="dark"] .registry-section .notice strong {
+  color: #e7d69f;
+}
+
+body.dark-mode .registry-section .notice span,
+html[data-theme="dark"] .registry-section .notice span {
+  color: #c7b98f;
+}
+
+body.dark-mode .registry-section .pet,
+html[data-theme="dark"] .registry-section .pet {
+  background: linear-gradient(145deg, #172d39, #132631);
+  border-color: rgba(255,255,255,.06);
+  box-shadow:
+    8px 12px 25px rgba(0,0,0,.25),
+    -5px -5px 13px rgba(255,255,255,.025);
+}
+
+body.dark-mode .registry-section .meta,
+html[data-theme="dark"] .registry-section .meta {
+  background: rgba(11,28,37,.55);
+  box-shadow:
+    inset 3px 3px 8px rgba(0,0,0,.20),
+    inset -3px -3px 7px rgba(255,255,255,.025);
+}
+
+body.dark-mode .registry-section .meta span,
+html[data-theme="dark"] .registry-section .meta span {
+  color: #78919e;
+}
+
+body.dark-mode .registry-section .meta strong,
+html[data-theme="dark"] .registry-section .meta strong {
+  color: #c9dce4;
+}
+
+body.dark-mode .pet-view-profile,
+html[data-theme="dark"] .pet-view-profile {
+  border-top-color: rgba(255,255,255,.08);
+}
+
+body.dark-mode .footer,
+html[data-theme="dark"] .footer {
+  background: linear-gradient(135deg, #081d2c, #0d3148);
+}
+
+/* ------------------------------------------------------------
+   OPTIONAL THEME TOGGLE BUTTON
+   The HTML/JS button can use class="theme-toggle".
+   ------------------------------------------------------------ */
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: rgba(255,255,255,.08);
+  color: #ffffff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.14);
+}
+
+/* ------------------------------------------------------------
+   CLEAN DESKTOP HERO
+   1001px and above
+   ------------------------------------------------------------ */
+
+@media (min-width: 1001px) {
 
   .content {
     padding-top: 24px;
   }
 
-
-  /* ==========================================================
-     HERO
-     ========================================================== */
-
   .home-hero {
-
-    min-height: 525px;
-
-    grid-template-columns:
-      minmax(0, 1fr)
-      minmax(500px, .95fr);
-
-    gap: 10px;
-
-    padding:
-      55px 52px 48px;
-
-    border-radius:
-      28px;
-
+    grid-template-columns: minmax(0, 1.10fr) minmax(420px, .90fr);
+    gap: 18px;
+    min-height: 500px;
+    padding: 46px 42px 40px;
   }
-
 
   .hero-copy {
-
-    max-width:
-      610px;
-
-    padding-left:
-      5px;
-
+    min-width: 0;
+    max-width: none;
+    padding-left: 3px;
   }
-
-
-  .hero-eyebrow {
-
-    margin-bottom:
-      15px;
-
-    font-size:
-      12px;
-
-    letter-spacing:
-      3.5px;
-
-  }
-
 
   .hero-title {
-
-    font-size:
-      clamp(54px, 5vw, 76px);
-
-    line-height:
-      .96;
-
-    letter-spacing:
-      -3px;
-
+    max-width: none;
+    font-size: clamp(48px, 5vw, 66px);
+    line-height: .98;
+    letter-spacing: -2.8px;
   }
 
-
-  .hero-title span::after {
-
-    height:
-      6px;
-
-    bottom:
-      -11px;
-
-    right:
-      -18px;
-
+  /* The green phrase is already a separate block in the HTML. */
+  .hero-title > span {
+    display: block;
   }
-
 
   .hero-description {
-
-    max-width:
-      550px;
-
-    margin-top:
-      29px;
-
-    font-size:
-      15px;
-
-    line-height:
-      1.7;
-
+    max-width: 530px;
+    margin-top: 24px;
+    font-size: 14px;
+    line-height: 1.65;
   }
-
 
   .hero-actions {
-
-    gap:
-      14px;
-
-    margin-top:
-      31px;
-
+    margin-top: 25px;
+    gap: 11px;
   }
-
 
   .hero-button {
-
-    min-height:
-      54px;
-
-    padding:
-      0 23px;
-
-    border-radius:
-      16px;
-
-    font-size:
-      12px;
-
+    min-height: 50px;
+    padding: 0 20px;
+    border-radius: 14px;
+    font-size: 11px;
   }
-
 
   .hero-trust {
-
-    gap:
-      28px;
-
-    margin-top:
-      29px;
-
+    gap: 21px;
+    margin-top: 23px;
   }
-
 
   .hero-trust-item {
-
-    font-size:
-      10px;
-
+    font-size: 9px;
   }
-
-
-  /* ==========================================================
-     HERO ANIMAL AREA
-     ========================================================== */
 
   .hero-visual {
-
-    min-height:
-      430px;
-
-    margin-right:
-      -5px;
-
+    min-height: 405px;
+    min-width: 0;
+    margin: 0;
   }
-
 
   .hero-image-main {
-
-    width:
-      69%;
-
-    height:
-      375px;
-
-    right:
-      7%;
-
-    top:
-      27px;
-
-    border-radius:
-      32px;
-
-    transform:
-      rotate(2deg);
-
+    width: 73%;
+    height: 355px;
+    right: 3%;
+    top: 25px;
+    border-radius: 29px;
   }
-
 
   .hero-image-small {
-
-    width:
-      38%;
-
-    height:
-      205px;
-
-    left:
-      0;
-
-    bottom:
-      0;
-
-    border-radius:
-      27px;
-
-    border-width:
-      9px;
-
+    width: 35%;
+    height: 178px;
+    left: 0;
+    bottom: 0;
+    border-radius: 23px;
+    border-width: 8px;
   }
-
 
   .hero-image-badge {
-
-    left:
-      7%;
-
-    bottom:
-      39px;
-
-    padding:
-      11px 15px;
-
-    border-radius:
-      16px;
-
+    left: 7%;
+    bottom: 30px;
+    padding: 9px 13px;
+    border-radius: 14px;
   }
-
-
-  .hero-image-badge > span {
-
-    width:
-      29px;
-
-    height:
-      29px;
-
-  }
-
-
-  .hero-image-badge strong {
-
-    font-size:
-      10px;
-
-  }
-
-
-  .hero-image-badge small {
-
-    font-size:
-      8px;
-
-  }
-
 
   .hero-handwritten {
-
-    right:
-      -3px;
-
-    top:
-      2px;
-
-    font-size:
-      24px;
-
+    right: 1%;
+    top: 0;
+    font-size: 20px;
   }
-
 
   .hero-handwritten span {
-
-    font-size:
-      29px;
-
+    margin-left: 50px;
+    font-size: 25px;
   }
-
-
-  /* ==========================================================
-     FEATURE CARDS
-     ========================================================== */
 
   .feature-section {
-
-    grid-template-columns:
-      repeat(4, minmax(0, 1fr));
-
-    gap:
-      15px;
-
-    margin-top:
-      22px;
-
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 21px;
   }
-
 
   .feature-card {
-
-    min-height:
-      136px;
-
-    padding:
-      19px;
-
-    border-radius:
-      21px;
-
+    min-height: 130px;
+    padding: 17px;
   }
-
-
-  .feature-icon {
-
-    flex-basis:
-      58px;
-
-    width:
-      58px;
-
-    height:
-      58px;
-
-    border-radius:
-      17px;
-
-    font-size:
-      24px;
-
-  }
-
 
   .feature-content h3 {
-
-    font-size:
-      14px;
-
+    font-size: 13px;
   }
-
 
   .feature-content p {
-
-    max-width:
-      155px;
-
-    font-size:
-      10px;
-
-    line-height:
-      1.6;
-
+    font-size: 9px;
   }
-
-
-  .feature-arrow {
-
-    font-size:
-      21px;
-
-  }
-
-
-  /* ==========================================================
-     STATISTICS
-     ========================================================== */
 
   .stats-section {
-
-    margin-top:
-      20px;
-
-    padding:
-      29px 25px;
-
-    border-radius:
-      22px;
-
+    margin-top: 18px;
+    padding: 26px 22px;
   }
-
 
   .stat-item strong {
-
-    font-size:
-      32px;
-
+    font-size: 30px;
   }
-
-
-  .stat-item span {
-
-    margin-top:
-      7px;
-
-    font-size:
-      11px;
-
-  }
-
-
-  .stat-divider {
-
-    height:
-      46px;
-
-  }
-
-
-  /* ==========================================================
-     MISSION
-     ========================================================== */
 
   .mission-section {
-
-    grid-template-columns:
-      1.05fr
-      1.65fr
-      .55fr;
-
-    gap:
-      30px;
-
-    min-height:
-      300px;
-
-    margin-top:
-      22px;
-
-    padding:
-      40px 44px;
-
-    border-radius:
-      27px;
-
+    min-height: 285px;
+    margin-top: 20px;
+    padding: 36px 38px;
   }
-
-
-  .mission-eyebrow {
-
-    font-size:
-      10px;
-
-    letter-spacing:
-      3px;
-
-  }
-
 
   .mission-copy h2 {
-
-    font-size:
-      35px;
-
-    line-height:
-      1.02;
-
+    font-size: 33px;
   }
-
-
-  .mission-copy p {
-
-    max-width:
-      470px;
-
-    font-size:
-      12px;
-
-  }
-
-
-  .mission-button {
-
-    margin-top:
-      21px;
-
-    padding:
-      12px 18px;
-
-    font-size:
-      10px;
-
-  }
-
-
-  .mission-values {
-
-    gap:
-      22px;
-
-  }
-
-
-  .mission-value-icon {
-
-    width:
-      70px;
-
-    height:
-      70px;
-
-    margin-bottom:
-      11px;
-
-    font-size:
-      27px;
-
-  }
-
-
-  .mission-value strong {
-
-    font-size:
-      12px;
-
-  }
-
-
-  .mission-value > span {
-
-    font-size:
-      9px;
-
-  }
-
-
-  .mission-decoration {
-
-    font-size:
-      22px;
-
-  }
-
-
-  .mission-decoration span {
-
-    font-size:
-      30px;
-
-  }
-
-
-  /* ==========================================================
-     REGISTRY HEADER
-     ========================================================== */
 
   .registry-section {
-
-    margin-top:
-      32px;
-
-    padding-top:
-      8px;
-
+    margin-top: 30px;
   }
-
-
-  .registry-section-head {
-
-    margin-bottom:
-      19px;
-
-  }
-
-
-  .registry-eyebrow {
-
-    margin-bottom:
-      7px;
-
-    font-size:
-      10px;
-
-    letter-spacing:
-      3px;
-
-  }
-
 
   .registry-section-head h2 {
-
-    font-size:
-      36px;
-
-    letter-spacing:
-      -1.2px;
-
+    font-size: 34px;
   }
-
-
-  .registry-section-head p {
-
-    margin-top:
-      7px;
-
-    font-size:
-      12px;
-
-  }
-
-
-  .registry-live-count {
-
-    padding:
-      9px 14px;
-
-    font-size:
-      10px;
-
-  }
-
-
-  /* ==========================================================
-     SEARCH
-     ========================================================== */
-
-  .registry-search-wrap {
-
-    margin-bottom:
-      15px;
-
-  }
-
-
-  .registry-search-wrap .search {
-
-    min-height:
-      56px;
-
-    border-radius:
-      18px;
-
-    font-size:
-      11px;
-
-  }
-
-
-  .registry-search-icon {
-
-    left:
-      18px;
-
-    font-size:
-      16px;
-
-  }
-
-
-  /* ==========================================================
-     NOTICE
-     ========================================================== */
-
-  .registry-section .notice {
-
-    min-height:
-      48px;
-
-    margin-bottom:
-      20px;
-
-    padding:
-      12px 17px;
-
-    border-radius:
-      15px;
-
-  }
-
-
-  .registry-section .notice strong {
-
-    font-size:
-      9px;
-
-  }
-
-
-  .registry-section .notice span {
-
-    font-size:
-      9px;
-
-  }
-
-
-  /* ==========================================================
-     ANIMAL REGISTRY GRID
-     ========================================================== */
-
-  .registry-section .grid {
-
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
-    gap:
-      20px;
-
-  }
-
-
-  /* ==========================================================
-     ANIMAL CARDS
-     ========================================================== */
 
   .registry-section .pet {
-
-    grid-template-columns:
-      205px minmax(0, 1fr);
-
-    gap:
-      20px;
-
-    min-height:
-      245px;
-
-    padding:
-      16px;
-
-    border-radius:
-      24px;
-
+    grid-template-columns: 185px minmax(0, 1fr);
   }
-
 
   .registry-section .pet-img {
-
-    width:
-      205px;
-
-    height:
-      225px;
-
-    border-radius:
-      19px;
-
+    width: 185px;
+    height: 215px;
   }
-
-
-  .registry-section .pet-card-content {
-
-    padding:
-      4px 2px 3px;
-
-  }
-
-
-  .registry-section .pet-name {
-
-    font-size:
-      21px;
-
-  }
-
-
-  .registry-section .pet-id {
-
-    margin-top:
-      6px;
-
-    font-size:
-      8px;
-
-  }
-
-
-  .registry-section .pill {
-
-    padding:
-      6px 9px;
-
-    font-size:
-      7px;
-
-  }
-
-
-  .registry-section .pet-meta {
-
-    gap:
-      10px;
-
-    margin-top:
-      19px;
-
-  }
-
-
-  .registry-section .meta {
-
-    padding:
-      11px 12px;
-
-    border-radius:
-      13px;
-
-  }
-
-
-  .registry-section .meta span {
-
-    margin-bottom:
-      5px;
-
-    font-size:
-      7px;
-
-  }
-
-
-  .registry-section .meta strong {
-
-    font-size:
-      9px;
-
-  }
-
-
-  .pet-view-profile {
-
-    margin-top:
-      13px;
-
-    padding-top:
-      12px;
-
-    font-size:
-      10px;
-
-  }
-
-
-  .pet-view-profile span {
-
-    font-size:
-      17px;
-
-  }
-
-
-  /* ==========================================================
-     FOOTER
-     ========================================================== */
-
-  body .footer {
-
-    margin-top:
-      30px;
-
-    padding:
-      27px 32px;
-
-    border-radius:
-      22px;
-
-  }
-
-
-  .footer-logo {
-
-    width:
-      43px;
-
-    height:
-      43px;
-
-    border-radius:
-      13px;
-
-    font-size:
-      23px;
-
-  }
-
-
-  .footer-brand strong {
-
-    font-size:
-      13px;
-
-  }
-
-
-  .footer-brand span {
-
-    font-size:
-      8px;
-
-  }
-
-
-  .footer-links {
-
-    gap:
-      20px;
-
-  }
-
-
-  .footer-links a {
-
-    font-size:
-      9px;
-
-  }
-
 }
-/* ============================================================
-   BUJJI HERO - FINAL DESKTOP POLISH
-   ------------------------------------------------------------
-   Desktop only.
-   Mobile design remains unchanged.
-   Header remains completely untouched.
-   ============================================================ */
 
-@media (min-width: 1001px) {
-
-  /* ----------------------------------------------------------
-     HERO CONTAINER
-     ---------------------------------------------------------- */
-
-  .home-hero {
-
-    grid-template-columns:
-      minmax(0, 1.02fr)
-      minmax(470px, .98fr);
-
-    min-height:
-      500px;
-
-    padding:
-      48px 42px 42px;
-
-    gap:
-      5px;
-
-  }
-
-
-  /* ----------------------------------------------------------
-     HERO TEXT
-     ---------------------------------------------------------- */
-
-  .hero-copy {
-
-    max-width:
-      575px;
-
-    padding-left:
-      4px;
-
-  }
-
-
-  .hero-eyebrow {
-
-    margin-bottom:
-      13px;
-
-    font-size:
-      11px;
-
-    letter-spacing:
-      3.2px;
-
-  }
-
-
-  .hero-title {
-
-    max-width:
-      560px;
-
-    font-size:
-      clamp(52px, 5vw, 70px);
-
-    line-height:
-      .98;
-
-    letter-spacing:
-      -2.6px;
-
-  }
-
-
-  /*
-     Keep "Give Every Animal" together more naturally.
-  */
-
-  .hero-title span {
-
-    margin-top:
-      2px;
-
-  }
-
-
-  .hero-title span::after {
-
-    left:
-      1px;
-
-    right:
-      -14px;
-
-    bottom:
-      -8px;
-
-    height:
-      5px;
-
-  }
-
-
-  .hero-description {
-
-    max-width:
-      500px;
-
-    margin-top:
-      25px;
-
-    font-size:
-      13px;
-
-    line-height:
-      1.65;
-
-  }
-
-
-  /* ----------------------------------------------------------
-     HERO BUTTONS
-     ---------------------------------------------------------- */
-
-  .hero-actions {
-
-    margin-top:
-      25px;
-
-    gap:
-      11px;
-
-  }
-
-
-  .hero-button {
-
-    min-height:
-      50px;
-
-    padding:
-      0 19px;
-
-    border-radius:
-      14px;
-
-    font-size:
-      11px;
-
-  }
-
-
-  .hero-button-icon {
-
-    font-size:
-      15px;
-
-  }
-
-
-  /* ----------------------------------------------------------
-     TRUST ITEMS
-     ---------------------------------------------------------- */
-
-  .hero-trust {
-
-    margin-top:
-      23px;
-
-    gap:
-      21px;
-
-  }
-
-
-  .hero-trust-item {
-
-    font-size:
-      9px;
-
-  }
-
-
-  .hero-trust-item span:first-child {
-
-    font-size:
-      14px;
-
-  }
-
-
-  /* ----------------------------------------------------------
-     HERO VISUAL
-     ---------------------------------------------------------- */
-
-  .hero-visual {
-
-    min-height:
-      410px;
-
-    margin-right:
-      3px;
-
-  }
-
-
-  /* ----------------------------------------------------------
-     MAIN BUJJI PHOTO
-     ---------------------------------------------------------- */
-
-  .hero-image-main {
-
-    width:
-      67%;
-
-    height:
-      355px;
-
-    right:
-      8%;
-
-    top:
-      27px;
-
-    border-radius:
-      29px;
-
-    transform:
-      rotate(1.5deg);
-
-  }
-
-
-  .hero-image-main img {
-
-    object-position:
-      center center;
-
-  }
-
-
-  /* ----------------------------------------------------------
-     SECONDARY PHOTO
-     ---------------------------------------------------------- */
-
-  .hero-image-small {
-
-    width:
-      35%;
-
-    height:
-      178px;
-
-    left:
-      1%;
-
-    bottom:
-      3px;
-
-    border-width:
-      8px;
-
-    border-radius:
-      23px;
-
-    transform:
-      rotate(-4deg);
-
-  }
-
-
-  /* ----------------------------------------------------------
-     DIGITAL ID BADGE
-     ---------------------------------------------------------- */
-
-  .hero-image-badge {
-
-    left:
-      8%;
-
-    bottom:
-      34px;
-
-    padding:
-      9px 13px;
-
-    border-radius:
-      14px;
-
-  }
-
-
-  .hero-image-badge > span {
-
-    width:
-      25px;
-
-    height:
-      25px;
-
-    font-size:
-      11px;
-
-  }
-
-
-  .hero-image-badge strong {
-
-    font-size:
-      9px;
-
-  }
-
-
-  .hero-image-badge small {
-
-    font-size:
-      7px;
-
-  }
-
-
-  /* ----------------------------------------------------------
-     SMALL TAG / BIG IMPACT
-     ---------------------------------------------------------- */
-
-  .hero-handwritten {
-
-    right:
-      0;
-
-    top:
-      0;
-
-    font-size:
-      21px;
-
-    line-height:
-      1.12;
-
-  }
-
-
-  .hero-handwritten strong {
-
-    font-size:
-      22px;
-
-  }
-
-
-  .hero-handwritten span {
-
-    margin-left:
-      54px;
-
-    margin-top:
-      5px;
-
-    font-size:
-      26px;
-
-  }
-
-
-  /* ----------------------------------------------------------
-     HERO BACKGROUND DECORATION
-     ---------------------------------------------------------- */
-
-  .home-hero::after {
-
-    right:
-      18px;
-
-    bottom:
-      2px;
-
-    font-size:
-      86px;
-
-  }
-
-}
-/* ============================================================
-   HERO TITLE DESKTOP FINAL ADJUSTMENT
-   ============================================================ */
-
-@media (min-width: 1001px) {
-
-  .home-hero {
-    grid-template-columns:
-      minmax(0, 1.12fr)
-      minmax(440px, .88fr);
-  }
-
-  .hero-copy {
-    max-width: 640px;
-  }
-
-  .hero-title {
-    max-width: 620px;
-    font-size: clamp(50px, 4.7vw, 68px);
-    letter-spacing: -2.5px;
-  }
-
-  .hero-visual {
-    margin-left: -10px;
-  }
-
-  .hero-image-main {
-    width: 70%;
-    right: 5%;
-  }
-
-  .hero-handwritten {
-    right: -4px;
-    top: 2px;
-  }
-
-}
-/* ============================================================
-   HERO FIX FOR LAPTOP / SMALL DESKTOP
+/* ------------------------------------------------------------
+   SMALL LAPTOP / TABLET LANDSCAPE
    801px - 1000px
-   ------------------------------------------------------------
-   Keeps mobile design unchanged.
-   Header remains untouched.
-   ============================================================ */
+   ------------------------------------------------------------ */
 
 @media (min-width: 801px) and (max-width: 1000px) {
 
   .home-hero {
-
-    grid-template-columns:
-      minmax(0, 1.05fr)
-      minmax(350px, .95fr);
-
-    gap: 8px;
-
+    grid-template-columns: minmax(0, 1.06fr) minmax(350px, .94fr);
+    gap: 10px;
     min-height: 470px;
-
-    padding:
-      42px 30px 35px;
-
+    padding: 40px 28px 34px;
   }
-
 
   .hero-copy {
-
-    max-width:
-      520px;
-
+    min-width: 0;
+    max-width: none;
   }
-
 
   .hero-title {
-
-    max-width:
-      none;
-
-    font-size:
-      51px;
-
-    line-height:
-      .98;
-
-    letter-spacing:
-      -2px;
-
-    white-space:
-      nowrap;
-
+    max-width: none;
+    font-size: clamp(43px, 5.2vw, 54px);
+    line-height: .98;
+    letter-spacing: -2px;
   }
-
-
-  .hero-title span {
-
-    display:
-      block;
-
-    white-space:
-      nowrap;
-
-  }
-
 
   .hero-description {
-
-    max-width:
-      455px;
-
-    font-size:
-      12px;
-
-    line-height:
-      1.6;
-
+    max-width: 440px;
+    margin-top: 21px;
+    font-size: 12px;
+    line-height: 1.6;
   }
-
 
   .hero-actions {
-
-    margin-top:
-      23px;
-
+    margin-top: 21px;
+    gap: 10px;
   }
-
 
   .hero-button {
-
-    min-height:
-      48px;
-
-    padding:
-      0 17px;
-
-    font-size:
-      10px;
-
+    min-height: 47px;
+    padding: 0 16px;
+    font-size: 10px;
   }
-
 
   .hero-trust {
-
-    gap:
-      15px;
-
-    margin-top:
-      20px;
-
+    gap: 14px;
+    margin-top: 19px;
   }
-
 
   .hero-trust-item {
-
-    font-size:
-      8px;
-
+    font-size: 8px;
   }
-
-
-  /* ==========================================================
-     HERO IMAGE
-     ========================================================== */
 
   .hero-visual {
-
-    min-height:
-      370px;
-
-    margin-right:
-      0;
-
+    min-width: 0;
+    min-height: 365px;
   }
-
 
   .hero-image-main {
-
-    width:
-      70%;
-
-    height:
-      315px;
-
-    right:
-      4%;
-
-    top:
-      25px;
-
-    border-radius:
-      27px;
-
+    width: 71%;
+    height: 310px;
+    right: 3%;
+    top: 24px;
+    border-radius: 26px;
   }
-
 
   .hero-image-small {
-
-    width:
-      35%;
-
-    height:
-      155px;
-
-    left:
-      0;
-
-    bottom:
-      5px;
-
-    border-width:
-      7px;
-
-    border-radius:
-      21px;
-
+    width: 36%;
+    height: 150px;
+    left: 0;
+    bottom: 2px;
+    border-width: 7px;
+    border-radius: 21px;
   }
-
 
   .hero-image-badge {
-
-    left:
-      5%;
-
-    bottom:
-      29px;
-
-    padding:
-      8px 11px;
-
+    left: 5%;
+    bottom: 27px;
+    padding: 7px 10px;
   }
-
 
   .hero-handwritten {
-
-    right:
-      0;
-
-    top:
-      0;
-
-    font-size:
-      18px;
-
+    right: 0;
+    top: 0;
+    font-size: 17px;
   }
-
-
-  .hero-handwritten strong {
-
-    font-size:
-      19px;
-
-  }
-
 
   .hero-handwritten span {
-
-    margin-left:
-      45px;
-
-    font-size:
-      23px;
-
+    margin-left: 40px;
+    font-size: 21px;
   }
 
+  .feature-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mission-section {
+    grid-template-columns: 1fr;
+  }
+
+  .mission-decoration {
+    display: none;
+  }
+
+  .registry-section .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------------------------------------
+   MOBILE
+   Keep the existing mobile look, with only theme support.
+   ------------------------------------------------------------ */
+
+@media (max-width: 800px) {
+  body.dark-mode .home-hero,
+  html[data-theme="dark"] .home-hero {
+    background:
+      radial-gradient(circle at 75% 20%, rgba(34,197,126,.14), transparent 34%),
+      linear-gradient(145deg, #11262f, #132a34);
+  }
+
+  body.dark-mode .feature-card,
+  html[data-theme="dark"] .feature-card,
+  body.dark-mode .stats-section,
+  html[data-theme="dark"] .stats-section,
+  body.dark-mode .registry-section .pet,
+  html[data-theme="dark"] .registry-section .pet {
+    background: linear-gradient(145deg, #172d39, #132631);
+  }
+}
+
+/* ------------------------------------------------------------
+   REDUCED MOTION
+   ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }
