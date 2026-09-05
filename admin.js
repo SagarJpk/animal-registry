@@ -98,23 +98,179 @@ let animalsCache = [];
 
 let editingAnimalId = null;
 
+
 /* PHOTO UPLOAD STATE */
+
 let selectedPhotoFile = null;
 let currentPhotoUrl = "";
+
+
+/* ============================================================
+   PHOTO STORAGE
+   ============================================================ */
+
+const ANIMAL_PHOTO_BUCKET =
+  "animal-photos";
+
+const MAX_PHOTO_SIZE =
+  5 * 1024 * 1024;
+
+
+function getPhotoExtension(
+  file
+) {
+
+  const type =
+    file?.type || "";
+
+
+  if (type === "image/png") {
+    return "png";
+  }
+
+
+  if (type === "image/webp") {
+    return "webp";
+  }
+
+
+  return "jpg";
+}
+
+
+async function uploadAnimalPhoto(
+  animalUuid,
+  file = selectedPhotoFile
+) {
+
+  if (!file) {
+    return currentPhotoUrl || null;
+  }
+
+
+  if (!animalUuid) {
+    throw new Error(
+      "Animal ID is required before uploading a photo."
+    );
+  }
+
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ];
+
+
+  if (!allowedTypes.includes(file.type)) {
+
+    throw new Error(
+      "Please select JPG, PNG or WebP."
+    );
+  }
+
+
+  if (file.size > MAX_PHOTO_SIZE) {
+
+    throw new Error(
+      "Photo must be 5 MB or smaller."
+    );
+  }
+
+
+  const extension =
+    getPhotoExtension(file);
+
+
+  const storagePath =
+    `${animalUuid}/profile-${Date.now()}.${extension}`;
+
+
+  const {
+    error: uploadError
+  } =
+    await supabaseClient.storage
+      .from(
+        ANIMAL_PHOTO_BUCKET
+      )
+      .upload(
+        storagePath,
+        file,
+        {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type
+        }
+      );
+
+
+  if (uploadError) {
+
+    throw new Error(
+      `Photo upload failed: ${uploadError.message}`
+    );
+  }
+
+
+  const {
+    data
+  } =
+    supabaseClient.storage
+      .from(
+        ANIMAL_PHOTO_BUCKET
+      )
+      .getPublicUrl(
+        storagePath
+      );
+
+
+  const publicUrl =
+    data?.publicUrl || "";
+
+
+  if (!publicUrl) {
+
+    throw new Error(
+      "Photo uploaded, but its public URL could not be created."
+    );
+  }
+
+
+  return publicUrl;
+}
 
 
 /* ============================================================
    HTML ESCAPE
    ============================================================ */
 
-function escapeHtml(value) {
+function escapeHtml(
+  value
+) {
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#39;"
+    );
 }
 
 
@@ -130,6 +286,7 @@ function showLoginMessage(
   loginMessage.textContent =
     message;
 
+
   loginMessage.style.color =
     type === "success"
       ? "#2d8a62"
@@ -139,7 +296,8 @@ function showLoginMessage(
 
 function clearLoginMessage() {
 
-  loginMessage.textContent = "";
+  loginMessage.textContent =
+    "";
 }
 
 
@@ -153,6 +311,7 @@ function setLoginLoading(
 
   loginButton.disabled =
     isLoading;
+
 
   loginButton.textContent =
     isLoading
@@ -170,6 +329,7 @@ function showLogin() {
   loginScreen.style.display =
     "flex";
 
+
   adminApp.style.display =
     "none";
 }
@@ -179,6 +339,7 @@ function showAdminApp() {
 
   loginScreen.style.display =
     "none";
+
 
   adminApp.style.display =
     "block";
@@ -196,13 +357,19 @@ async function getAdminProfile(
   const {
     data,
     error
-  } = await supabaseClient
-    .from("admin_users")
-    .select(
-      "id,email,full_name,role,is_active"
-    )
-    .eq("id", userId)
-    .maybeSingle();
+  } =
+    await supabaseClient
+      .from(
+        "admin_users"
+      )
+      .select(
+        "id,email,full_name,role,is_active"
+      )
+      .eq(
+        "id",
+        userId
+      )
+      .maybeSingle();
 
 
   if (error) {
@@ -211,6 +378,7 @@ async function getAdminProfile(
       "Admin profile error:",
       error
     );
+
 
     throw new Error(
       "Unable to verify administrator permissions."
@@ -260,7 +428,9 @@ async function login(
 
   clearLoginMessage();
 
-  setLoginLoading(true);
+  setLoginLoading(
+    true
+  );
 
 
   try {
@@ -269,10 +439,12 @@ async function login(
       data,
       error
     } =
-      await supabaseClient.auth.signInWithPassword({
-        email: email.trim(),
-        password
-      });
+      await supabaseClient.auth
+        .signInWithPassword({
+          email:
+            email.trim(),
+          password
+        });
 
 
     if (error) {
@@ -281,6 +453,7 @@ async function login(
         "Login error:",
         error
       );
+
 
       throw new Error(
         "Invalid email or password."
@@ -326,9 +499,12 @@ async function login(
       !currentAdmin
     ) {
 
-      await supabaseClient.auth.signOut();
+      await supabaseClient.auth
+        .signOut();
 
-      currentUser = null;
+
+      currentUser =
+        null;
     }
 
 
@@ -340,7 +516,9 @@ async function login(
 
   } finally {
 
-    setLoginLoading(false);
+    setLoginLoading(
+      false
+    );
   }
 }
 
@@ -371,7 +549,8 @@ async function logout() {
 
   try {
 
-    await supabaseClient.auth.signOut();
+    await supabaseClient.auth
+      .signOut();
 
   } catch (error) {
 
@@ -382,23 +561,50 @@ async function logout() {
 
   } finally {
 
-    currentUser = null;
-    currentAdmin = null;
-    animalsCache = [];
-    editingAnimalId = null;
+    currentUser =
+      null;
+
+    currentAdmin =
+      null;
+
+    animalsCache =
+      [];
+
+    editingAnimalId =
+      null;
+
+    selectedPhotoFile =
+      null;
+
+    currentPhotoUrl =
+      "";
+
 
     showLogin();
 
-    passwordInput.value = "";
+
+    passwordInput.value =
+      "";
+
 
     clearLoginMessage();
 
-    animalList.innerHTML = "";
 
-    totalAnimals.textContent = "0";
-    activeAnimals.textContent = "0";
-    lostAnimals.textContent = "0";
-    changeRequests.textContent = "0";
+    animalList.innerHTML =
+      "";
+
+
+    totalAnimals.textContent =
+      "0";
+
+    activeAnimals.textContent =
+      "0";
+
+    lostAnimals.textContent =
+      "0";
+
+    changeRequests.textContent =
+      "0";
   }
 }
 
@@ -409,7 +615,10 @@ async function logout() {
 
 async function loadDashboard() {
 
-  setLoading(true);
+  setLoading(
+    true
+  );
+
 
   try {
 
@@ -425,6 +634,7 @@ async function loadDashboard() {
       error
     );
 
+
     animalList.innerHTML = `
       <div class="empty-state">
 
@@ -437,14 +647,19 @@ async function loadDashboard() {
         </h4>
 
         <p>
-          ${escapeHtml(error.message)}
+          ${escapeHtml(
+            error.message
+          )}
         </p>
 
       </div>
     `;
   }
 
-  setLoading(false);
+
+  setLoading(
+    false
+  );
 }
 
 
@@ -459,7 +674,9 @@ async function loadAnimals() {
     error
   } =
     await supabaseClient
-      .from("animals")
+      .from(
+        "animals"
+      )
       .select(`
         id,
         animal_id,
@@ -503,6 +720,7 @@ async function loadAnimals() {
       "Animal loading error:",
       error
     );
+
 
     throw new Error(
       error.message
@@ -564,12 +782,16 @@ async function loadChangeRequests() {
     error
   } =
     await supabaseClient
-      .from("change_requests")
+      .from(
+        "change_requests"
+      )
       .select(
         "id",
         {
-          count: "exact",
-          head: true
+          count:
+            "exact",
+          head:
+            true
         }
       )
       .eq(
@@ -585,8 +807,10 @@ async function loadChangeRequests() {
       error
     );
 
+
     changeRequests.textContent =
       "0";
+
 
     return;
   }
@@ -617,6 +841,7 @@ function searchAnimals(
       animalsCache
     );
 
+
     return;
   }
 
@@ -643,7 +868,9 @@ function searchAnimals(
           .toLowerCase();
 
 
-        return searchable.includes(q);
+        return searchable.includes(
+          q
+        );
       }
     );
 
@@ -683,6 +910,7 @@ function renderAnimals(
       </div>
     `;
 
+
     return;
   }
 
@@ -700,7 +928,9 @@ function renderAnimals(
         animals
           .map(
             animal =>
-              renderAnimalCard(animal)
+              renderAnimalCard(
+                animal
+              )
           )
           .join("")
       }
@@ -719,7 +949,8 @@ function renderAnimalCard(
 ) {
 
   const photo =
-    animal.photo_url || "";
+    animal.photo_url ||
+    "";
 
 
   const location = [
@@ -760,8 +991,12 @@ function renderAnimalCard(
           photo
             ? `
               <img
-                src="${escapeHtml(photo)}"
-                alt="${escapeHtml(animal.name)}"
+                src="${escapeHtml(
+                  photo
+                )}"
+                alt="${escapeHtml(
+                  animal.name
+                )}"
                 style="
                   width:100%;
                   height:100%;
@@ -788,7 +1023,9 @@ function renderAnimalCard(
       </div>
 
 
-      <div style="min-width:0">
+      <div
+        style="min-width:0"
+      >
 
         <div
           style="
@@ -805,7 +1042,9 @@ function renderAnimalCard(
               font-size:14px;
             "
           >
-            ${escapeHtml(animal.name)}
+            ${escapeHtml(
+              animal.name
+            )}
           </strong>
 
 
@@ -820,7 +1059,9 @@ function renderAnimalCard(
               font-weight:800;
             "
           >
-            ${escapeHtml(animal.status)}
+            ${escapeHtml(
+              animal.status
+            )}
           </span>
 
 
@@ -854,7 +1095,9 @@ function renderAnimalCard(
             font-weight:700;
           "
         >
-          ${escapeHtml(animal.animal_id)}
+          ${escapeHtml(
+            animal.animal_id
+          )}
         </div>
 
 
@@ -870,15 +1113,24 @@ function renderAnimalCard(
         >
 
           <span>
-            ${escapeHtml(animal.type || "—")}
+            ${escapeHtml(
+              animal.type ||
+              "—"
+            )}
           </span>
 
           <span>
-            ${escapeHtml(animal.breed || "—")}
+            ${escapeHtml(
+              animal.breed ||
+              "—"
+            )}
           </span>
 
           <span>
-            ${escapeHtml(location || "Location not added")}
+            ${escapeHtml(
+              location ||
+              "Location not added"
+            )}
           </span>
 
         </div>
@@ -938,6 +1190,7 @@ function addEditorStyles() {
       "animalEditorStyles"
     )
   ) {
+
     return;
   }
 
@@ -1337,6 +1590,7 @@ function createEditorModal() {
       "animalEditorModal"
     )
   ) {
+
     return;
   }
 
@@ -1535,53 +1789,54 @@ function createEditorModal() {
 
             <div class="editor-field">
 
-  <label>
-    Animal Photo
-  </label>
+              <label>
+                Animal Photo
+              </label>
 
-  <div class="photo-upload-box">
+              <div class="photo-upload-box">
 
-    <input
-      id="f_photo_file"
-      type="file"
-      accept="image/jpeg,image/png,image/webp"
-      style="display:none"
-    >
+                <input
+                  id="f_photo_file"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  style="display:none"
+                >
 
-    <button
-      id="photoUploadButton"
-      type="button"
-      class="photo-upload-button"
-    >
-      📷 Choose Photo from Laptop
-    </button>
+                <button
+                  id="photoUploadButton"
+                  type="button"
+                  class="photo-upload-button"
+                >
+                  📷 Choose Photo from Laptop
+                </button>
 
-    <div class="photo-upload-help">
-      JPG, PNG or WebP • Maximum 5 MB
-    </div>
+                <div class="photo-upload-help">
+                  JPG, PNG or WebP • Maximum 5 MB
+                </div>
 
-    <div
-      id="photoPreview"
-      class="photo-preview"
-    >
-      <div class="photo-preview-empty">
-        🐾 No photo selected
-      </div>
-    </div>
+                <div
+                  id="photoPreview"
+                  class="photo-preview"
+                >
+                  <div class="photo-preview-empty">
+                    🐾 No photo selected
+                  </div>
+                </div>
 
-    <div
-      id="photoUploadStatus"
-      class="photo-upload-status"
-    ></div>
+                <div
+                  id="photoUploadStatus"
+                  class="photo-upload-status"
+                ></div>
 
-  </div>
+              </div>
 
-  <input
-    id="f_photo"
-    type="hidden"
-  >
+              <input
+                id="f_photo"
+                type="hidden"
+              >
 
-</div>
+            </div>
+
 
             <div class="editor-field">
 
@@ -1967,29 +2222,38 @@ function createEditorModal() {
               <div class="editor-checks">
 
                 <label class="editor-check">
+
                   <input
                     id="f_children"
                     type="checkbox"
                   >
+
                   Good with children
+
                 </label>
 
 
                 <label class="editor-check">
+
                   <input
                     id="f_dogs"
                     type="checkbox"
                   >
+
                   Good with dogs
+
                 </label>
 
 
                 <label class="editor-check">
+
                   <input
                     id="f_cats"
                     type="checkbox"
                   >
+
                   Good with cats
+
                 </label>
 
               </div>
@@ -2200,6 +2464,7 @@ function createEditorModal() {
 
         </section>
 
+
       </form>
 
 
@@ -2237,8 +2502,158 @@ function createEditorModal() {
   );
 
 
+  /* ============================================================
+     PHOTO UPLOAD EVENTS
+     ============================================================ */
+
   document
-    .getElementById("modalClose")
+    .getElementById(
+      "photoUploadButton"
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+        document
+          .getElementById(
+            "f_photo_file"
+          )
+          .click();
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      "f_photo_file"
+    )
+    .addEventListener(
+      "change",
+      event => {
+
+        const file =
+          event.target.files?.[0];
+
+
+        const status =
+          document.getElementById(
+            "photoUploadStatus"
+          );
+
+
+        const preview =
+          document.getElementById(
+            "photoPreview"
+          );
+
+
+        status.textContent =
+          "";
+
+        status.style.color =
+          "#b84c4c";
+
+
+        if (!file) {
+
+          selectedPhotoFile =
+            null;
+
+          return;
+        }
+
+
+        const allowedTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/webp"
+        ];
+
+
+        if (
+          !allowedTypes.includes(
+            file.type
+          )
+        ) {
+
+          status.textContent =
+            "Please select JPG, PNG or WebP.";
+
+
+          event.target.value =
+            "";
+
+
+          selectedPhotoFile =
+            null;
+
+
+          return;
+        }
+
+
+        if (
+          file.size >
+          MAX_PHOTO_SIZE
+        ) {
+
+          status.textContent =
+            "Photo must be 5 MB or smaller.";
+
+
+          event.target.value =
+            "";
+
+
+          selectedPhotoFile =
+            null;
+
+
+          return;
+        }
+
+
+        selectedPhotoFile =
+          file;
+
+
+        const reader =
+          new FileReader();
+
+
+        reader.onload =
+          event => {
+
+            preview.innerHTML = `
+              <img
+                src="${event.target.result}"
+                alt="Selected animal photo"
+              >
+            `;
+
+
+            status.style.color =
+              "#2d8a62";
+
+
+            status.textContent =
+              `✓ ${file.name} selected`;
+          };
+
+
+        reader.readAsDataURL(
+          file
+        );
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      "modalClose"
+    )
     .addEventListener(
       "click",
       closeAnimalEditor
@@ -2246,7 +2661,9 @@ function createEditorModal() {
 
 
   document
-    .getElementById("editorCancel")
+    .getElementById(
+      "editorCancel"
+    )
     .addEventListener(
       "click",
       closeAnimalEditor
@@ -2254,7 +2671,9 @@ function createEditorModal() {
 
 
   document
-    .getElementById("editorSave")
+    .getElementById(
+      "editorSave"
+    )
     .addEventListener(
       "click",
       saveAnimal
@@ -2262,7 +2681,9 @@ function createEditorModal() {
 
 
   document
-    .getElementById("addVaccination")
+    .getElementById(
+      "addVaccination"
+    )
     .addEventListener(
       "click",
       () =>
@@ -2271,7 +2692,9 @@ function createEditorModal() {
 
 
   document
-    .getElementById("addMedical")
+    .getElementById(
+      "addMedical"
+    )
     .addEventListener(
       "click",
       () =>
@@ -2280,7 +2703,9 @@ function createEditorModal() {
 
 
   document
-    .getElementById("addWeight")
+    .getElementById(
+      "addWeight"
+    )
     .addEventListener(
       "click",
       () =>
@@ -2293,133 +2718,16 @@ function createEditorModal() {
     event => {
 
       if (
-        event.target === modal
+        event.target ===
+        modal
       ) {
+
         closeAnimalEditor();
+
       }
     }
   );
 }
-
-/* ============================================================
-   PHOTO UPLOAD
-   ============================================================ */
-
-document
-  .getElementById("photoUploadButton")
-  .addEventListener(
-    "click",
-    () => {
-      document
-        .getElementById("f_photo_file")
-        .click();
-    }
-  );
-
-
-document
-  .getElementById("f_photo_file")
-  .addEventListener(
-    "change",
-    event => {
-
-      const file =
-        event.target.files?.[0];
-
-      const status =
-        document.getElementById(
-          "photoUploadStatus"
-        );
-
-      const preview =
-        document.getElementById(
-          "photoPreview"
-        );
-
-
-      status.textContent = "";
-      status.style.color = "#b84c4c";
-
-
-      if (!file) {
-        selectedPhotoFile = null;
-        return;
-      }
-
-
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/webp"
-      ];
-
-
-      if (
-        !allowedTypes.includes(
-          file.type
-        )
-      ) {
-
-        status.textContent =
-          "Please select JPG, PNG or WebP.";
-
-        event.target.value = "";
-
-        selectedPhotoFile = null;
-
-        return;
-      }
-
-
-      const maxSize =
-        5 * 1024 * 1024;
-
-
-      if (
-        file.size > maxSize
-      ) {
-
-        status.textContent =
-          "Photo must be 5 MB or smaller.";
-
-        event.target.value = "";
-
-        selectedPhotoFile = null;
-
-        return;
-      }
-
-
-      selectedPhotoFile =
-        file;
-
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload = event => {
-
-        preview.innerHTML = `
-          <img
-            src="${event.target.result}"
-            alt="Selected animal photo"
-          >
-        `;
-
-        status.style.color =
-          "#2d8a62";
-
-        status.textContent =
-          `✓ ${file.name} selected`;
-      };
-
-
-      reader.readAsDataURL(file);
-
-    }
-  );
-
 /* ============================================================
    FIELD HELPER
    ============================================================ */
@@ -2951,48 +3259,63 @@ async function openAddAnimal() {
     "animalEditorForm"
   ).reset();
 
-   /* ============================================================
-   RESET PHOTO FOR NEW ANIMAL
-   ============================================================ */
 
-selectedPhotoFile = null;
-currentPhotoUrl = "";
+  /* ============================================================
+     RESET PHOTO FOR NEW ANIMAL
+     ============================================================ */
 
-const photoFileInput =
-  document.getElementById(
-    "f_photo_file"
+  selectedPhotoFile = null;
+
+  currentPhotoUrl = "";
+
+
+  const photoFileInput =
+    document.getElementById(
+      "f_photo_file"
+    );
+
+
+  const photoPreview =
+    document.getElementById(
+      "photoPreview"
+    );
+
+
+  const photoStatus =
+    document.getElementById(
+      "photoUploadStatus"
+    );
+
+
+  if (photoFileInput) {
+
+    photoFileInput.value = "";
+
+  }
+
+
+  if (photoPreview) {
+
+    photoPreview.innerHTML = `
+      <div class="photo-preview-empty">
+        🐾 No photo selected
+      </div>
+    `;
+
+  }
+
+
+  if (photoStatus) {
+
+    photoStatus.textContent = "";
+
+  }
+
+
+  setField(
+    "f_photo",
+    ""
   );
-
-const photoPreview =
-  document.getElementById(
-    "photoPreview"
-  );
-
-const photoStatus =
-  document.getElementById(
-    "photoUploadStatus"
-  );
-
-if (photoFileInput) {
-  photoFileInput.value = "";
-}
-
-if (photoPreview) {
-  photoPreview.innerHTML = `
-    <div class="photo-preview-empty">
-      🐾 No photo selected
-    </div>
-  `;
-}
-
-if (photoStatus) {
-  photoStatus.textContent = "";
-}
-
-setField(
-  "f_photo",
-  ""
-);
 
 
   document.getElementById(
@@ -3101,114 +3424,139 @@ async function openAnimalEditor(
     animal.animal_id
   );
 
+
   setField(
     "f_name",
     animal.name
   );
+
 
   setField(
     "f_type",
     animal.type
   );
 
+
   setField(
     "f_breed",
     animal.breed
   );
+
 
   setField(
     "f_gender",
     animal.gender
   );
 
+
   setField(
     "f_dob",
     animal.date_of_birth
   );
+
 
   setField(
     "f_colour",
     animal.colour
   );
 
+
   setField(
     "f_markings",
     animal.markings
   );
 
-/* ============================================================
-   LOAD EXISTING PHOTO
-   ============================================================ */
 
-selectedPhotoFile = null;
-currentPhotoUrl = animal.photo_url || "";
+  /* ============================================================
+     LOAD EXISTING PHOTO
+     ============================================================ */
 
-const photoFileInput =
-  document.getElementById(
-    "f_photo_file"
+  selectedPhotoFile = null;
+
+  currentPhotoUrl =
+    animal.photo_url || "";
+
+
+  const photoFileInput =
+    document.getElementById(
+      "f_photo_file"
+    );
+
+
+  const photoPreview =
+    document.getElementById(
+      "photoPreview"
+    );
+
+
+  const photoStatus =
+    document.getElementById(
+      "photoUploadStatus"
+    );
+
+
+  if (photoFileInput) {
+
+    photoFileInput.value = "";
+
+  }
+
+
+  setField(
+    "f_photo",
+    currentPhotoUrl
   );
 
-const photoPreview =
-  document.getElementById(
-    "photoPreview"
-  );
 
-const photoStatus =
-  document.getElementById(
-    "photoUploadStatus"
-  );
+  if (currentPhotoUrl) {
 
-if (photoFileInput) {
-  photoFileInput.value = "";
-}
+    photoPreview.innerHTML = `
+      <img
+        src="${escapeHtml(currentPhotoUrl)}"
+        alt="${escapeHtml(animal.name)}"
+      >
+    `;
 
-setField(
-  "f_photo",
-  currentPhotoUrl
-);
 
-if (currentPhotoUrl) {
+    photoStatus.textContent =
+      "Current photo loaded. Choose a new photo to replace it.";
 
-  photoPreview.innerHTML = `
-    <img
-      src="${escapeHtml(currentPhotoUrl)}"
-      alt="${escapeHtml(animal.name)}"
-    >
-  `;
 
-  photoStatus.textContent =
-    "Current photo loaded. Choose a new photo to replace it.";
+    photoStatus.style.color =
+      "#2d8a62";
 
-  photoStatus.style.color =
-    "#2d8a62";
+  } else {
 
-} else {
+    photoPreview.innerHTML = `
+      <div class="photo-preview-empty">
+        🐾 No photo uploaded
+      </div>
+    `;
 
-  photoPreview.innerHTML = `
-    <div class="photo-preview-empty">
-      🐾 No photo uploaded
-    </div>
-  `;
 
-  photoStatus.textContent =
-    "";
+    photoStatus.textContent =
+      "";
 
-}
+  }
+
 
   setField(
     "f_microchip",
     animal.microchip_number
   );
 
+
   setField(
     "f_microchip_provider",
     animal.microchip_provider
   );
 
+
   setField(
     "f_government_reference",
     animal.government_reference
   );
+
 
   setField(
     "f_identification_notes",
@@ -3221,15 +3569,18 @@ if (currentPhotoUrl) {
     animal.location_city
   );
 
+
   setField(
     "f_location_state",
     animal.location_state
   );
 
+
   setField(
     "f_location_country",
     animal.location_country || "India"
   );
+
 
   setField(
     "f_map_url",
@@ -3242,25 +3593,30 @@ if (currentPhotoUrl) {
     animal.status
   );
 
+
   setField(
     "f_registration_date",
     animal.registration_date
   );
+
 
   setField(
     "f_public",
     animal.is_public
   );
 
+
   setField(
     "f_lost",
     animal.is_lost
   );
 
+
   setField(
     "f_special",
     animal.special_instructions
   );
+
 
   setField(
     "f_notes",
@@ -3296,50 +3652,60 @@ if (currentPhotoUrl) {
       owner.name
     );
 
+
     setField(
       "f_owner_phone",
       owner.phone
     );
+
 
     setField(
       "f_owner_alt",
       owner.alternate_phone
     );
 
+
     setField(
       "f_owner_email",
       owner.email
     );
+
 
     setField(
       "f_owner_city",
       owner.city
     );
 
+
     setField(
       "f_owner_state",
       owner.state
     );
+
 
     setField(
       "f_owner_country",
       owner.country || "India"
     );
 
+
     setField(
       "f_owner_postal",
       owner.postal_code
     );
+
 
     setField(
       "f_emergency_name",
       owner.emergency_contact_name
     );
 
+
     setField(
       "f_emergency_phone",
       owner.emergency_contact_phone
     );
+
   }
 
 
@@ -3356,50 +3722,60 @@ if (currentPhotoUrl) {
       records.behaviour.temperament
     );
 
+
     setField(
       "f_energy",
       records.behaviour.energy_level
     );
+
 
     setField(
       "f_children",
       records.behaviour.good_with_children
     );
 
+
     setField(
       "f_dogs",
       records.behaviour.good_with_dogs
     );
+
 
     setField(
       "f_cats",
       records.behaviour.good_with_cats
     );
 
+
     setField(
       "f_stranger",
       records.behaviour.stranger_friendliness
     );
+
 
     setField(
       "f_leash",
       records.behaviour.leash_behavior
     );
 
+
     setField(
       "f_handling",
       records.behaviour.handling_behavior
     );
+
 
     setField(
       "f_food",
       records.behaviour.food_preferences
     );
 
+
     setField(
       "f_behaviour_instructions",
       records.behaviour.special_instructions
     );
+
   }
 
 
@@ -3455,6 +3831,7 @@ function closeAnimalEditor() {
     modal.classList.remove(
       "open"
     );
+
   }
 
 
@@ -3495,28 +3872,37 @@ function collectVaccinations() {
         vaccine_name:
           get("vaccine"),
 
+
         vaccination_date:
           get("date"),
+
 
         next_due_date:
           get("next") || null,
 
+
         batch_number:
           get("batch") || null,
+
 
         manufacturer:
           get("manufacturer") || null,
 
+
         clinic_name:
           get("clinic") || null,
+
 
         veterinarian_name:
           get("vet") || null,
 
+
         status:
           get("status") ||
           "RECORDED"
+
       };
+
     })
     .filter(
       record =>
@@ -3558,24 +3944,32 @@ function collectMedicalRecords() {
         record_date:
           get("date"),
 
+
         record_type:
           get("type") || null,
+
 
         diagnosis:
           get("diagnosis") || null,
 
+
         treatment:
           get("treatment") || null,
+
 
         medication:
           get("medication") || null,
 
+
         clinic_name:
           get("clinic") || null,
 
+
         veterinarian_name:
           get("vet") || null
+
       };
+
     })
     .filter(
       record =>
@@ -3616,13 +4010,17 @@ function collectWeightRecords() {
         recorded_date:
           get("date"),
 
+
         weight:
           get("weight"),
+
 
         unit:
           get("unit") ||
           "kg"
+
       };
+
     })
     .filter(
       record =>
@@ -3647,6 +4045,7 @@ async function saveOwner() {
   if (!ownerName) {
 
     return null;
+
   }
 
 
@@ -3655,50 +4054,60 @@ async function saveOwner() {
     name:
       ownerName,
 
+
     phone:
       getField(
         "f_owner_phone"
       ) || null,
+
 
     alternate_phone:
       getField(
         "f_owner_alt"
       ) || null,
 
+
     email:
       getField(
         "f_owner_email"
       ) || null,
+
 
     city:
       getField(
         "f_owner_city"
       ) || null,
 
+
     state:
       getField(
         "f_owner_state"
       ) || null,
+
 
     country:
       getField(
         "f_owner_country"
       ) || "India",
 
+
     postal_code:
       getField(
         "f_owner_postal"
       ) || null,
+
 
     emergency_contact_name:
       getField(
         "f_emergency_name"
       ) || null,
 
+
     emergency_contact_phone:
       getField(
         "f_emergency_phone"
       ) || null
+
   };
 
 
@@ -3734,6 +4143,7 @@ async function saveOwner() {
 
 
     return ownerId;
+
   }
 
 
@@ -3769,74 +4179,208 @@ async function saveBehaviour(
   animalId
 ) {
 
-  const data = {
+  const behaviourData = {
 
     animal_id:
       animalId,
+
 
     temperament:
       getField(
         "f_temperament"
       ) || null,
 
+
     energy_level:
       getField(
         "f_energy"
       ) || null,
+
 
     good_with_children:
       getField(
         "f_children"
       ),
 
+
     good_with_dogs:
       getField(
         "f_dogs"
       ),
+
 
     good_with_cats:
       getField(
         "f_cats"
       ),
 
+
     stranger_friendliness:
       getField(
         "f_stranger"
       ) || null,
+
 
     leash_behavior:
       getField(
         "f_leash"
       ) || null,
 
+
     handling_behavior:
       getField(
         "f_handling"
       ) || null,
+
 
     food_preferences:
       getField(
         "f_food"
       ) || null,
 
+
     special_instructions:
       getField(
         "f_behaviour_instructions"
       ) || null
+
   };
+
+
+  const {
+    data: existing,
+    error:
+      existingError
+  } =
+    await supabaseClient
+      .from("behaviour_traits")
+      .select("id")
+      .eq(
+        "animal_id",
+        animalId
+      )
+      .maybeSingle();
+
+
+  if (existingError) {
+    throw existingError;
+  }
+
+
+  if (existing?.id) {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("behaviour_traits")
+        .update(
+          behaviourData
+        )
+        .eq(
+          "id",
+          existing.id
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+  } else {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("behaviour_traits")
+        .insert(
+          behaviourData
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+  }
+}
+
+
+/* ============================================================
+   SAVE VACCINATIONS
+   ============================================================ */
+
+async function saveVaccinations(
+  animalId,
+  records
+) {
+
+  const {
+    error:
+      deleteError
+  } =
+    await supabaseClient
+      .from("vaccinations")
+      .delete()
+      .eq(
+        "animal_id",
+        animalId
+      );
+
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+
+  if (!records.length) {
+    return;
+  }
+
+
+  const rows =
+    records.map(
+      record => ({
+
+        animal_id:
+          animalId,
+
+        vaccine_name:
+          record.vaccine_name,
+
+        vaccination_date:
+          record.vaccination_date,
+
+        next_due_date:
+          record.next_due_date,
+
+        batch_number:
+          record.batch_number,
+
+        manufacturer:
+          record.manufacturer,
+
+        clinic_name:
+          record.clinic_name,
+
+        veterinarian_name:
+          record.veterinarian_name,
+
+        status:
+          record.status
+
+      })
+    );
 
 
   const {
     error
   } =
     await supabaseClient
-      .from("behaviour_traits")
-      .upsert(
-        data,
-        {
-          onConflict:
-            "animal_id"
-        }
+      .from("vaccinations")
+      .insert(
+        rows
       );
 
 
@@ -3847,125 +4391,151 @@ async function saveBehaviour(
 
 
 /* ============================================================
-   REPLACE CHILD RECORDS
+   SAVE MEDICAL RECORDS
    ============================================================ */
 
-async function replaceChildRecords(
+async function saveMedicalRecords(
   animalId,
-  vaccinations,
-  medical,
-  weight
+  records
 ) {
 
-  await Promise.all([
-
-    supabaseClient
-      .from("vaccinations")
-      .delete()
-      .eq(
-        "animal_id",
-        animalId
-      ),
-
-    supabaseClient
+  const {
+    error:
+      deleteError
+  } =
+    await supabaseClient
       .from("medical_records")
       .delete()
       .eq(
         "animal_id",
         animalId
-      ),
+      );
 
-    supabaseClient
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+
+  if (!records.length) {
+    return;
+  }
+
+
+  const rows =
+    records.map(
+      record => ({
+
+        animal_id:
+          animalId,
+
+        record_date:
+          record.record_date,
+
+        record_type:
+          record.record_type,
+
+        diagnosis:
+          record.diagnosis,
+
+        treatment:
+          record.treatment,
+
+        medication:
+          record.medication,
+
+        clinic_name:
+          record.clinic_name,
+
+        veterinarian_name:
+          record.veterinarian_name
+
+      })
+    );
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("medical_records")
+      .insert(
+        rows
+      );
+
+
+  if (error) {
+    throw error;
+  }
+}
+
+
+/* ============================================================
+   SAVE WEIGHT HISTORY
+   ============================================================ */
+
+async function saveWeightHistory(
+  animalId,
+  records
+) {
+
+  const {
+    error:
+      deleteError
+  } =
+    await supabaseClient
       .from("weight_history")
       .delete()
       .eq(
         "animal_id",
         animalId
-      )
-  ]);
-
-
-  if (vaccinations.length) {
-
-    const rows =
-      vaccinations.map(
-        record => ({
-          ...record,
-          animal_id:
-            animalId
-        })
       );
 
 
-    const {
-      error
-    } =
-      await supabaseClient
-        .from("vaccinations")
-        .insert(
-          rows
-        );
-
-
-    if (error) {
-      throw error;
-    }
+  if (deleteError) {
+    throw deleteError;
   }
 
 
-  if (medical.length) {
-
-    const rows =
-      medical.map(
-        record => ({
-          ...record,
-          animal_id:
-            animalId
-        })
-      );
-
-
-    const {
-      error
-    } =
-      await supabaseClient
-        .from("medical_records")
-        .insert(
-          rows
-        );
-
-
-    if (error) {
-      throw error;
-    }
+  if (!records.length) {
+    return;
   }
 
 
-  if (weight.length) {
+  const rows =
+    records.map(
+      record => ({
 
-    const rows =
-      weight.map(
-        record => ({
-          ...record,
-          animal_id:
-            animalId
-        })
+        animal_id:
+          animalId,
+
+        recorded_date:
+          record.recorded_date,
+
+        weight:
+          Number(
+            record.weight
+          ),
+
+        unit:
+          record.unit
+
+      })
+    );
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("weight_history")
+      .insert(
+        rows
       );
 
 
-    const {
-      error
-    } =
-      await supabaseClient
-        .from("weight_history")
-        .insert(
-          rows
-        );
-
-
-    if (error) {
-      throw error;
-    }
+  if (error) {
+    throw error;
   }
 }
 
@@ -3976,229 +4546,179 @@ async function replaceChildRecords(
 
 async function saveAnimal() {
 
-  const saveButton =
-    document.getElementById(
-      "editorSave"
-    );
-
   const message =
     document.getElementById(
       "editorMessage"
     );
 
 
-  message.textContent =
-    "";
-
-
-  const animalId =
-    getField(
-      "f_animal_id"
+  const saveButton =
+    document.getElementById(
+      "editorSave"
     );
-
-  const name =
-    getField(
-      "f_name"
-    );
-
-  const type =
-    getField(
-      "f_type"
-    );
-
-
-  if (
-    !animalId ||
-    !name ||
-    !type
-  ) {
-
-    message.textContent =
-      "Animal ID, Name and Type are required.";
-
-    return;
-  }
-
-
-  saveButton.disabled =
-    true;
-
-  saveButton.textContent =
-    "SAVING...";
 
 
   try {
 
-    /*
-      Check duplicate Animal ID
-    */
-
-    let duplicateQuery =
-      supabaseClient
-        .from("animals")
-        .select("id")
-        .eq(
-          "animal_id",
-          animalId
-        );
+    saveButton.disabled =
+      true;
 
 
-    if (editingAnimalId) {
-
-      duplicateQuery =
-        duplicateQuery.neq(
-          "id",
-          editingAnimalId
-        );
-    }
+    message.style.color =
+      "#245579";
 
 
-    const {
-      data: duplicate
-    } =
-      await duplicateQuery.maybeSingle();
+    message.textContent =
+      "Saving animal...";
 
-
-    if (duplicate) {
-
-      throw new Error(
-        `Animal ID "${animalId}" is already in use.`
-      );
-    }
-
-
-    /*
-      Save owner first
-    */
 
     const ownerId =
       await saveOwner();
 
 
-    /*
-      Animal data
-    */
-
     const animalData = {
 
       animal_id:
-        animalId,
+        getField(
+          "f_animal_id"
+        ),
+
 
       name:
-        name,
+        getField(
+          "f_name"
+        ),
+
 
       type:
-        type,
+        getField(
+          "f_type"
+        ),
+
 
       breed:
         getField(
           "f_breed"
         ) || null,
 
+
       gender:
         getField(
           "f_gender"
         ) || null,
+
 
       date_of_birth:
         getField(
           "f_dob"
         ) || null,
 
+
       colour:
         getField(
           "f_colour"
         ) || null,
+
 
       markings:
         getField(
           "f_markings"
         ) || null,
 
+
+      photo_url:
+        currentPhotoUrl || null,
+
+
       microchip_number:
         getField(
           "f_microchip"
         ) || null,
+
 
       microchip_provider:
         getField(
           "f_microchip_provider"
         ) || null,
 
-      identification_notes:
-        getField(
-          "f_identification_notes"
-        ) || null,
 
       government_reference:
         getField(
           "f_government_reference"
         ) || null,
 
-      photo_url:
-        currentPhotoUrl || null,
+
+      identification_notes:
+        getField(
+          "f_identification_notes"
+        ) || null,
+
 
       owner_id:
         ownerId,
+
 
       location_city:
         getField(
           "f_location_city"
         ) || null,
 
+
       location_state:
         getField(
           "f_location_state"
         ) || null,
+
 
       location_country:
         getField(
           "f_location_country"
         ) || "India",
 
+
       map_url:
         getField(
           "f_map_url"
         ) || null,
+
 
       status:
         getField(
           "f_status"
         ) || "ACTIVE RECORD",
 
+
+      registration_date:
+        getField(
+          "f_registration_date"
+        ) || null,
+
+
       is_public:
         getField(
           "f_public"
         ),
+
 
       is_lost:
         getField(
           "f_lost"
         ),
 
+
       special_instructions:
         getField(
           "f_special"
         ) || null,
 
+
       notes:
         getField(
           "f_notes"
-        ) || null,
+        ) || null
 
-      registration_date:
-        getField(
-          "f_registration_date"
-        ) ||
-        new Date()
-          .toISOString()
-          .slice(0,10)
     };
 
-
-    /*
-      INSERT or UPDATE
-    */
 
     let savedAnimalId =
       editingAnimalId;
@@ -4248,91 +4768,110 @@ async function saveAnimal() {
 
       savedAnimalId =
         data.id;
+
     }
 
-     /*
-  PHOTO UPLOAD
-*/
-
-if (selectedPhotoFile) {
-
-  message.style.color =
-    "#245579";
-
-  message.textContent =
-    "Uploading animal photo...";
-
-
-  const uploadedPhotoUrl =
-    await uploadAnimalPhoto(
-      savedAnimalId,
-      selectedPhotoFile
-    );
-
-
-  const {
-    error: photoUpdateError
-  } =
-    await supabaseClient
-      .from("animals")
-      .update({
-        photo_url:
-          uploadedPhotoUrl
-      })
-      .eq(
-        "id",
-        savedAnimalId
-      );
-
-
-  if (photoUpdateError) {
-    throw photoUpdateError;
-  }
-
-
-  currentPhotoUrl =
-    uploadedPhotoUrl;
-
-  selectedPhotoFile =
-    null;
-}
 
     /*
-      Behaviour
+      PHOTO UPLOAD
     */
+
+    if (selectedPhotoFile) {
+
+      message.style.color =
+        "#245579";
+
+
+      message.textContent =
+        "Uploading animal photo...";
+
+
+      const uploadedPhotoUrl =
+        await uploadAnimalPhoto(
+          savedAnimalId,
+          selectedPhotoFile
+        );
+
+
+      const {
+        error:
+          photoUpdateError
+      } =
+        await supabaseClient
+          .from("animals")
+          .update({
+            photo_url:
+              uploadedPhotoUrl
+          })
+          .eq(
+            "id",
+            savedAnimalId
+          );
+
+
+      if (photoUpdateError) {
+        throw photoUpdateError;
+      }
+
+
+      currentPhotoUrl =
+        uploadedPhotoUrl;
+
+
+      selectedPhotoFile =
+        null;
+
+    }
+
+
+    message.textContent =
+      "Saving behaviour...";
+
 
     await saveBehaviour(
       savedAnimalId
     );
 
 
-    /*
-      Health records
-    */
+    message.textContent =
+      "Saving vaccinations...";
 
-    await replaceChildRecords(
 
+    await saveVaccinations(
       savedAnimalId,
+      collectVaccinations()
+    );
 
-      collectVaccinations(),
 
-      collectMedicalRecords(),
+    message.textContent =
+      "Saving medical records...";
 
+
+    await saveMedicalRecords(
+      savedAnimalId,
+      collectMedicalRecords()
+    );
+
+
+    message.textContent =
+      "Saving weight history...";
+
+
+    await saveWeightHistory(
+      savedAnimalId,
       collectWeightRecords()
-
     );
 
 
     message.style.color =
       "#2d8a62";
 
+
     message.textContent =
-      "Animal saved successfully.";
+      "✓ Animal saved successfully.";
 
 
     await loadAnimals();
-
-    await loadChangeRequests();
 
 
     setTimeout(
@@ -4341,7 +4880,7 @@ if (selectedPhotoFile) {
         closeAnimalEditor();
 
       },
-      700
+      800
     );
 
 
@@ -4358,7 +4897,7 @@ if (selectedPhotoFile) {
 
 
     message.textContent =
-      error.message ||
+      error?.message ||
       "Unable to save animal.";
 
   } finally {
@@ -4366,11 +4905,8 @@ if (selectedPhotoFile) {
     saveButton.disabled =
       false;
 
-    saveButton.textContent =
-      "SAVE ANIMAL";
   }
 }
-
 
 /* ============================================================
    FORM EVENTS
@@ -4432,7 +4968,9 @@ document.addEventListener(
     ) {
 
       closeAnimalEditor();
+
     }
+
   }
 );
 
@@ -4450,6 +4988,7 @@ supabaseClient.auth.onAuthStateChange(
     if (!session) {
 
       currentUser = null;
+
       currentAdmin = null;
 
       showLogin();
@@ -4464,6 +5003,7 @@ supabaseClient.auth.onAuthStateChange(
     ) {
 
       return;
+
     }
 
 
@@ -4481,9 +5021,12 @@ supabaseClient.auth.onAuthStateChange(
 
       updateAdminHeader();
 
+
       showAdminApp();
 
+
       await loadDashboard();
+
 
     } catch (error) {
 
@@ -4495,15 +5038,21 @@ supabaseClient.auth.onAuthStateChange(
 
       await supabaseClient.auth.signOut();
 
+
       currentUser = null;
+
       currentAdmin = null;
 
+
       showLogin();
+
 
       showLoginMessage(
         error.message
       );
+
     }
+
   }
 );
 
@@ -4534,12 +5083,14 @@ async function initialize() {
       );
 
       return;
+
     }
 
 
     if (!data.session) {
 
       return;
+
     }
 
 
@@ -4555,7 +5106,9 @@ async function initialize() {
 
     updateAdminHeader();
 
+
     showAdminApp();
+
 
     await loadDashboard();
 
@@ -4570,11 +5123,16 @@ async function initialize() {
 
     await supabaseClient.auth.signOut();
 
+
     currentUser = null;
+
     currentAdmin = null;
 
+
     showLogin();
+
   }
+
 }
 
 
