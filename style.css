@@ -11100,3 +11100,93 @@ body.dark-mode .profile-v2-outline-button {
   }
 
 }
+/* ============================================================
+   CHANGE REQUEST SUBMIT BUTTON FIX
+   ============================================================ */
+
+.profile-v2-change-form button[type="submit"].profile-v2-full-button {
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: auto !important;
+  min-width: 145px !important;
+  min-height: 42px !important;
+
+  padding: 0 18px !important;
+
+  border: 0 !important;
+  border-radius: 12px !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0e8060,
+      #14c984
+    ) !important;
+
+  font-family: inherit !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+
+  line-height: 1 !important;
+
+  text-align: center !important;
+
+  cursor: pointer !important;
+
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  box-shadow:
+    6px 7px 15px rgba(15, 130, 95, .22) !important;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    opacity .2s ease !important;
+}
+
+
+.profile-v2-change-form button[type="submit"].profile-v2-full-button:hover {
+  transform: translateY(-2px) !important;
+
+  box-shadow:
+    8px 10px 20px rgba(15, 130, 95, .28) !important;
+}
+
+
+.profile-v2-change-form button[type="submit"].profile-v2-full-button:active {
+  transform: translateY(0) !important;
+
+  box-shadow:
+    3px 4px 9px rgba(15, 130, 95, .20) !important;
+}
+
+
+.profile-v2-change-form button[type="submit"].profile-v2-full-button:disabled {
+  opacity: .65 !important;
+
+  cursor: not-allowed !important;
+
+  transform: none !important;
+}
+
+
+/* Dark mode */
+
+body.dark-mode
+.profile-v2-change-form
+button[type="submit"].profile-v2-full-button {
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0e8060,
+      #14c984
+    ) !important;
+}
