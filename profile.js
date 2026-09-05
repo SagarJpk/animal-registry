@@ -1033,7 +1033,16 @@ async function loadAnimalFromSupabase() {
 
   try {
 
+    /* ========================================================
+       LOAD SUPABASE LIBRARY
+       ======================================================== */
+
     await loadSupabaseLibrary();
+
+
+    /* ========================================================
+       CREATE SUPABASE CLIENT
+       ======================================================== */
 
     supabaseClient =
       window.supabase.createClient(
@@ -1041,24 +1050,184 @@ async function loadAnimalFromSupabase() {
         SUPABASE_PUBLISHABLE_KEY
       );
 
+
+    /* ========================================================
+       GET PROFILE ID
+       ======================================================== */
+
     const profileId =
       getProfileId();
 
-  if (!profileId) {
 
-    showProfileError(
-      "No animal profile ID was provided."
-    );
+    if (!profileId) {
 
-    return;
+      showProfileError(
+        "No animal ID was provided."
+      );
+
+      return;
+
+    }
+
+
+    /* ========================================================
+       LOAD ANIMAL
+       ======================================================== */
+
+    let query =
+      supabaseClient
+        .from("animals")
+        .select(`
+          *,
+          owners (
+            name,
+            phone,
+            alternate_phone
+          ),
+          behaviour_traits (
+            temperament,
+            traits,
+            notes
+          ),
+          vaccinations (
+            id,
+            vaccine_name,
+            vaccination_date,
+            next_due_date,
+            status
+          ),
+          weight_history (
+            id,
+            recorded_date,
+            weight,
+            unit,
+            notes
+          )
+        `);
+
+
+    /* ========================================================
+       UUID FROM INDEX.HTML
+       ======================================================== */
+
+    if (
+      profileId.match(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      )
+    ) {
+
+      query =
+        query.eq(
+          "id",
+          profileId
+        );
+
+    }
+
+    else {
+
+      /* ======================================================
+         ALSO ALLOW ANIMAL ID
+         Example:
+         ANM-KA-2024-0016503
+         ====================================================== */
+
+      query =
+        query.eq(
+          "animal_id",
+          profileId
+        );
+
+    }
+
+
+    /* ========================================================
+       EXECUTE QUERY
+       ======================================================== */
+
+    const {
+      data,
+      error
+    } = await query.maybeSingle();
+
+
+    /* ========================================================
+       SUPABASE ERROR
+       ======================================================== */
+
+    if (error) {
+
+      console.error(
+        "Supabase profile loading error:",
+        error
+      );
+
+
+      showProfileError(
+        "Unable to load this animal profile."
+      );
+
+
+      return;
+
+    }
+
+
+    /* ========================================================
+       ANIMAL NOT FOUND
+       ======================================================== */
+
+    if (!data) {
+
+      console.error(
+        "Animal profile not found:",
+        profileId
+      );
+
+
+      showProfileError(
+        "Animal profile not found."
+      );
+
+
+      return;
+
+    }
+
+
+    /* ========================================================
+       NORMALIZE DATA
+       ======================================================== */
+
+    currentAnimal =
+      normalizeAnimal(
+        data
+      );
+
+
+    /* ========================================================
+       RENDER PROFILE
+       ======================================================== */
+
+    renderProfile();
 
   }
 
+  catch (error) {
 
-  try {
+    console.error(
+      "Profile loading failed:",
+      error
+    );
 
-    let animal = null;
 
+    showProfileError(
+      "Unable to load this animal profile right now."
+    );
+
+  }
+
+}
 
     /* ========================================================
        FIRST TRY UUID
