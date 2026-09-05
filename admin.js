@@ -98,6 +98,10 @@ let animalsCache = [];
 
 let editingAnimalId = null;
 
+/* PHOTO UPLOAD STATE */
+let selectedPhotoFile = null;
+let currentPhotoUrl = "";
+
 
 /* ============================================================
    HTML ESCAPE
@@ -1075,6 +1079,78 @@ function addEditorStyles() {
     .editor-field textarea {
       min-height:70px;
       resize:vertical;
+    }
+
+    .photo-upload-box {
+      padding:12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.25);
+      box-shadow:var(--shadow-inset);
+    }
+
+    .photo-upload-button {
+      width:100%;
+      border:0;
+      border-radius:11px;
+      padding:11px 13px;
+      color:#fff;
+      background:
+        linear-gradient(
+          135deg,
+          #245579,
+          #173d5d
+        );
+      box-shadow:var(--shadow-soft);
+      font-size:10px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .photo-upload-button:hover {
+      transform:translateY(-1px);
+    }
+
+    .photo-upload-help {
+      margin-top:7px;
+      text-align:center;
+      color:var(--muted);
+      font-size:8px;
+    }
+
+    .photo-preview {
+      margin-top:10px;
+      width:100%;
+      min-height:120px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      border-radius:12px;
+      background:#dce4e9;
+      box-shadow:var(--shadow-inset);
+    }
+
+    .photo-preview img {
+      display:block;
+      width:100%;
+      max-height:180px;
+      object-fit:cover;
+      border-radius:10px;
+    }
+
+    .photo-preview-empty {
+      padding:25px 10px;
+      color:var(--muted);
+      font-size:10px;
+      text-align:center;
+    }
+
+    .photo-upload-status {
+      margin-top:7px;
+      min-height:16px;
+      font-size:9px;
+      font-weight:700;
+      text-align:center;
     }
 
     .editor-checks {
@@ -2225,6 +2301,124 @@ function createEditorModal() {
   );
 }
 
+/* ============================================================
+   PHOTO UPLOAD
+   ============================================================ */
+
+document
+  .getElementById("photoUploadButton")
+  .addEventListener(
+    "click",
+    () => {
+      document
+        .getElementById("f_photo_file")
+        .click();
+    }
+  );
+
+
+document
+  .getElementById("f_photo_file")
+  .addEventListener(
+    "change",
+    event => {
+
+      const file =
+        event.target.files?.[0];
+
+      const status =
+        document.getElementById(
+          "photoUploadStatus"
+        );
+
+      const preview =
+        document.getElementById(
+          "photoPreview"
+        );
+
+
+      status.textContent = "";
+      status.style.color = "#b84c4c";
+
+
+      if (!file) {
+        selectedPhotoFile = null;
+        return;
+      }
+
+
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ];
+
+
+      if (
+        !allowedTypes.includes(
+          file.type
+        )
+      ) {
+
+        status.textContent =
+          "Please select JPG, PNG or WebP.";
+
+        event.target.value = "";
+
+        selectedPhotoFile = null;
+
+        return;
+      }
+
+
+      const maxSize =
+        5 * 1024 * 1024;
+
+
+      if (
+        file.size > maxSize
+      ) {
+
+        status.textContent =
+          "Photo must be 5 MB or smaller.";
+
+        event.target.value = "";
+
+        selectedPhotoFile = null;
+
+        return;
+      }
+
+
+      selectedPhotoFile =
+        file;
+
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload = event => {
+
+        preview.innerHTML = `
+          <img
+            src="${event.target.result}"
+            alt="Selected animal photo"
+          >
+        `;
+
+        status.style.color =
+          "#2d8a62";
+
+        status.textContent =
+          `✓ ${file.name} selected`;
+      };
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
 
 /* ============================================================
    FIELD HELPER
@@ -2757,6 +2951,49 @@ async function openAddAnimal() {
     "animalEditorForm"
   ).reset();
 
+   /* ============================================================
+   RESET PHOTO FOR NEW ANIMAL
+   ============================================================ */
+
+selectedPhotoFile = null;
+currentPhotoUrl = "";
+
+const photoFileInput =
+  document.getElementById(
+    "f_photo_file"
+  );
+
+const photoPreview =
+  document.getElementById(
+    "photoPreview"
+  );
+
+const photoStatus =
+  document.getElementById(
+    "photoUploadStatus"
+  );
+
+if (photoFileInput) {
+  photoFileInput.value = "";
+}
+
+if (photoPreview) {
+  photoPreview.innerHTML = `
+    <div class="photo-preview-empty">
+      🐾 No photo selected
+    </div>
+  `;
+}
+
+if (photoStatus) {
+  photoStatus.textContent = "";
+}
+
+setField(
+  "f_photo",
+  ""
+);
+
 
   document.getElementById(
     "f_owner_country"
@@ -2899,10 +3136,64 @@ async function openAnimalEditor(
     animal.markings
   );
 
-  setField(
-    "f_photo",
-    animal.photo_url
+/* ============================================================
+   LOAD EXISTING PHOTO
+   ============================================================ */
+
+selectedPhotoFile = null;
+currentPhotoUrl = animal.photo_url || "";
+
+const photoFileInput =
+  document.getElementById(
+    "f_photo_file"
   );
+
+const photoPreview =
+  document.getElementById(
+    "photoPreview"
+  );
+
+const photoStatus =
+  document.getElementById(
+    "photoUploadStatus"
+  );
+
+if (photoFileInput) {
+  photoFileInput.value = "";
+}
+
+setField(
+  "f_photo",
+  currentPhotoUrl
+);
+
+if (currentPhotoUrl) {
+
+  photoPreview.innerHTML = `
+    <img
+      src="${escapeHtml(currentPhotoUrl)}"
+      alt="${escapeHtml(animal.name)}"
+    >
+  `;
+
+  photoStatus.textContent =
+    "Current photo loaded. Choose a new photo to replace it.";
+
+  photoStatus.style.color =
+    "#2d8a62";
+
+} else {
+
+  photoPreview.innerHTML = `
+    <div class="photo-preview-empty">
+      🐾 No photo uploaded
+    </div>
+  `;
+
+  photoStatus.textContent =
+    "";
+
+}
 
   setField(
     "f_microchip",
@@ -3845,9 +4136,7 @@ async function saveAnimal() {
         ) || null,
 
       photo_url:
-        getField(
-          "f_photo"
-        ) || null,
+        currentPhotoUrl || null,
 
       owner_id:
         ownerId,
@@ -3961,6 +4250,52 @@ async function saveAnimal() {
         data.id;
     }
 
+     /*
+  PHOTO UPLOAD
+*/
+
+if (selectedPhotoFile) {
+
+  message.style.color =
+    "#245579";
+
+  message.textContent =
+    "Uploading animal photo...";
+
+
+  const uploadedPhotoUrl =
+    await uploadAnimalPhoto(
+      savedAnimalId,
+      selectedPhotoFile
+    );
+
+
+  const {
+    error: photoUpdateError
+  } =
+    await supabaseClient
+      .from("animals")
+      .update({
+        photo_url:
+          uploadedPhotoUrl
+      })
+      .eq(
+        "id",
+        savedAnimalId
+      );
+
+
+  if (photoUpdateError) {
+    throw photoUpdateError;
+  }
+
+
+  currentPhotoUrl =
+    uploadedPhotoUrl;
+
+  selectedPhotoFile =
+    null;
+}
 
     /*
       Behaviour
