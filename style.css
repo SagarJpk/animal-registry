@@ -10287,12 +10287,12 @@ body.dark-mode .profile-v2-modal-weight > span {
 }
 /* ============================================================
    PROFILE V2 MODAL SYSTEM
+   FINAL CLEAN VERSION
    ============================================================ */
 
 .profile-v2-modal {
   position: fixed;
   inset: 0;
-
   z-index: 99999;
 
   display: flex;
@@ -10303,59 +10303,46 @@ body.dark-mode .profile-v2-modal-weight > span {
 
   opacity: 0;
   visibility: hidden;
-
   pointer-events: none;
 
-  transition:
-    opacity .22s ease,
-    visibility .22s ease;
-}
+  background: rgba(7, 25, 35, 0.72);
 
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  transition:
+    opacity 0.22s ease,
+    visibility 0.22s ease;
+}
 
 .profile-v2-modal.show {
   opacity: 1;
   visibility: visible;
-
   pointer-events: auto;
 }
-
-
-/* ============================================================
-   MODAL BACKDROP
-   ============================================================ */
 
 .profile-v2-modal-backdrop {
   position: absolute;
   inset: 0;
+  z-index: 0;
 
-  background:
-    rgba(7, 25, 35, .72);
+  background: transparent;
 
-  backdrop-filter:
-    blur(8px);
-
-  -webkit-backdrop-filter:
-    blur(8px);
+  cursor: pointer;
 }
-
-
-/* ============================================================
-   MODAL DIALOG
-   ============================================================ */
 
 .profile-v2-modal-dialog {
   position: relative;
-
   z-index: 2;
 
   width: min(760px, 100%);
-
   max-height: min(86vh, 850px);
 
   overflow-y: auto;
 
   padding: 30px;
 
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 26px;
 
   background:
@@ -10366,136 +10353,121 @@ body.dark-mode .profile-v2-modal-weight > span {
     );
 
   box-shadow:
-    18px 22px 50px rgba(5, 25, 35, .30),
-    -8px -8px 24px rgba(255, 255, 255, .75);
+    18px 22px 50px rgba(5, 25, 35, 0.30),
+    -8px -8px 24px rgba(255, 255, 255, 0.75);
 
-  transform:
-    translateY(18px)
-    scale(.97);
+  transform: translateY(18px) scale(0.97);
 
   transition:
-    transform .22s ease;
+    transform 0.22s ease;
 }
 
-
-.profile-v2-modal.show
-.profile-v2-modal-dialog {
-  transform:
-    translateY(0)
-    scale(1);
+.profile-v2-modal.show .profile-v2-modal-dialog {
+  transform: translateY(0) scale(1);
 }
 
-
-/* ============================================================
-   CLOSE BUTTON
-   ============================================================ */
-
-.profile-v2-modal-close {
-  position: absolute;
-
-  top: 14px;
-  right: 14px;
-
-  width: 38px;
-  height: 38px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  border: 0;
-  border-radius: 50%;
-
-  color: #36596b;
-
-  background: #edf5f7;
-
-  box-shadow:
-    5px 6px 13px rgba(27,55,72,.12),
-    -4px -4px 12px rgba(255,255,255,.9);
-
-  font-family: inherit;
-  font-size: 23px;
-  line-height: 1;
-
-  cursor: pointer;
-
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease;
+.profile-v2-modal-dialog::-webkit-scrollbar {
+  width: 8px;
 }
 
-
-.profile-v2-modal-close:hover {
-  transform:
-    rotate(90deg);
-
-  box-shadow:
-    7px 8px 17px rgba(27,55,72,.18),
-    -4px -4px 12px rgba(255,255,255,.9);
+.profile-v2-modal-dialog::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-
-/* ============================================================
-   MODAL CONTENT
-   ============================================================ */
+.profile-v2-modal-dialog::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(80, 110, 125, 0.35);
+}
 
 .profile-v2-modal-content {
   width: 100%;
 }
 
+.profile-v2-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  color: #36596b;
+  background: #edf5f7;
+
+  box-shadow:
+    5px 6px 13px rgba(27, 55, 72, 0.12),
+    -4px -4px 12px rgba(255, 255, 255, 0.90);
+
+  font-family: Arial, sans-serif;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    transform 0.20s ease,
+    box-shadow 0.20s ease,
+    background 0.20s ease;
+}
+
+.profile-v2-modal-close:hover {
+  transform: rotate(90deg);
+  background: #f5fafb;
+
+  box-shadow:
+    7px 8px 17px rgba(27, 55, 72, 0.18),
+    -4px -4px 12px rgba(255, 255, 255, 0.90);
+}
 
 .profile-v2-modal-kicker {
-  margin-bottom: 8px;
+  margin: 0 45px 8px 0;
 
   color: #0e8060;
 
   font-size: 9px;
-
   font-weight: 900;
-
   letter-spacing: 1.8px;
-
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
-
 .profile-v2-modal-content h2 {
-  margin:
-    0 45px 10px 0;
+  margin: 0 45px 10px 0;
 
   color: #123b53;
 
   font-size: 25px;
-
-  line-height: 1.2;
-
   font-weight: 900;
+  line-height: 1.2;
 }
 
-
 .profile-v2-modal-description {
-  margin:
-    0 0 22px;
+  margin: 0 0 22px;
 
   color: #708896;
 
   font-size: 11px;
-
   line-height: 1.65;
 }
 
-
-/* ============================================================
-   MODAL HIGHLIGHT
-   ============================================================ */
-
 .profile-v2-modal-highlight {
   margin-bottom: 22px;
-
   padding: 17px 19px;
 
+  border: 1px solid rgba(20, 150, 110, 0.10);
   border-radius: 16px;
 
   background:
@@ -10504,56 +10476,41 @@ body.dark-mode .profile-v2-modal-weight > span {
       #e8f7f1,
       #f5fbfa
     );
-
-  border: 1px solid rgba(20, 150, 110, .10);
 }
-
 
 .profile-v2-modal-highlight span {
   display: block;
-
   margin-bottom: 6px;
 
   color: #7b929f;
 
   font-size: 8px;
-
   font-weight: 900;
-
   letter-spacing: 1.2px;
 }
-
 
 .profile-v2-modal-highlight strong {
   color: #0e8060;
 
   font-size: 16px;
+  font-weight: 900;
 }
-
-
-/* ============================================================
-   MODAL SECTIONS
-   ============================================================ */
 
 .profile-v2-modal-section {
   margin-top: 20px;
 }
 
-
 .profile-v2-modal-label {
   display: block;
-
   margin-bottom: 10px;
 
   color: #6e8795;
 
   font-size: 8px;
-
   font-weight: 900;
-
   letter-spacing: 1.3px;
+  text-transform: uppercase;
 }
-
 
 .profile-v2-modal-text {
   margin: 0;
@@ -10561,10 +10518,8 @@ body.dark-mode .profile-v2-modal-weight > span {
   color: #496776;
 
   font-size: 11px;
-
   line-height: 1.7;
 }
-
 
 .profile-v2-modal-muted {
   margin: 0;
@@ -10572,50 +10527,33 @@ body.dark-mode .profile-v2-modal-weight > span {
   color: #8196a3;
 
   font-size: 10px;
+  line-height: 1.6;
 }
-
-
-/* ============================================================
-   TRAITS
-   ============================================================ */
 
 .profile-v2-traits {
   display: flex;
-
   flex-wrap: wrap;
-
   gap: 8px;
 }
 
-
 .profile-v2-trait {
   display: inline-flex;
-
   align-items: center;
 
   min-height: 30px;
-
   padding: 0 12px;
 
   border-radius: 20px;
 
   color: #24566c;
-
   background: #e5f0f3;
 
   font-size: 9px;
-
   font-weight: 800;
 }
 
-
-/* ============================================================
-   MODAL TABLE
-   ============================================================ */
-
 .profile-v2-modal-table-wrap {
   width: 100%;
-
   overflow-x: auto;
 
   border-radius: 15px;
@@ -10623,81 +10561,61 @@ body.dark-mode .profile-v2-modal-weight > span {
   background: #f7fbfc;
 
   box-shadow:
-    inset 0 0 0 1px rgba(45, 82, 100, .05);
+    inset 0 0 0 1px rgba(45, 82, 100, 0.05);
 }
-
 
 .profile-v2-modal-table {
   width: 100%;
-
   min-width: 540px;
 
   border-collapse: collapse;
 }
 
-
 .profile-v2-modal-table th {
   padding: 13px 14px;
 
   color: #718996;
-
   background: #eaf3f5;
 
   font-size: 8px;
-
   font-weight: 900;
-
-  letter-spacing: .8px;
-
+  letter-spacing: 0.8px;
   text-align: left;
-
   text-transform: uppercase;
 }
-
 
 .profile-v2-modal-table td {
   padding: 14px;
 
   color: #526f7e;
 
-  border-top:
-    1px solid rgba(57, 88, 103, .08);
+  border-top: 1px solid rgba(57, 88, 103, 0.08);
 
   font-size: 10px;
-
   line-height: 1.45;
 }
 
-
 .profile-v2-modal-table td strong {
   color: #173f55;
-
   font-weight: 900;
 }
 
-
 .profile-v2-table-status {
   display: inline-flex;
-
   align-items: center;
 
   min-height: 24px;
-
   padding: 0 9px;
 
   border-radius: 20px;
 
   color: #0e8060;
-
   background: #e2f5ed;
 
   font-size: 8px;
-
   font-weight: 900;
-
   text-transform: uppercase;
 }
-
 
 .profile-v2-empty-row {
   padding: 28px !important;
@@ -10707,6 +10625,63 @@ body.dark-mode .profile-v2-modal-weight > span {
   text-align: center;
 }
 
+/* ============================================================
+   WEIGHT HISTORY
+   ============================================================ */
+
+.profile-v2-modal-weight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-v2-modal-weight {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+  padding: 13px 15px;
+
+  border-radius: 12px;
+
+  background: #edf5f7;
+}
+
+.profile-v2-modal-weight strong {
+  display: block;
+
+  color: #143e58;
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.profile-v2-modal-weight small {
+  display: block;
+  margin-top: 4px;
+
+  color: #8196a3;
+
+  font-size: 8px;
+}
+
+.profile-v2-modal-weight > span {
+  color: #607c8d;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.profile-v2-modal-empty {
+  padding: 25px;
+
+  color: #8297a4;
+
+  text-align: center;
+
+  font-size: 10px;
+}
 
 /* ============================================================
    CHANGE REQUEST FORM
@@ -10714,405 +10689,154 @@ body.dark-mode .profile-v2-modal-weight > span {
 
 .profile-v2-change-form {
   display: flex;
-
   flex-direction: column;
-
   gap: 16px;
 }
 
-
 .profile-v2-form-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
-
 .profile-v2-form-group {
   display: flex;
-
   flex-direction: column;
-
   gap: 7px;
 }
-
 
 .profile-v2-form-group label {
   color: #5f7a89;
 
   font-size: 9px;
-
   font-weight: 900;
-
-  letter-spacing: .4px;
+  letter-spacing: 0.4px;
 }
-
 
 .profile-v2-form-group input,
 .profile-v2-form-group select,
 .profile-v2-form-group textarea {
   width: 100%;
-
   box-sizing: border-box;
 
-  border: 1px solid rgba(64, 103, 120, .12);
-
+  border: 1px solid rgba(64, 103, 120, 0.12);
   border-radius: 12px;
 
   padding: 11px 13px;
 
   color: #234d62;
-
   background: #f8fcfc;
 
   outline: none;
 
   font-family: inherit;
-
   font-size: 10px;
 
   transition:
-    border-color .2s ease,
-    box-shadow .2s ease;
+    border-color 0.20s ease,
+    box-shadow 0.20s ease;
 }
 
+.profile-v2-form-group input::placeholder,
+.profile-v2-form-group textarea::placeholder {
+  color: #9baeb7;
+}
 
 .profile-v2-form-group input:focus,
 .profile-v2-form-group select:focus,
 .profile-v2-form-group textarea:focus {
-  border-color: rgba(14, 128, 96, .45);
+  border-color: rgba(14, 128, 96, 0.45);
 
   box-shadow:
-    0 0 0 3px rgba(14, 128, 96, .08);
+    0 0 0 3px rgba(14, 128, 96, 0.08);
 }
-
 
 .profile-v2-form-group input[readonly] {
   color: #708896;
-
   background: #edf4f6;
 
   cursor: not-allowed;
 }
 
-
 .profile-v2-form-group textarea {
   min-height: 120px;
-
   resize: vertical;
 
   line-height: 1.55;
 }
 
-
-/* ============================================================
-   FORM ACTIONS
-   ============================================================ */
-
 .profile-v2-form-actions {
   display: flex;
-
   align-items: center;
   justify-content: flex-end;
 
   gap: 10px;
-
   margin-top: 4px;
 }
 
-
 .profile-v2-outline-button,
-.profile-v2-full-button {
-  min-height: 42px;
-
+.profile-v2-full-button,
+.profile-v2-submit-button {
   display: inline-flex;
 
   align-items: center;
   justify-content: center;
 
-  padding:
-    0 17px;
+  min-height: 42px;
+
+  padding: 0 17px;
 
   border-radius: 12px;
 
   font-family: inherit;
-
   font-size: 9px;
-
   font-weight: 900;
+
+  line-height: 1;
 
   cursor: pointer;
 
+  appearance: none;
+  -webkit-appearance: none;
+
   transition:
-    transform .2s ease,
-    box-shadow .2s ease;
+    transform 0.20s ease,
+    box-shadow 0.20s ease,
+    opacity 0.20s ease;
 }
 
-
 .profile-v2-outline-button {
-  border: 1px solid rgba(57, 91, 106, .12);
+  border: 1px solid rgba(57, 91, 106, 0.12);
 
   color: #496a79;
-
   background: #edf5f7;
 
   box-shadow:
-    5px 6px 13px rgba(27,55,72,.10),
-    -4px -4px 12px rgba(255,255,255,.85);
+    5px 6px 13px rgba(27, 55, 72, 0.10),
+    -4px -4px 12px rgba(255, 255, 255, 0.85);
 }
-
 
 .profile-v2-full-button {
+  width: 100%;
+  margin-top: 13px;
+
   border: 0;
 
-  color: #ffffff;
-
-  background:
-    linear-gradient(
-      135deg,
-      #0e8060,
-      #14c984
-    );
-
-  box-shadow:
-    6px 7px 15px rgba(15,130,95,.20);
-}
-
-
-.profile-v2-outline-button:hover,
-.profile-v2-full-button:hover {
-  transform:
-    translateY(-2px);
-}
-
-
-.profile-v2-full-button:disabled {
-  opacity: .65;
-
-  cursor: not-allowed;
-
-  transform: none;
-}
-
-
-/* ============================================================
-   FORM STATUS
-   ============================================================ */
-
-.profile-v2-form-status {
-  min-height: 18px;
-
-  color: #718996;
-
-  font-size: 9px;
-
-  line-height: 1.5;
-}
-
-
-.profile-v2-form-status.success {
   color: #0e8060;
 
-  font-weight: 800;
-}
-
-
-.profile-v2-form-status.error {
-  color: #b44b4b;
-
-  font-weight: 800;
-}
-
-
-/* ============================================================
-   DARK MODE
-   ============================================================ */
-
-body.dark-mode .profile-v2-modal-dialog {
-  background:
-    linear-gradient(
-      145deg,
-      #122630 0%,
-      #0d2029 100%
-    );
+  background: #e2f5ec;
 
   box-shadow:
-    18px 22px 50px rgba(0,0,0,.55),
-    -6px -6px 20px rgba(48,75,87,.08);
+    5px 6px 13px rgba(27, 55, 72, 0.08);
 }
 
-
-body.dark-mode .profile-v2-modal-close {
-  color: #d6e7ed;
-
-  background: #18323d;
-
-  box-shadow:
-    5px 6px 13px rgba(0,0,0,.30),
-    -4px -4px 12px rgba(52,77,88,.10);
-}
-
-
-body.dark-mode .profile-v2-modal-content h2 {
-  color: #edf7fa;
-}
-
-
-body.dark-mode .profile-v2-modal-description,
-body.dark-mode .profile-v2-modal-text {
-  color: #9ab0ba;
-}
-
-
-body.dark-mode .profile-v2-modal-highlight {
-  background:
-    linear-gradient(
-      135deg,
-      #14372f,
-      #102b28
-    );
-
-  border-color:
-    rgba(20, 201, 132, .12);
-}
-
-
-body.dark-mode .profile-v2-modal-label,
-body.dark-mode .profile-v2-form-group label {
-  color: #91aab5;
-}
-
-
-body.dark-mode .profile-v2-trait {
-  color: #b9ddd2;
-
-  background: #193b40;
-}
-
-
-body.dark-mode .profile-v2-modal-table-wrap {
-  background: #122a34;
-}
-
-
-body.dark-mode .profile-v2-modal-table th {
-  color: #9bb1bb;
-
-  background: #19333d;
-}
-
-
-body.dark-mode .profile-v2-modal-table td {
-  color: #abc0c8;
-
-  border-color:
-    rgba(160,190,200,.08);
-}
-
-
-body.dark-mode .profile-v2-modal-table td strong {
-  color: #e0edf1;
-}
-
-
-body.dark-mode .profile-v2-form-group input,
-body.dark-mode .profile-v2-form-group select,
-body.dark-mode .profile-v2-form-group textarea {
-  color: #dcebf0;
-
-  background: #142c35;
-
-  border-color:
-    rgba(156,190,201,.14);
-}
-
-
-body.dark-mode .profile-v2-form-group input[readonly] {
-  color: #8fa8b2;
-
-  background: #19323c;
-}
-
-
-body.dark-mode .profile-v2-outline-button {
-  color: #b5cbd3;
-
-  background: #19323c;
-
-  box-shadow:
-    5px 6px 13px rgba(0,0,0,.25),
-    -4px -4px 12px rgba(52,77,88,.08);
-}
-
-
-/* ============================================================
-   MOBILE MODAL
-   ============================================================ */
-
-@media (max-width: 700px) {
-
-  .profile-v2-modal {
-    padding: 12px;
-  }
-
-
-  .profile-v2-modal-dialog {
-    width: 100%;
-
-    max-height: 92vh;
-
-    padding: 22px 18px;
-
-    border-radius: 20px;
-  }
-
-
-  .profile-v2-modal-content h2 {
-    font-size: 21px;
-
-    margin-right: 35px;
-  }
-
-
-  .profile-v2-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-
-  .profile-v2-form-actions {
-    flex-direction: column-reverse;
-
-    align-items: stretch;
-  }
-
-
-  .profile-v2-outline-button,
-  .profile-v2-full-button {
-    width: 100%;
-  }
-
-
-  .profile-v2-modal-table {
-    min-width: 500px;
-  }
-
-}
-/* ============================================================
-   CHANGE REQUEST SUBMIT BUTTON FIX
-   ============================================================ */
-
-.profile-v2-change-form button[type="submit"].profile-v2-full-button {
-  display: inline-flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
+/* This is the actual Request a Change button class */
+.profile-v2-submit-button {
   width: auto !important;
   min-width: 145px !important;
   min-height: 42px !important;
+
+  margin: 0 !important;
 
   padding: 0 18px !important;
 
@@ -11128,59 +10852,197 @@ body.dark-mode .profile-v2-outline-button {
       #14c984
     ) !important;
 
-  font-family: inherit !important;
   font-size: 10px !important;
   font-weight: 900 !important;
 
-  line-height: 1 !important;
+  box-shadow:
+    6px 7px 15px rgba(15, 130, 95, 0.22) !important;
+}
 
-  text-align: center !important;
+.profile-v2-outline-button:hover,
+.profile-v2-full-button:hover,
+.profile-v2-submit-button:hover {
+  transform: translateY(-2px);
+}
 
-  cursor: pointer !important;
+.profile-v2-outline-button:active,
+.profile-v2-full-button:active,
+.profile-v2-submit-button:active {
+  transform: translateY(0);
+}
 
-  appearance: none !important;
-  -webkit-appearance: none !important;
+.profile-v2-full-button:disabled,
+.profile-v2-submit-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.profile-v2-form-status {
+  min-height: 18px;
+
+  color: #718996;
+
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.profile-v2-form-status.success {
+  color: #0e8060;
+  font-weight: 800;
+}
+
+.profile-v2-form-status.error {
+  color: #b44b4b;
+  font-weight: 800;
+}
+
+/* ============================================================
+   MODAL DARK MODE
+   ============================================================ */
+
+body.dark-mode .profile-v2-modal {
+  background: rgba(2, 14, 21, 0.78);
+}
+
+body.dark-mode .profile-v2-modal-dialog {
+  border-color: rgba(255, 255, 255, 0.07);
+
+  background:
+    linear-gradient(
+      145deg,
+      #122630 0%,
+      #0d2029 100%
+    );
 
   box-shadow:
-    6px 7px 15px rgba(15, 130, 95, .22) !important;
-
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease,
-    opacity .2s ease !important;
+    18px 22px 50px rgba(0, 0, 0, 0.55),
+    -6px -6px 20px rgba(48, 75, 87, 0.08);
 }
 
-
-.profile-v2-change-form button[type="submit"].profile-v2-full-button:hover {
-  transform: translateY(-2px) !important;
+body.dark-mode .profile-v2-modal-close {
+  color: #d6e7ed;
+  background: #18323d;
 
   box-shadow:
-    8px 10px 20px rgba(15, 130, 95, .28) !important;
+    5px 6px 13px rgba(0, 0, 0, 0.30),
+    -4px -4px 12px rgba(52, 77, 88, 0.10);
 }
 
-
-.profile-v2-change-form button[type="submit"].profile-v2-full-button:active {
-  transform: translateY(0) !important;
-
-  box-shadow:
-    3px 4px 9px rgba(15, 130, 95, .20) !important;
+body.dark-mode .profile-v2-modal-close:hover {
+  background: #20414d;
 }
 
-
-.profile-v2-change-form button[type="submit"].profile-v2-full-button:disabled {
-  opacity: .65 !important;
-
-  cursor: not-allowed !important;
-
-  transform: none !important;
+body.dark-mode .profile-v2-modal-content h2 {
+  color: #edf7fa;
 }
 
+body.dark-mode .profile-v2-modal-description,
+body.dark-mode .profile-v2-modal-text {
+  color: #9ab0ba;
+}
 
-/* Dark mode */
+body.dark-mode .profile-v2-modal-highlight {
+  background:
+    linear-gradient(
+      135deg,
+      #14372f,
+      #102b28
+    );
 
-body.dark-mode
-.profile-v2-change-form
-button[type="submit"].profile-v2-full-button {
+  border-color: rgba(20, 201, 132, 0.12);
+}
+
+body.dark-mode .profile-v2-modal-highlight span,
+body.dark-mode .profile-v2-modal-label,
+body.dark-mode .profile-v2-form-group label {
+  color: #91aab5;
+}
+
+body.dark-mode .profile-v2-modal-highlight strong {
+  color: #58d7a8;
+}
+
+body.dark-mode .profile-v2-modal-muted {
+  color: #829aa7;
+}
+
+body.dark-mode .profile-v2-trait {
+  color: #b9ddd2;
+  background: #193b40;
+}
+
+body.dark-mode .profile-v2-modal-table-wrap {
+  background: #122a34;
+}
+
+body.dark-mode .profile-v2-modal-table th {
+  color: #9bb1bb;
+  background: #19333d;
+}
+
+body.dark-mode .profile-v2-modal-table td {
+  color: #abc0c8;
+  border-color: rgba(160, 190, 200, 0.08);
+}
+
+body.dark-mode .profile-v2-modal-table td strong {
+  color: #e0edf1;
+}
+
+body.dark-mode .profile-v2-table-status {
+  color: #7ce0b7;
+  background: rgba(35, 195, 139, 0.13);
+}
+
+body.dark-mode .profile-v2-modal-weight {
+  background: #142d39;
+}
+
+body.dark-mode .profile-v2-modal-weight strong {
+  color: #e2eef3;
+}
+
+body.dark-mode .profile-v2-modal-weight small,
+body.dark-mode .profile-v2-modal-weight > span {
+  color: #8fa7b4;
+}
+
+body.dark-mode .profile-v2-modal-empty,
+body.dark-mode .profile-v2-empty-row {
+  color: #829aa7 !important;
+}
+
+body.dark-mode .profile-v2-form-group input,
+body.dark-mode .profile-v2-form-group select,
+body.dark-mode .profile-v2-form-group textarea {
+  color: #dcebf0;
+  background: #142c35;
+  border-color: rgba(156, 190, 201, 0.14);
+}
+
+body.dark-mode .profile-v2-form-group input::placeholder,
+body.dark-mode .profile-v2-form-group textarea::placeholder {
+  color: #718994;
+}
+
+body.dark-mode .profile-v2-form-group input[readonly] {
+  color: #8fa8b2;
+  background: #19323c;
+}
+
+body.dark-mode .profile-v2-outline-button {
+  color: #b5cbd3;
+  background: #19323c;
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+body.dark-mode .profile-v2-full-button {
+  color: #76dfb2;
+  background: rgba(35, 195, 139, 0.12);
+}
+
+body.dark-mode .profile-v2-submit-button {
   color: #ffffff !important;
 
   background:
@@ -11190,13 +11052,70 @@ button[type="submit"].profile-v2-full-button {
       #14c984
     ) !important;
 }
+
 /* ============================================================
-   REQUEST A CHANGE - SUBMIT BUTTON
+   MODAL RESPONSIVE
    ============================================================ */
 
-.profile-v2-submit-button {
-  display: inline-flex !important;
+@media (max-width: 700px) {
 
+  .profile-v2-modal {
+    padding: 12px;
+  }
+
+  .profile-v2-modal-dialog {
+    width: 100%;
+    max-height: 92vh;
+
+    padding: 22px 18px;
+
+    border-radius: 20px;
+  }
+
+  .profile-v2-modal-content h2 {
+    margin-right: 35px;
+    font-size: 21px;
+  }
+
+  .profile-v2-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-v2-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .profile-v2-outline-button,
+  .profile-v2-submit-button {
+    width: 100% !important;
+  }
+
+  .profile-v2-full-button {
+    width: 100%;
+  }
+
+  .profile-v2-modal-table {
+    min-width: 500px;
+  }
+
+  .profile-v2-modal-weight {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+}
+
+/* ============================================================
+   FINAL BUTTON NORMALIZATION
+   ============================================================ */
+
+.profile-v2-change-form button {
+  box-sizing: border-box;
+}
+
+.profile-v2-change-form button[type="submit"].profile-v2-submit-button {
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
 
@@ -11210,18 +11129,20 @@ button[type="submit"].profile-v2-full-button {
   border-radius: 12px !important;
 
   color: #ffffff !important;
-
-  background: linear-gradient(
-    135deg,
-    #0e8060,
-    #14c984
-  ) !important;
+  background:
+    linear-gradient(
+      135deg,
+      #0e8060,
+      #14c984
+    ) !important;
 
   font-family: inherit !important;
   font-size: 10px !important;
   font-weight: 900 !important;
-
   line-height: 1 !important;
+
+  text-align: center !important;
+  text-decoration: none !important;
 
   cursor: pointer !important;
 
@@ -11229,54 +11150,28 @@ button[type="submit"].profile-v2-full-button {
   -webkit-appearance: none !important;
 
   box-shadow:
-    6px 7px 15px rgba(15, 130, 95, .22) !important;
-
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease,
-    opacity .2s ease !important;
+    6px 7px 15px rgba(15, 130, 95, 0.22) !important;
 }
 
-
-.profile-v2-submit-button:hover {
+.profile-v2-change-form button[type="submit"].profile-v2-submit-button:hover {
   transform: translateY(-2px) !important;
 
   box-shadow:
-    8px 10px 20px rgba(15, 130, 95, .28) !important;
+    8px 10px 20px rgba(15, 130, 95, 0.28) !important;
 }
 
-
-.profile-v2-submit-button:active {
+.profile-v2-change-form button[type="submit"].profile-v2-submit-button:active {
   transform: translateY(0) !important;
 }
 
-
-.profile-v2-submit-button:disabled {
-  opacity: .65 !important;
-
+.profile-v2-change-form button[type="submit"].profile-v2-submit-button:disabled {
+  opacity: 0.65 !important;
   cursor: not-allowed !important;
+  transform: none !important;
 }
-
-
-/* Dark mode */
-
-body.dark-mode .profile-v2-submit-button {
-  color: #ffffff !important;
-
-  background: linear-gradient(
-    135deg,
-    #0e8060,
-    #14c984
-  ) !important;
-}
-
-
-/* Mobile */
 
 @media (max-width: 700px) {
-
-  .profile-v2-submit-button {
+  .profile-v2-change-form button[type="submit"].profile-v2-submit-button {
     width: 100% !important;
   }
-
 }
