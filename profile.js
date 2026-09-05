@@ -15,15 +15,524 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_w9-d4xchiCpeOnKRas_u2Q_wrFVPOwf";
 
-const {
-  createClient
-} = window.supabase;
+let supabaseClient = null;
 
-const supabaseClient =
-  createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
+
+/* ============================================================
+   LOAD SUPABASE LIBRARY
+   ============================================================ */
+
+function loadSupabaseLibrary() {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      if (window.supabase) {
+
+        resolve();
+
+        return;
+
+      }
+
+
+      const script =
+        document.createElement(
+          "script"
+        );
+
+
+      script.src =
+        "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+
+
+      script.onload =
+        () => resolve();
+
+
+      script.onerror =
+        () =>
+          reject(
+            new Error(
+              "Unable to load Supabase library"
+            )
+          );
+
+
+      document.head.appendChild(
+        script
+      );
+
+    }
   );
+
+}
+
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
+let currentAnimal = null;
+
+
+/* ============================================================
+   ESCAPE HTML
+   ============================================================ */
+
+function esc(value) {
+
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#39;"
+    );
+
+}
+
+
+/* ============================================================
+   FORMAT DATE
+   ============================================================ */
+
+function formatDate(value) {
+
+  if (!value) {
+    return "Not Added";
+  }
+
+  const date =
+    new Date(
+      value + "T00:00:00"
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return value;
+  }
+
+  return date.toLocaleDateString(
+    "en-GB",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }
+  );
+
+}
+
+
+/* ============================================================
+   GET PROFILE ID
+   ============================================================ */
+
+function getProfileId() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  return (
+    params.get("id") ||
+    params.get("animal_id") ||
+    ""
+  ).trim();
+
+}
+
+
+/* ============================================================
+   NORMALIZE OWNER
+   ============================================================ */
+
+function normalizeOwner(
+  owner
+) {
+
+  if (!owner) {
+
+    return {
+      name: "Not Added",
+      phone: "",
+      alternatePhone: ""
+    };
+
+  }
+
+  if (
+    Array.isArray(owner)
+  ) {
+
+    owner =
+      owner[0] || null;
+
+  }
+
+  return {
+
+    name:
+      owner?.name ||
+      "Not Added",
+
+    phone:
+      owner?.phone ||
+      owner?.mobile ||
+      "",
+
+    alternatePhone:
+      owner?.alternate_phone ||
+      owner?.alternatePhone ||
+      ""
+
+  };
+
+}
+
+
+/* ============================================================
+   NORMALIZE BEHAVIOUR
+   ============================================================ */
+
+function normalizeBehaviour(
+  behaviour
+) {
+
+  if (!behaviour) {
+
+    return {
+      temperament: "Not Added",
+      traits: [],
+      notes: ""
+    };
+
+  }
+
+  if (
+    Array.isArray(behaviour)
+  ) {
+
+    behaviour =
+      behaviour[0] || null;
+
+  }
+
+  const traits = [];
+
+
+  if (
+    behaviour?.traits &&
+    Array.isArray(
+      behaviour.traits
+    )
+  ) {
+
+    traits.push(
+      ...behaviour.traits
+    );
+
+  }
+
+
+  if (
+    behaviour?.temperament
+  ) {
+
+    return {
+
+      temperament:
+        behaviour.temperament,
+
+      traits,
+
+      notes:
+        behaviour.notes ||
+        behaviour.description ||
+        ""
+
+    };
+
+  }
+
+
+  return {
+
+    temperament:
+      behaviour?.behaviour ||
+      "Not Added",
+
+    traits,
+
+    notes:
+      behaviour?.notes ||
+      ""
+
+  };
+
+}
+
+
+/* ============================================================
+   NORMALIZE VACCINATIONS
+   ============================================================ */
+
+function normalizeVaccinations(
+  vaccinations
+) {
+
+  if (
+    !Array.isArray(
+      vaccinations
+    )
+  ) {
+
+    return [];
+
+  }
+
+  return vaccinations
+    .map(
+      vaccination => {
+
+        return [
+
+          vaccination?.vaccine_name ||
+          vaccination?.name ||
+          vaccination?.vaccine ||
+          "Not Added",
+
+          vaccination?.vaccination_date ||
+          vaccination?.date ||
+          "",
+
+          vaccination?.next_due_date ||
+          vaccination?.next_due ||
+          "",
+
+          vaccination?.status ||
+          "RECORDED"
+
+        ];
+
+      }
+    );
+
+}
+
+
+/* ============================================================
+   NORMALIZE WEIGHT HISTORY
+   ============================================================ */
+
+function normalizeWeightHistory(
+  records
+) {
+
+  if (
+    !Array.isArray(
+      records
+    )
+  ) {
+
+    return [];
+
+  }
+
+  return records
+    .map(
+      record => {
+
+        return {
+
+          weight:
+            record?.weight,
+
+          unit:
+            record?.unit ||
+            "kg",
+
+          date:
+            record?.recorded_date ||
+            record?.date,
+
+          notes:
+            record?.notes ||
+            ""
+
+        };
+
+      }
+    )
+    .filter(
+      record =>
+        record.weight !==
+        undefined &&
+        record.weight !==
+        null
+    );
+
+}
+
+
+/* ============================================================
+   NORMALIZE ANIMAL
+   ============================================================ */
+
+function normalizeAnimal(
+  animal
+) {
+
+  const owner =
+    normalizeOwner(
+      animal?.owners
+    );
+
+
+  const behaviour =
+    normalizeBehaviour(
+      animal?.behaviour_traits
+    );
+
+
+  return {
+
+    id:
+      animal?.id ||
+      "",
+
+    animalId:
+      animal?.animal_id ||
+      "Not Added",
+
+    name:
+      animal?.name ||
+      "Unnamed Animal",
+
+    type:
+      animal?.type ||
+      "Not Added",
+
+    breed:
+      animal?.breed ||
+      "Not Added",
+
+    gender:
+      animal?.gender ||
+      "Not Added",
+
+    dob:
+      animal?.date_of_birth ||
+      "",
+
+    photo:
+      animal?.photo_url ||
+      "",
+
+    colour:
+      animal?.colour ||
+      "Not Added",
+
+    markings:
+      animal?.markings ||
+      "Not Added",
+
+    microchipNumber:
+      animal?.microchip_number ||
+      "Not Added",
+
+    microchipProvider:
+      animal?.microchip_provider ||
+      "Not Added",
+
+    governmentReference:
+      animal?.government_reference ||
+      "Not Added",
+
+    identificationNotes:
+      animal?.identification_notes ||
+      "",
+
+    neutering:
+      animal?.neutering_status ||
+      animal?.neutered_status ||
+      "Not Added",
+
+    status:
+      animal?.status ||
+      "ACTIVE",
+
+    isLost:
+      Boolean(
+        animal?.is_lost
+      ),
+
+    parent:
+      owner.name,
+
+    phone:
+      owner.phone,
+
+    alternatePhone:
+      owner.alternatePhone,
+
+    behaviour:
+      behaviour.temperament,
+
+    behaviourTraits:
+      behaviour.traits,
+
+    behaviourNotes:
+      behaviour.notes,
+
+    location:
+      [
+        animal?.location_city,
+        animal?.location_state,
+        animal?.location_country
+      ]
+        .filter(Boolean)
+        .join(", ") ||
+      "Not Added",
+
+    mapUrl:
+      animal?.map_url ||
+      "",
+
+    vaccinations:
+      normalizeVaccinations(
+        animal?.vaccinations
+      ),
+
+    weightHistory:
+      normalizeWeightHistory(
+        animal?.weight_history
+      )
+
+  };
+
+}
 
 
 /* ============================================================
@@ -522,8 +1031,18 @@ function normalizeAnimal(
 
 async function loadAnimalFromSupabase() {
 
-  const profileId =
-    getProfileId();
+  try {
+
+    await loadSupabaseLibrary();
+
+    supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+    const profileId =
+      getProfileId();
 
   if (!profileId) {
 
