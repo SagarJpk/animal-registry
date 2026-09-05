@@ -1,90 +1,845 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#08243f">
 
-<title>Animal Registry</title>
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1.0"
+>
 
-<link rel="stylesheet" href="style.css">
+<meta
+  name="theme-color"
+  content="#08243f"
+>
+
+<title>Animal Digital ID</title>
+
+<link
+  rel="stylesheet"
+  href="style.css"
+>
 
 <!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
 </head>
+
 
 <body>
 
+
 <div class="page">
+
 <div class="card">
 
+
+<!-- =========================================================
+     EXISTING HEADER
+     DO NOT CHANGE
+     ========================================================= -->
+
 <header class="header">
+
   <div class="brand">
+
     <div class="logo">🐾</div>
 
     <div>
+
       <h1>ANIMAL DIGITAL ID</h1>
-      <p>Private animal registry • individual digital profiles</p>
+
+      <p>
+        Private animal registry • individual digital profiles
+      </p>
+
     </div>
+
   </div>
 
+
   <nav class="nav">
-    <a href="./">Home</a>
+
+    <a href="./">
+      Home
+    </a>
+
   </nav>
+
 </header>
+
+
+<!-- =========================================================
+     MAIN CONTENT
+     ========================================================= -->
 
 <main class="content">
 
-  <div class="notice">
-    🛡️ <strong>Private Animal Registry:</strong>
-    Owner-maintained records. These profiles are not government-issued identity documents.
-  </div>
 
-  <div class="registry-head">
-    <div>
-      <h2 style="margin:0">Animal Registry</h2>
+<!-- =========================================================
+     HERO
+     ========================================================= -->
 
-      <p style="color:var(--muted);font-size:12px">
-        Select an animal to open its individual profile.
-      </p>
+<section class="home-hero">
+
+
+  <div class="hero-copy">
+
+
+    <div class="hero-eyebrow">
+      A SAFER, KINDER WORLD
     </div>
+
+
+    <h2 class="hero-title">
+
+      Give Every Animal
+      <span>an Identity</span>
+
+    </h2>
+
+
+    <p class="hero-description">
+
+      Animal Digital ID helps create a safer and more
+      compassionate world for animals through individual
+      digital profiles, identification and community support.
+
+    </p>
+
+
+    <div class="hero-actions">
+
+
+      <a
+        href="#registry"
+        class="hero-button hero-button-primary"
+      >
+
+        <span class="hero-button-icon">
+          🐾
+        </span>
+
+        <span>
+          Explore Animals
+        </span>
+
+        <span>
+          →
+        </span>
+
+      </a>
+
+
+      <a
+        href="#registry"
+        class="hero-button hero-button-secondary"
+      >
+
+        <span class="hero-button-icon">
+          🔎
+        </span>
+
+        <span>
+          Find an Animal
+        </span>
+
+        <span>
+          →
+        </span>
+
+      </a>
+
+
+    </div>
+
+
+    <div class="hero-trust">
+
+
+      <div class="hero-trust-item">
+
+        <span>
+          🛡️
+        </span>
+
+        <span>
+          Trusted Records
+        </span>
+
+      </div>
+
+
+      <div class="hero-trust-item">
+
+        <span>
+          🐾
+        </span>
+
+        <span>
+          Animal Focused
+        </span>
+
+      </div>
+
+
+      <div class="hero-trust-item">
+
+        <span>
+          ♡
+        </span>
+
+        <span>
+          Community Driven
+        </span>
+
+      </div>
+
+
+    </div>
+
+
   </div>
 
-  <input
-    id="search"
-    class="search"
-    type="search"
-    placeholder="Search by name, ID, breed, parent or location…"
+
+
+  <!-- HERO ANIMAL VISUAL -->
+
+  <div class="hero-visual">
+
+
+    <div class="hero-glow hero-glow-one"></div>
+
+    <div class="hero-glow hero-glow-two"></div>
+
+
+    <div class="hero-image-main">
+
+      <div
+        id="heroMainImage"
+        class="hero-animal-image hero-animal-placeholder"
+      >
+
+        🐾
+
+      </div>
+
+
+      <div class="hero-image-badge">
+
+        <span>
+          ✓
+        </span>
+
+        <div>
+
+          <strong>
+            Digital Identity
+          </strong>
+
+          <small>
+            Every animal matters
+          </small>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="hero-image-small">
+
+      <div
+        id="heroSecondImage"
+        class="hero-animal-image hero-animal-placeholder"
+      >
+
+        🐾
+
+      </div>
+
+    </div>
+
+
+    <div class="hero-handwritten">
+
+      Small Tag<br>
+
+      <strong>
+        Big Impact
+      </strong>
+
+      <span>
+        ♡
+      </span>
+
+    </div>
+
+
+  </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     FEATURE CARDS
+     ========================================================= -->
+
+<section class="feature-section">
+
+
+  <a
+    href="#registry"
+    class="feature-card feature-green"
   >
 
+    <div class="feature-icon">
+      🐾
+    </div>
+
+    <div class="feature-content">
+
+      <h3>
+        Register Animal
+      </h3>
+
+      <p>
+        Create and maintain an individual digital
+        identity for your animal.
+      </p>
+
+    </div>
+
+    <span class="feature-arrow">
+      →
+    </span>
+
+  </a>
+
+
+
+  <a
+    href="#registry"
+    class="feature-card feature-blue"
+  >
+
+    <div class="feature-icon">
+      ▣
+    </div>
+
+    <div class="feature-content">
+
+      <h3>
+        Find an Animal
+      </h3>
+
+      <p>
+        Search the public registry and open
+        an individual digital profile.
+      </p>
+
+    </div>
+
+    <span class="feature-arrow">
+      →
+    </span>
+
+  </a>
+
+
+
+  <a
+    href="#registry"
+    class="feature-card feature-red"
+  >
+
+    <div class="feature-icon">
+      📍
+    </div>
+
+    <div class="feature-content">
+
+      <h3>
+        Lost &amp; Found
+      </h3>
+
+      <p>
+        Help connect lost animals with their
+        families and communities.
+      </p>
+
+    </div>
+
+    <span class="feature-arrow">
+      →
+    </span>
+
+  </a>
+
+
+
+  <a
+    href="#registry"
+    class="feature-card feature-purple"
+  >
+
+    <div class="feature-icon">
+      🛡️
+    </div>
+
+    <div class="feature-content">
+
+      <h3>
+        Verify Animal
+      </h3>
+
+      <p>
+        View registered information and verify
+        an animal's digital identity.
+      </p>
+
+    </div>
+
+    <span class="feature-arrow">
+      →
+    </span>
+
+  </a>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     LIVE STATISTICS
+     ========================================================= -->
+
+<section class="stats-section">
+
+
+  <div class="stat-item">
+
+    <strong id="statAnimals">
+      0
+    </strong>
+
+    <span>
+      Animals Registered
+    </span>
+
+  </div>
+
+
+  <div class="stat-divider"></div>
+
+
+  <div class="stat-item">
+
+    <strong id="statActive">
+      0
+    </strong>
+
+    <span>
+      Active Records
+    </span>
+
+  </div>
+
+
+  <div class="stat-divider"></div>
+
+
+  <div class="stat-item">
+
+    <strong id="statLost">
+      0
+    </strong>
+
+    <span>
+      Lost Animals
+    </span>
+
+  </div>
+
+
+  <div class="stat-divider"></div>
+
+
+  <div class="stat-item">
+
+    <strong id="statProfiles">
+      0
+    </strong>
+
+    <span>
+      Digital Profiles
+    </span>
+
+  </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     MISSION
+     ========================================================= -->
+
+<section class="mission-section">
+
+
+  <div class="mission-copy">
+
+
+    <div class="mission-eyebrow">
+      MORE THAN PETS
+    </div>
+
+
+    <h2>
+      Stronger Communities,
+      <br>
+      Happier Animals
+    </h2>
+
+
+    <p>
+
+      Together we can create a safer, healthier and
+      more compassionate environment for every animal.
+
+    </p>
+
+
+    <a
+      href="#registry"
+      class="mission-button"
+    >
+
+      Explore Registry
+
+      <span>
+        →
+      </span>
+
+    </a>
+
+
+  </div>
+
+
+
+  <div class="mission-values">
+
+
+    <div class="mission-value">
+
+      <div class="mission-value-icon">
+        ♡
+      </div>
+
+      <strong>
+        Safer
+      </strong>
+
+      <span>
+        Communities
+      </span>
+
+    </div>
+
+
+
+    <div class="mission-value">
+
+      <div class="mission-value-icon">
+        🐾
+      </div>
+
+      <strong>
+        Healthier
+      </strong>
+
+      <span>
+        Animals
+      </span>
+
+    </div>
+
+
+
+    <div class="mission-value">
+
+      <div class="mission-value-icon">
+        👥
+      </div>
+
+      <strong>
+        More
+      </strong>
+
+      <span>
+        Reunions
+      </span>
+
+    </div>
+
+
+
+    <div class="mission-value">
+
+      <div class="mission-value-icon">
+        🍃
+      </div>
+
+      <strong>
+        A Kinder
+      </strong>
+
+      <span>
+        Tomorrow
+      </span>
+
+    </div>
+
+
+  </div>
+
+
+  <div class="mission-decoration">
+
+    Paws Make a<br>
+
+    <strong>
+      Brighter
+      Tomorrow
+    </strong>
+
+    <span>
+      🐾
+    </span>
+
+  </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     REGISTRY
+     ========================================================= -->
+
+<section
+  id="registry"
+  class="registry-section"
+>
+
+
+  <div class="registry-section-head">
+
+
+    <div>
+
+
+      <div class="registry-eyebrow">
+        MEET THE ANIMALS
+      </div>
+
+
+      <h2>
+        Animal Registry
+      </h2>
+
+
+      <p>
+        Explore registered animals and open their
+        individual digital profiles.
+      </p>
+
+
+    </div>
+
+
+    <div
+      id="count"
+      class="registry-live-count"
+    ></div>
+
+
+  </div>
+
+
+
+  <!-- SEARCH -->
+
+  <div class="registry-search-wrap">
+
+
+    <span class="registry-search-icon">
+      🔎
+    </span>
+
+
+    <input
+      id="search"
+      class="search"
+      type="search"
+      placeholder="Search by name, ID, breed, parent or location…"
+      autocomplete="off"
+    >
+
+
+  </div>
+
+
+
+  <!-- PRIVACY NOTICE -->
+
+  <div class="notice">
+
+
+    <span class="notice-icon">
+      🛡️
+    </span>
+
+
+    <div>
+
+      <strong>
+        Private Animal Registry
+      </strong>
+
+      <span>
+        Owner-maintained records. These profiles are
+        not government-issued identity documents.
+      </span>
+
+    </div>
+
+
+  </div>
+
+
+
+  <!-- ANIMAL GRID -->
+
   <div
-    id="count"
-    style="font-size:10px;color:var(--muted);margin-bottom:10px"
+    id="petGrid"
+    class="grid"
   ></div>
 
-  <div id="petGrid" class="grid"></div>
+
+</section>
+
 
 </main>
 
+
+
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+
 <footer class="footer">
-  <strong>ANIMAL DIGITAL ID</strong>
-  • Private owner-maintained registry • Not government-issued
+
+
+  <div class="footer-brand">
+
+
+    <div class="footer-logo">
+      🐾
+    </div>
+
+
+    <div>
+
+      <strong>
+        ANIMAL DIGITAL ID
+      </strong>
+
+      <span>
+        Every Animal Matters
+      </span>
+
+    </div>
+
+
+  </div>
+
+
+
+  <div class="footer-links">
+
+
+    <a href="./">
+      Home
+    </a>
+
+    <a href="#registry">
+      Registry
+    </a>
+
+    <a href="#registry">
+      Animals
+    </a>
+
+    <a href="#registry">
+      Find an Animal
+    </a>
+
+
+  </div>
+
+
+
+  <div class="footer-note">
+
+    <span>
+      Private owner-maintained registry
+    </span>
+
+    <span>
+      Not government-issued
+    </span>
+
+  </div>
+
+
 </footer>
 
+
+
 </div>
+
 </div>
+
 
 
 <script>
+
 
 /* ============================================================
    SUPABASE CONFIGURATION
    ============================================================ */
 
-const SUPABASE_URL = "https://qnlatfajpbyefxyyehna.supabase.co";
+const SUPABASE_URL =
+  "https://qnlatfajpbyefxyyehna.supabase.co";
+
 
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_w9-d4xchiCpeOnKRas_u2Q_wrFVPOwf";
+
 
 const supabaseClient =
   window.supabase.createClient(
@@ -93,13 +848,46 @@ const supabaseClient =
   );
 
 
+
 /* ============================================================
    PAGE ELEMENTS
    ============================================================ */
 
-const grid = document.getElementById("petGrid");
-const search = document.getElementById("search");
-const count = document.getElementById("count");
+const grid =
+  document.getElementById("petGrid");
+
+
+const search =
+  document.getElementById("search");
+
+
+const count =
+  document.getElementById("count");
+
+
+const statAnimals =
+  document.getElementById("statAnimals");
+
+
+const statActive =
+  document.getElementById("statActive");
+
+
+const statLost =
+  document.getElementById("statLost");
+
+
+const statProfiles =
+  document.getElementById("statProfiles");
+
+
+const heroMainImage =
+  document.getElementById("heroMainImage");
+
+
+const heroSecondImage =
+  document.getElementById("heroSecondImage");
+
 
 
 /* ============================================================
@@ -107,9 +895,12 @@ const count = document.getElementById("count");
    ============================================================ */
 
 const esc = value =>
+
   String(value ?? "").replace(
     /[&<>"']/g,
+
     character =>
+
       ({
         "&": "&amp;",
         "<": "&lt;",
@@ -117,7 +908,9 @@ const esc = value =>
         '"': "&quot;",
         "'": "&#39;"
       }[character])
+
   );
+
 
 
 /* ============================================================
@@ -127,148 +920,393 @@ const esc = value =>
 let animals = [];
 
 
+
 /* ============================================================
-   LOAD ANIMALS FROM SUPABASE
+   HERO IMAGE
    ============================================================ */
 
-async function loadAnimals() {
+function setHeroAnimalImage(
+  element,
+  animal
+) {
 
-  grid.innerHTML = `
-    <div
-      class="empty"
-      style="grid-column:1/-1"
-    >
-      Loading animal registry…
-    </div>
-  `;
-
-  const { data, error } = await supabaseClient
-
-    .from("animals")
-
-    .select(`
-      id,
-      animal_id,
-      name,
-      type,
-      breed,
-      gender,
-      date_of_birth,
-      photo_url,
-      location_city,
-      location_state,
-      location_country,
-      map_url,
-      status,
-      is_public,
-      is_lost,
-      owners (
-        name
-      ),
-      behaviour_traits (
-        temperament
-      )
-    `)
-
-    .eq("is_public", true)
-
-    .order("name", {
-      ascending: true
-    });
+  if (!element) {
+    return;
+  }
 
 
-  /* ============================================================
-     ERROR HANDLING
-     ============================================================ */
+  if (
+    animal &&
+    animal.photo
+  ) {
 
-  if (error) {
-
-    console.error(
-      "Supabase animal loading error:",
-      error
+    element.classList.remove(
+      "hero-animal-placeholder"
     );
 
-    count.textContent = "";
 
-    grid.innerHTML = `
-      <div
-        class="empty"
-        style="grid-column:1/-1"
+    element.innerHTML = `
+
+      <img
+        src="${esc(animal.photo)}"
+        alt="${esc(animal.name)}"
       >
-        Unable to load the animal registry.
-        Please try again later.
-      </div>
+
     `;
 
     return;
   }
 
 
-  /* ============================================================
-     CONVERT SUPABASE DATA TO REGISTRY FORMAT
-     ============================================================ */
-
-  animals = (data || []).map(animal => {
-
-    const owner =
-      Array.isArray(animal.owners)
-        ? animal.owners[0]
-        : animal.owners;
-
-    const behaviour =
-      Array.isArray(animal.behaviour_traits)
-        ? animal.behaviour_traits[0]
-        : animal.behaviour_traits;
-
-    const locationParts = [
-      animal.location_city,
-      animal.location_state,
-      animal.location_country
-    ].filter(Boolean);
+  element.classList.add(
+    "hero-animal-placeholder"
+  );
 
 
-    return {
+  element.innerHTML = "🐾";
 
-      id: animal.id,
+}
 
-      animalId: animal.animal_id,
 
-      name: animal.name,
 
-      type: animal.type,
+/* ============================================================
+   LIVE STATISTICS
+   ============================================================ */
 
-      breed: animal.breed,
+function updateStatistics() {
 
-      gender: animal.gender,
+  const total =
+    animals.length;
 
-      dob: animal.date_of_birth,
 
-      photo: animal.photo_url,
+  const active =
+    animals.filter(
+      animal =>
+        String(
+          animal.status || ""
+        ).toLowerCase()
+          .includes("active")
+    ).length;
 
-      parent: owner?.name || "Not Added",
 
-      location:
-        locationParts.join(", ") || "Not Added",
+  const lost =
+    animals.filter(
+      animal =>
+        animal.isLost === true
+    ).length;
 
-      mapUrl: animal.map_url || "",
 
-      behaviour:
-        behaviour?.temperament || "Not Added",
+  statAnimals.textContent =
+    total;
 
-      status:
-        animal.status || "ACTIVE RECORD",
 
-      isLost:
-        animal.is_lost === true
+  statActive.textContent =
+    active;
 
-    };
 
-  });
+  statLost.textContent =
+    lost;
 
+
+  statProfiles.textContent =
+    total;
+
+
+}
+
+
+
+/* ============================================================
+   LOAD ANIMALS FROM SUPABASE
+   ============================================================ */
+
+async function loadAnimals() {
+
+
+  grid.innerHTML = `
+
+    <div
+      class="empty"
+      style="grid-column:1/-1"
+    >
+
+      Loading animal registry…
+
+    </div>
+
+  `;
+
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+
+    .from("animals")
+
+    .select(`
+
+      id,
+
+      animal_id,
+
+      name,
+
+      type,
+
+      breed,
+
+      gender,
+
+      date_of_birth,
+
+      photo_url,
+
+      location_city,
+
+      location_state,
+
+      location_country,
+
+      map_url,
+
+      status,
+
+      is_public,
+
+      is_lost,
+
+      owners (
+        name
+      ),
+
+      behaviour_traits (
+        temperament
+      )
+
+    `)
+
+    .eq(
+      "is_public",
+      true
+    )
+
+    .order(
+      "name",
+      {
+        ascending: true
+      }
+    );
+
+
+
+  /* ==========================================================
+     ERROR HANDLING
+     ========================================================== */
+
+  if (error) {
+
+
+    console.error(
+      "Supabase animal loading error:",
+      error
+    );
+
+
+    count.textContent =
+      "";
+
+
+    statAnimals.textContent =
+      "0";
+
+
+    statActive.textContent =
+      "0";
+
+
+    statLost.textContent =
+      "0";
+
+
+    statProfiles.textContent =
+      "0";
+
+
+    grid.innerHTML = `
+
+      <div
+        class="empty"
+        style="grid-column:1/-1"
+      >
+
+        Unable to load the animal registry.
+
+        <br>
+
+        Please try again later.
+
+      </div>
+
+    `;
+
+
+    return;
+
+  }
+
+
+
+  /* ==========================================================
+     CONVERT SUPABASE DATA
+     ========================================================== */
+
+  animals =
+    (data || []).map(
+      animal => {
+
+
+        const owner =
+          Array.isArray(
+            animal.owners
+          )
+
+            ? animal.owners[0]
+
+            : animal.owners;
+
+
+
+        const behaviour =
+          Array.isArray(
+            animal.behaviour_traits
+          )
+
+            ? animal.behaviour_traits[0]
+
+            : animal.behaviour_traits;
+
+
+
+        const locationParts = [
+
+          animal.location_city,
+
+          animal.location_state,
+
+          animal.location_country
+
+        ].filter(Boolean);
+
+
+
+        return {
+
+
+          id:
+            animal.id,
+
+
+          animalId:
+            animal.animal_id,
+
+
+          name:
+            animal.name,
+
+
+          type:
+            animal.type,
+
+
+          breed:
+            animal.breed,
+
+
+          gender:
+            animal.gender,
+
+
+          dob:
+            animal.date_of_birth,
+
+
+          photo:
+            animal.photo_url,
+
+
+          parent:
+            owner?.name ||
+            "Not Added",
+
+
+          location:
+            locationParts.join(
+              ", "
+            ) ||
+            "Not Added",
+
+
+          mapUrl:
+            animal.map_url ||
+            "",
+
+
+          behaviour:
+            behaviour?.temperament ||
+            "Not Added",
+
+
+          status:
+            animal.status ||
+            "ACTIVE RECORD",
+
+
+          isLost:
+            animal.is_lost === true
+
+        };
+
+      }
+
+    );
+
+
+
+  /* ==========================================================
+     UPDATE HERO
+     ========================================================== */
+
+  setHeroAnimalImage(
+    heroMainImage,
+    animals[0]
+  );
+
+
+  setHeroAnimalImage(
+    heroSecondImage,
+    animals[1]
+  );
+
+
+
+  /* ==========================================================
+     UPDATE STATS
+     ========================================================== */
+
+  updateStatistics();
+
+
+
+  /* ==========================================================
+     RENDER REGISTRY
+     ========================================================== */
 
   render();
 
 }
+
 
 
 /* ============================================================
@@ -277,144 +1315,282 @@ async function loadAnimals() {
 
 function render() {
 
+
   const q =
     search.value
       .trim()
       .toLowerCase();
 
 
+
   const list =
-    animals.filter(animal => {
+    animals.filter(
+      animal => {
 
-      return [
 
-        animal.name,
+        return [
 
-        animal.animalId,
+          animal.name,
 
-        animal.breed,
+          animal.animalId,
 
-        animal.parent,
+          animal.breed,
 
-        animal.location,
+          animal.parent,
 
-        animal.type,
+          animal.location,
 
-        animal.gender,
+          animal.type,
 
-        animal.behaviour
+          animal.gender,
 
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(q);
+          animal.behaviour
 
-    });
+        ]
 
+          .filter(Boolean)
+
+          .join(" ")
+
+          .toLowerCase()
+
+          .includes(q);
+
+      }
+
+    );
+
+
+
+  /* ==========================================================
+     COUNT
+     ========================================================== */
 
   count.textContent =
+
     `${list.length} registered animal${
-      list.length === 1 ? "" : "s"
+      list.length === 1
+        ? ""
+        : "s"
     }`;
 
 
+
+  /* ==========================================================
+     EMPTY SEARCH
+     ========================================================== */
+
   if (!list.length) {
 
+
     grid.innerHTML = `
+
       <div
         class="empty"
         style="grid-column:1/-1"
       >
-        No matching animal found.
+
+        <div class="empty-icon">
+          🐾
+        </div>
+
+        <strong>
+          No matching animal found
+        </strong>
+
+        <span>
+          Try another name, ID, breed or location.
+        </span>
+
       </div>
+
     `;
+
 
     return;
 
   }
 
 
-  grid.innerHTML = list.map(animal => {
 
-    return `
+  /* ==========================================================
+     ANIMAL CARDS
+     ========================================================== */
 
-      <a
-        class="pet"
-        href="./profile.html?id=${encodeURIComponent(animal.id)}"
-      >
+  grid.innerHTML =
 
-        <div class="pet-img">
+    list.map(
+      animal => {
 
-          <img
-            src="${esc(animal.photo)}"
-            alt="${esc(animal.name)}"
+
+        const photoHtml =
+
+          animal.photo
+
+            ? `
+
+              <img
+                src="${esc(animal.photo)}"
+                alt="${esc(animal.name)}"
+                loading="lazy"
+              >
+
+            `
+
+            : `
+
+              <div class="pet-no-photo">
+                🐾
+              </div>
+
+            `;
+
+
+
+        return `
+
+          <a
+            class="pet"
+            href="./profile.html?id=${encodeURIComponent(
+              animal.id
+            )}"
           >
 
-        </div>
 
+            <div class="pet-img">
 
-        <div>
+              ${photoHtml}
 
-          <div class="pet-top">
-
-            <div class="pet-name">
-              ${esc(animal.name)}
-            </div>
-
-            <span class="pill">
-              ✓ ${esc(animal.status)}
-            </span>
-
-          </div>
-
-
-          <div class="pet-id">
-            ${esc(animal.animalId)}
-          </div>
-
-
-          <div class="pet-meta">
-
-            <div class="meta">
-              <span>Type</span>
-              <strong>${esc(animal.type)}</strong>
             </div>
 
 
-            <div class="meta">
-              <span>Behaviour</span>
-              <strong>${esc(animal.behaviour)}</strong>
+
+            <div class="pet-card-content">
+
+
+              <div class="pet-top">
+
+
+                <div>
+
+                  <div class="pet-name">
+                    ${esc(animal.name)}
+                  </div>
+
+
+                  <div class="pet-id">
+                    ${esc(animal.animalId)}
+                  </div>
+
+                </div>
+
+
+                <span class="pill">
+
+                  ✓ ${esc(animal.status)}
+
+                </span>
+
+
+              </div>
+
+
+
+              <div class="pet-meta">
+
+
+                <div class="meta">
+
+                  <span>
+                    Type
+                  </span>
+
+                  <strong>
+                    ${esc(animal.type)}
+                  </strong>
+
+                </div>
+
+
+
+                <div class="meta">
+
+                  <span>
+                    Behaviour
+                  </span>
+
+                  <strong>
+                    ${esc(animal.behaviour)}
+                  </strong>
+
+                </div>
+
+
+
+                <div class="meta">
+
+                  <span>
+                    Parent
+                  </span>
+
+                  <strong>
+                    ${esc(animal.parent)}
+                  </strong>
+
+                </div>
+
+
+
+                <div class="meta">
+
+                  <span>
+                    Location
+                  </span>
+
+                  <strong>
+
+                    ${esc(
+                      String(
+                        animal.location
+                      )
+                        .split(",")[0]
+                    )}
+
+                  </strong>
+
+                </div>
+
+
+              </div>
+
+
+
+              <div class="pet-view-profile">
+
+                View Digital Profile
+
+                <span>
+                  →
+                </span>
+
+              </div>
+
+
             </div>
 
 
-            <div class="meta">
-              <span>Parent</span>
-              <strong>${esc(animal.parent)}</strong>
-            </div>
+          </a>
 
+        `;
 
-            <div class="meta">
-              <span>Location</span>
-              <strong>
-                ${esc(
-                  String(animal.location)
-                    .split(",")[0]
-                )}
-              </strong>
-            </div>
+      }
 
-          </div>
+    )
 
-        </div>
-
-      </a>
-
-    `;
-
-  }).join("");
+    .join("");
 
 }
+
 
 
 /* ============================================================
@@ -427,13 +1603,17 @@ search.addEventListener(
 );
 
 
+
 /* ============================================================
    INITIAL LOAD
    ============================================================ */
 
 loadAnimals();
 
+
 </script>
 
+
 </body>
+
 </html>
