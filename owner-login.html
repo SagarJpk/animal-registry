@@ -1,1 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Owner Login | Animal Digital ID</title>
+
+  <link
+    rel="stylesheet"
+    href="./style.css?v=20260906"
+  >
+
+  <style>
+
+    /* =========================================================
+       OWNER LOGIN
+       ========================================================= */
+
+    .owner-login-page {
+      min-height: 100vh;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 30px 20px;
+
+      position: relative;
+    }
+
+
+    .owner-login-card {
+      width: min(460px, 100%);
+
+      padding: 36px;
+
+      border-radius: 28px;
+
+      background:
+        rgba(232, 237, 241, 0.96);
+
+      box-shadow:
+        15px 15px 35px rgba(125, 140, 152, 0.38),
+        -12px -12px 30px rgba(255, 255, 255, 0.84);
+
+      position: relative;
+      z-index: 2;
+    }
+
+
+    .owner-login-brand {
+      text-align: center;
+
+      margin-bottom: 30px;
+    }
+
+
+    .owner-login-logo {
+      width: 76px;
+      height: 76px;
+
+      margin: 0 auto 16px;
+
+      display: grid;
+      place-items: center;
+
+      font-size: 42px;
+
+      border-radius: 22px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #173d5d,
+          #285f85
+        );
+
+      box-shadow:
+        8px 8px 18px rgba(75, 95, 110, .28),
+        -6px -6px 16px rgba(255,255,255,.70);
+
+      position: relative;
+    }
+
+
+    .owner-login-brand h1 {
+      margin: 0;
+
+      color: #173b5b;
+
+      font-size: 24px;
+
+      line-height: 1.2;
+
+      font-weight: 900;
+    }
+
+
+    .owner-login-brand p {
+      margin: 8px 0 0;
+
+      color: #778896;
+
+      font-size: 10px;
+
+      line-height: 1.5;
+    }
+
+
+    .owner-login-title {
+      margin: 0 0 6px;
+
+      color: #173b5b;
+
+      font-size: 20px;
+
+      font-weight: 900;
+
+      text-align: center;
+    }
+
+
+    .owner-login-subtitle {
+      margin: 0 0 24px;
+
+      color: #778896;
+
+      font-size: 10px;
+
+      line-height: 1.55;
+
+      text-align: center;
+    }
+
+
+    .owner-login-form {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 15px;
+    }
+
+
+    .owner-login-field {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 7px;
+    }
+
+
+    .owner-login-field label {
+      color: #607988;
+
+      font-size: 9px;
+
+      font-weight: 900;
+
+      letter-spacing: .5px;
+
+      text-transform: uppercase;
+    }
+
+
+    .owner-login-field input {
+      width: 100%;
+
+      box-sizing: border-box;
+
+      padding: 13px 14px;
+
+      border: 0;
+
+      border-radius: 13px;
+
+      outline: none;
+
+      color: #24495d;
+
+      background: #e8edf1;
+
+      font-family: inherit;
+
+      font-size: 11px;
+
+      box-shadow:
+        inset 5px 5px 10px rgba(145,158,169,.26),
+        inset -5px -5px 10px rgba(255,255,255,.88);
+
+      transition:
+        box-shadow .2s ease;
+    }
+
+
+    .owner-login-field input:focus {
+      box-shadow:
+        inset 4px 4px 8px rgba(145,158,169,.25),
+        inset -4px -4px 8px rgba(255,255,255,.88),
+        0 0 0 2px rgba(61,114,152,.12);
+    }
+
+
+    .owner-login-field input::placeholder {
+      color: #9ba8b2;
+    }
+
+
+    .owner-login-password-wrap {
+      position: relative;
+    }
+
+
+    .owner-login-password-wrap input {
+      padding-right: 52px;
+    }
+
+
+    .owner-login-password-toggle {
+      position: absolute;
+
+      right: 10px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      width: 34px;
+      height: 34px;
+
+      display: grid;
+      place-items: center;
+
+      border: 0;
+
+      border-radius: 10px;
+
+      background: transparent;
+
+      color: #66808e;
+
+      font-size: 15px;
+
+      cursor: pointer;
+    }
+
+
+    .owner-login-password-toggle:hover {
+      background: rgba(61,114,152,.07);
+    }
+
+
+    .owner-login-actions {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 12px;
+
+      margin-top: 2px;
+    }
+
+
+    .owner-login-forgot {
+      border: 0;
+
+      padding: 0;
+
+      background: transparent;
+
+      color: #3d7298;
+
+      font-family: inherit;
+
+      font-size: 9px;
+
+      font-weight: 800;
+
+      cursor: pointer;
+    }
+
+
+    .owner-login-forgot:hover {
+      text-decoration: underline;
+    }
+
+
+    .owner-login-submit {
+      width: 100%;
+
+      min-height: 44px;
+
+      margin-top: 5px;
+
+      border: 0;
+
+      border-radius: 13px;
+
+      color: #ffffff;
+
+      background:
+        linear-gradient(
+          135deg,
+          #0e8060,
+          #14c984
+        );
+
+      font-family: inherit;
+
+      font-size: 10px;
+
+      font-weight: 900;
+
+      cursor: pointer;
+
+      box-shadow:
+        7px 8px 17px rgba(15,130,95,.22);
+
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        opacity .18s ease;
+    }
+
+
+    .owner-login-submit:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        9px 11px 22px rgba(15,130,95,.28);
+    }
+
+
+    .owner-login-submit:active {
+      transform: translateY(0);
+    }
+
+
+    .owner-login-submit:disabled {
+      opacity: .65;
+
+      cursor: not-allowed;
+
+      transform: none;
+    }
+
+
+    .owner-login-status {
+      min-height: 20px;
+
+      margin-top: 2px;
+
+      font-size: 9px;
+
+      line-height: 1.5;
+
+      text-align: center;
+    }
+
+
+    .owner-login-status.error {
+      color: #b44b4b;
+
+      font-weight: 800;
+    }
+
+
+    .owner-login-status.success {
+      color: #0e8060;
+
+      font-weight: 800;
+    }
+
+
+    .owner-login-back {
+      display: block;
+
+      margin-top: 22px;
+
+      color: #607988;
+
+      font-size: 9px;
+
+      font-weight: 800;
+
+      text-align: center;
+
+      text-decoration: none;
+    }
+
+
+    .owner-login-back:hover {
+      color: #3d7298;
+
+      text-decoration: underline;
+    }
+
+
+    .owner-login-footer {
+      margin-top: 25px;
+
+      padding-top: 18px;
+
+      border-top:
+        1px solid rgba(115,135,150,.14);
+
+      color: #91a0aa;
+
+      font-size: 8px;
+
+      line-height: 1.55;
+
+      text-align: center;
+    }
+
+
+    /* =========================================================
+       DARK MODE
+       ========================================================= */
+
+    body.dark-mode .owner-login-card {
+      background:
+        linear-gradient(
+          145deg,
+          #102631,
+          #0d2029
+        );
+
+      box-shadow:
+        15px 18px 38px rgba(0,0,0,.42),
+        -8px -8px 20px rgba(45,72,84,.08);
+    }
+
+
+    body.dark-mode .owner-login-brand h1,
+    body.dark-mode .owner-login-title {
+      color: #e5f1f5;
+    }
+
+
+    body.dark-mode .owner-login-brand p,
+    body.dark-mode .owner-login-subtitle {
+      color: #91aab7;
+    }
+
+
+    body.dark-mode .owner-login-field label {
+      color: #91aab7;
+    }
+
+
+    body.dark-mode .owner-login-field input {
+      color: #dbeaf0;
+
+      background: #142d39;
+
+      box-shadow:
+        inset 5px 5px 10px rgba(0,0,0,.20),
+        inset -5px -5px 10px rgba(48,75,87,.08);
+    }
+
+
+    body.dark-mode .owner-login-field input::placeholder {
+      color: #718b98;
+    }
+
+
+    body.dark-mode .owner-login-password-toggle {
+      color: #9bb2bd;
+    }
+
+
+    body.dark-mode .owner-login-forgot,
+    body.dark-mode .owner-login-back {
+      color: #8ebbd4;
+    }
+
+
+    body.dark-mode .owner-login-footer {
+      color: #758e99;
+
+      border-color:
+        rgba(255,255,255,.08);
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 600px) {
+
+      .owner-login-page {
+        padding: 18px;
+      }
+
+
+      .owner-login-card {
+        padding: 26px 20px;
+
+        border-radius: 22px;
+      }
+
+
+      .owner-login-logo {
+        width: 66px;
+        height: 66px;
+
+        font-size: 36px;
+      }
+
+
+      .owner-login-brand h1 {
+        font-size: 21px;
+      }
+
+
+      .owner-login-actions {
+        align-items: flex-start;
+
+        flex-direction: column;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <main class="owner-login-page">
+
+    <section class="owner-login-card">
+
+
+      <!-- BRAND -->
+
+      <div class="owner-login-brand">
+
+        <div class="owner-login-logo">
+          🐾
+        </div>
+
+        <h1>
+          ANIMAL DIGITAL ID
+        </h1>
+
+        <p>
+          Secure owner access to your animal records
+        </p>
+
+      </div>
+
+
+      <!-- LOGIN -->
+
+      <h2 class="owner-login-title">
+        Owner Login
+      </h2>
+
+
+      <p class="owner-login-subtitle">
+        Sign in to view the animals registered to your account.
+      </p>
+
+
+      <form
+        id="ownerLoginForm"
+        class="owner-login-form"
+      >
+
+
+        <div class="owner-login-field">
+
+          <label for="ownerEmail">
+            Email Address
+          </label>
+
+          <input
+            id="ownerEmail"
+            type="email"
+            autocomplete="email"
+            placeholder="Enter your email address"
+            required
+          >
+
+        </div>
+
+
+        <div class="owner-login-field">
+
+          <label for="ownerPassword">
+            Password
+          </label>
+
+          <div class="owner-login-password-wrap">
+
+            <input
+              id="ownerPassword"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              required
+            >
+
+            <button
+              type="button"
+              id="passwordToggle"
+              class="owner-login-password-toggle"
+              aria-label="Show password"
+            >
+              👁
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="ownerLoginStatus"
+          class="owner-login-status"
+          aria-live="polite"
+        >
+        </div>
+
+
+        <button
+          type="submit"
+          id="ownerLoginButton"
+          class="owner-login-submit"
+        >
+          Sign In
+        </button>
+
+
+        <div class="owner-login-actions">
+
+          <button
+            type="button"
+            id="forgotPasswordButton"
+            class="owner-login-forgot"
+          >
+            Forgot Password?
+          </button>
+
+        </div>
+
+
+      </form>
+
+
+      <a
+        href="./index.html"
+        class="owner-login-back"
+      >
+        ← Back to Animal Registry
+      </a>
+
+
+      <div class="owner-login-footer">
+
+        Owner accounts provide secure access to
+        registered animal information associated
+        with your account.
+
+      </div>
+
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================================================
+       SUPABASE
+       ========================================================= -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+  <script>
+
+    const SUPABASE_URL =
+      "https://qnlatfajpbyefxyyehna.supabase.co";
+
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_w9-d4xchiCpeOnKRas_u2Q_wrFVPOwf";
+
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+
+    /* =========================================================
+       ELEMENTS
+       ========================================================= */
+
+    const loginForm =
+      document.getElementById(
+        "ownerLoginForm"
+      );
+
+
+    const emailInput =
+      document.getElementById(
+        "ownerEmail"
+      );
+
+
+    const passwordInput =
+      document.getElementById(
+        "ownerPassword"
+      );
+
+
+    const loginButton =
+      document.getElementById(
+        "ownerLoginButton"
+      );
+
+
+    const statusBox =
+      document.getElementById(
+        "ownerLoginStatus"
+      );
+
+
+    const passwordToggle =
+      document.getElementById(
+        "passwordToggle"
+      );
+
+
+    const forgotPasswordButton =
+      document.getElementById(
+        "forgotPasswordButton"
+      );
+
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    function setStatus(
+      message,
+      type = ""
+    ) {
+
+      if (!statusBox) {
+        return;
+      }
+
+
+      statusBox.textContent =
+        message;
+
+
+      statusBox.className =
+        "owner-login-status";
+
+
+      if (type) {
+
+        statusBox.classList.add(
+          type
+        );
+
+      }
+
+    }
+
+
+    /* =========================================================
+       PASSWORD VISIBILITY
+       ========================================================= */
+
+    if (passwordToggle) {
+
+      passwordToggle.addEventListener(
+        "click",
+        function () {
+
+          const showing =
+            passwordInput.type ===
+            "text";
+
+
+          passwordInput.type =
+            showing
+              ? "password"
+              : "text";
+
+
+          passwordToggle.textContent =
+            showing
+              ? "👁"
+              : "🙈";
+
+
+          passwordToggle.setAttribute(
+            "aria-label",
+            showing
+              ? "Show password"
+              : "Hide password"
+          );
+
+        }
+      );
+
+    }
+
+
+    /* =========================================================
+       OWNER LOGIN
+       ========================================================= */
+
+    loginForm.addEventListener(
+      "submit",
+      async function (event) {
+
+        event.preventDefault();
+
+
+        const email =
+          emailInput.value.trim();
+
+
+        const password =
+          passwordInput.value;
+
+
+        if (
+          !email ||
+          !password
+        ) {
+
+          setStatus(
+            "Please enter your email address and password.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        loginButton.disabled =
+          true;
+
+
+        loginButton.textContent =
+          "Signing In...";
+
+
+        setStatus(
+          "Checking your account..."
+        );
+
+
+        try {
+
+          const {
+            data,
+            error
+          } =
+            await supabaseClient.auth.signInWithPassword({
+              email,
+              password
+            });
+
+
+          if (error) {
+
+            console.error(
+              "Owner login error:",
+              error
+            );
+
+
+            throw new Error(
+              error.message ||
+              "Unable to sign in."
+            );
+
+          }
+
+
+          if (
+            !data ||
+            !data.user
+          ) {
+
+            throw new Error(
+              "Login succeeded, but no user account was returned."
+            );
+
+          }
+
+
+          /* =================================================
+             VERIFY OWNER LINK
+             ================================================= */
+
+          const {
+            data: owner,
+            error: ownerError
+          } =
+            await supabaseClient
+              .from("owners")
+              .select(`
+                id,
+                name,
+                auth_user_id
+              `)
+              .eq(
+                "auth_user_id",
+                data.user.id
+              )
+              .maybeSingle();
+
+
+          if (ownerError) {
+
+            console.error(
+              "Owner lookup error:",
+              ownerError
+            );
+
+            await supabaseClient.auth.signOut();
+
+            throw new Error(
+              "Unable to verify the owner account."
+            );
+
+          }
+
+
+          if (!owner) {
+
+            await supabaseClient.auth.signOut();
+
+            throw new Error(
+              "Your login account is not linked to an owner record yet."
+            );
+
+          }
+
+
+          setStatus(
+            "Login successful. Opening your dashboard...",
+            "success"
+          );
+
+
+          setTimeout(
+            function () {
+
+              window.location.href =
+                "./owner-dashboard.html";
+
+            },
+            500
+          );
+
+        }
+
+
+        catch (error) {
+
+          console.error(
+            "Owner authentication failed:",
+            error
+          );
+
+
+          setStatus(
+            error.message ||
+            "Unable to sign in. Please check your credentials.",
+            "error"
+          );
+
+
+          loginButton.disabled =
+            false;
+
+
+          loginButton.textContent =
+            "Sign In";
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       FORGOT PASSWORD
+       ========================================================= */
+
+    forgotPasswordButton.addEventListener(
+      "click",
+      async function () {
+
+        const email =
+          emailInput.value.trim();
+
+
+        if (!email) {
+
+          setStatus(
+            "Enter your email address first.",
+            "error"
+          );
+
+
+          emailInput.focus();
+
+          return;
+
+        }
+
+
+        try {
+
+          setStatus(
+            "Sending password reset instructions..."
+          );
+
+
+          const {
+            error
+          } =
+            await supabaseClient.auth.resetPasswordForEmail(
+              email,
+              {
+                redirectTo:
+                  window.location.origin +
+                  window.location.pathname.replace(
+                    "owner-login.html",
+                    "owner-reset-password.html"
+                  )
+              }
+            );
+
+
+          if (error) {
+
+            throw error;
+
+          }
+
+
+          setStatus(
+            "Password reset instructions have been sent to your email.",
+            "success"
+          );
+
+        }
+
+
+        catch (error) {
+
+          console.error(
+            "Password reset failed:",
+            error
+          );
+
+
+          setStatus(
+            error.message ||
+            "Unable to send the password reset email.",
+            "error"
+          );
+
+        }
+
+      }
+    );
+
+
+  </script>
+
+</body>
+
+</html>
