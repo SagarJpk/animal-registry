@@ -11190,3 +11190,93 @@ button[type="submit"].profile-v2-full-button {
       #14c984
     ) !important;
 }
+/* ============================================================
+   REQUEST A CHANGE - SUBMIT BUTTON
+   ============================================================ */
+
+.profile-v2-submit-button {
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: auto !important;
+  min-width: 145px !important;
+  height: 42px !important;
+
+  padding: 0 18px !important;
+
+  border: 0 !important;
+  border-radius: 12px !important;
+
+  color: #ffffff !important;
+
+  background: linear-gradient(
+    135deg,
+    #0e8060,
+    #14c984
+  ) !important;
+
+  font-family: inherit !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  box-shadow:
+    6px 7px 15px rgba(15, 130, 95, .22) !important;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    opacity .2s ease !important;
+}
+
+
+.profile-v2-submit-button:hover {
+  transform: translateY(-2px) !important;
+
+  box-shadow:
+    8px 10px 20px rgba(15, 130, 95, .28) !important;
+}
+
+
+.profile-v2-submit-button:active {
+  transform: translateY(0) !important;
+}
+
+
+.profile-v2-submit-button:disabled {
+  opacity: .65 !important;
+
+  cursor: not-allowed !important;
+}
+
+
+/* Dark mode */
+
+body.dark-mode .profile-v2-submit-button {
+  color: #ffffff !important;
+
+  background: linear-gradient(
+    135deg,
+    #0e8060,
+    #14c984
+  ) !important;
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+  .profile-v2-submit-button {
+    width: 100% !important;
+  }
+
+}
