@@ -7918,3 +7918,228 @@ body .footer {
   }
 
 }
+/* ============================================================
+   HERO FIX FOR LAPTOP / SMALL DESKTOP
+   801px - 1000px
+   ------------------------------------------------------------
+   Keeps mobile design unchanged.
+   Header remains untouched.
+   ============================================================ */
+
+@media (min-width: 801px) and (max-width: 1000px) {
+
+  .home-hero {
+
+    grid-template-columns:
+      minmax(0, 1.05fr)
+      minmax(350px, .95fr);
+
+    gap: 8px;
+
+    min-height: 470px;
+
+    padding:
+      42px 30px 35px;
+
+  }
+
+
+  .hero-copy {
+
+    max-width:
+      520px;
+
+  }
+
+
+  .hero-title {
+
+    max-width:
+      none;
+
+    font-size:
+      51px;
+
+    line-height:
+      .98;
+
+    letter-spacing:
+      -2px;
+
+    white-space:
+      nowrap;
+
+  }
+
+
+  .hero-title span {
+
+    display:
+      block;
+
+    white-space:
+      nowrap;
+
+  }
+
+
+  .hero-description {
+
+    max-width:
+      455px;
+
+    font-size:
+      12px;
+
+    line-height:
+      1.6;
+
+  }
+
+
+  .hero-actions {
+
+    margin-top:
+      23px;
+
+  }
+
+
+  .hero-button {
+
+    min-height:
+      48px;
+
+    padding:
+      0 17px;
+
+    font-size:
+      10px;
+
+  }
+
+
+  .hero-trust {
+
+    gap:
+      15px;
+
+    margin-top:
+      20px;
+
+  }
+
+
+  .hero-trust-item {
+
+    font-size:
+      8px;
+
+  }
+
+
+  /* ==========================================================
+     HERO IMAGE
+     ========================================================== */
+
+  .hero-visual {
+
+    min-height:
+      370px;
+
+    margin-right:
+      0;
+
+  }
+
+
+  .hero-image-main {
+
+    width:
+      70%;
+
+    height:
+      315px;
+
+    right:
+      4%;
+
+    top:
+      25px;
+
+    border-radius:
+      27px;
+
+  }
+
+
+  .hero-image-small {
+
+    width:
+      35%;
+
+    height:
+      155px;
+
+    left:
+      0;
+
+    bottom:
+      5px;
+
+    border-width:
+      7px;
+
+    border-radius:
+      21px;
+
+  }
+
+
+  .hero-image-badge {
+
+    left:
+      5%;
+
+    bottom:
+      29px;
+
+    padding:
+      8px 11px;
+
+  }
+
+
+  .hero-handwritten {
+
+    right:
+      0;
+
+    top:
+      0;
+
+    font-size:
+      18px;
+
+  }
+
+
+  .hero-handwritten strong {
+
+    font-size:
+      19px;
+
+  }
+
+
+  .hero-handwritten span {
+
+    margin-left:
+      45px;
+
+    font-size:
+      23px;
+
+  }
+
+}
