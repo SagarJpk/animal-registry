@@ -11175,3 +11175,482 @@ body.dark-mode .profile-v2-submit-button {
     width: 100% !important;
   }
 }
+
+/* ============================================================
+   PROFILE V2 FINAL STABILITY / CROSS-BROWSER OVERRIDES
+   ============================================================ */
+
+/* ---------- Registered Information icon ---------- */
+/*
+   The profile HTML uses the 🪪 emoji inside .profile-v2-section-icon.
+   Hide the emoji glyph and draw a consistent CSS ID-card icon so
+   Windows/Chrome emoji-font differences cannot turn it into a
+   missing-glyph square.
+*/
+.profile-v2-section-icon {
+  position: relative !important;
+
+  width: 44px !important;
+  height: 44px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 auto !important;
+
+  font-size: 0 !important;
+  line-height: 1 !important;
+
+  overflow: hidden !important;
+}
+
+.profile-v2-section-icon::before {
+  content: "" !important;
+
+  position: absolute !important;
+
+  width: 25px !important;
+  height: 19px !important;
+
+  left: 50% !important;
+  top: 50% !important;
+
+  transform: translate(-50%, -50%) !important;
+
+  border: 2px solid #2b667c !important;
+  border-radius: 4px !important;
+
+  background: transparent !important;
+
+  box-sizing: border-box !important;
+}
+
+.profile-v2-section-icon::after {
+  content: "" !important;
+
+  position: absolute !important;
+
+  width: 11px !important;
+  height: 3px !important;
+
+  left: calc(50% + 1px) !important;
+  top: calc(50% + 4px) !important;
+
+  transform: translate(-50%, -50%) !important;
+
+  border-radius: 3px !important;
+
+  background: #2b667c !important;
+
+  box-shadow:
+    0 -6px 0 -1px #2b667c !important;
+}
+
+
+/* ---------- Dark-mode Registered Information icon ---------- */
+
+body.dark-mode .profile-v2-section-icon {
+  background: #17323d !important;
+}
+
+body.dark-mode .profile-v2-section-icon::before {
+  border-color: #72d8b0 !important;
+}
+
+body.dark-mode .profile-v2-section-icon::after {
+  background: #72d8b0 !important;
+
+  box-shadow:
+    0 -6px 0 -1px #72d8b0 !important;
+}
+
+
+/* ---------- Modal layer ---------- */
+
+.profile-v2-modal {
+  position: fixed !important;
+  inset: 0 !important;
+
+  z-index: 99999 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
+
+  padding: 24px !important;
+
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+
+  background: rgba(7, 25, 35, 0.72) !important;
+
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+
+  transition:
+    opacity 0.22s ease,
+    visibility 0.22s ease !important;
+}
+
+.profile-v2-modal.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.profile-v2-modal-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+
+  background: transparent !important;
+
+  cursor: pointer !important;
+}
+
+.profile-v2-modal-dialog {
+  position: relative !important;
+  z-index: 2 !important;
+
+  width: min(760px, calc(100vw - 48px)) !important;
+  max-width: 760px !important;
+  max-height: min(86vh, 850px) !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  padding: 30px !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 26px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f8fcfc 0%,
+      #edf5f7 100%
+    ) !important;
+
+  box-shadow:
+    18px 22px 50px rgba(5, 25, 35, 0.30),
+    -8px -8px 24px rgba(255, 255, 255, 0.75) !important;
+
+  transform: translateY(18px) scale(0.97) !important;
+
+  transition: transform 0.22s ease !important;
+}
+
+.profile-v2-modal.show .profile-v2-modal-dialog {
+  transform: translateY(0) scale(1) !important;
+}
+
+
+/* ---------- Modal controls ---------- */
+
+.profile-v2-modal-close {
+  position: absolute !important;
+
+  top: 14px !important;
+  right: 14px !important;
+
+  z-index: 5 !important;
+
+  width: 38px !important;
+  height: 38px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 50% !important;
+
+  color: #36596b !important;
+  background: #edf5f7 !important;
+
+  font-family: Arial, sans-serif !important;
+  font-size: 23px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  box-shadow:
+    5px 6px 13px rgba(27, 55, 72, 0.12),
+    -4px -4px 12px rgba(255, 255, 255, 0.90) !important;
+}
+
+.profile-v2-modal-close:hover {
+  transform: rotate(90deg) !important;
+}
+
+
+/* ---------- Modal form ---------- */
+
+.profile-v2-change-form,
+.profile-v2-change-form * {
+  box-sizing: border-box !important;
+}
+
+.profile-v2-form-grid {
+  display: grid !important;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr)) !important;
+
+  gap: 14px !important;
+}
+
+.profile-v2-form-group {
+  min-width: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  gap: 7px !important;
+}
+
+.profile-v2-form-group input,
+.profile-v2-form-group select,
+.profile-v2-form-group textarea {
+  display: block !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+
+  box-sizing: border-box !important;
+
+  font-family: inherit !important;
+}
+
+
+/* ---------- All Profile V2 buttons ---------- */
+
+.profile-v2-outline-button,
+.profile-v2-full-button,
+.profile-v2-submit-button {
+  box-sizing: border-box !important;
+
+  font-family: inherit !important;
+  font-weight: 900 !important;
+
+  line-height: 1 !important;
+
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  cursor: pointer !important;
+}
+
+
+/* ---------- Actual Request a Change submit button ---------- */
+
+.profile-v2-submit-button,
+.profile-v2-change-form button[type="submit"] {
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: auto !important;
+  min-width: 145px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+
+  margin: 0 !important;
+  padding: 0 18px !important;
+
+  border: 0 !important;
+  border-radius: 12px !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0e8060 0%,
+      #14c984 100%
+    ) !important;
+
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+
+  text-align: center !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+
+  box-shadow:
+    6px 7px 15px rgba(15, 130, 95, 0.22) !important;
+
+  cursor: pointer !important;
+
+  transition:
+    transform 0.20s ease,
+    box-shadow 0.20s ease,
+    opacity 0.20s ease !important;
+}
+
+.profile-v2-submit-button:hover,
+.profile-v2-change-form button[type="submit"]:hover {
+  transform: translateY(-2px) !important;
+
+  box-shadow:
+    8px 10px 20px rgba(15, 130, 95, 0.28) !important;
+}
+
+.profile-v2-submit-button:active,
+.profile-v2-change-form button[type="submit"]:active {
+  transform: translateY(0) !important;
+}
+
+.profile-v2-submit-button:disabled,
+.profile-v2-change-form button[type="submit"]:disabled {
+  opacity: 0.65 !important;
+
+  cursor: not-allowed !important;
+
+  transform: none !important;
+}
+
+
+/* ---------- Modal table stability ---------- */
+
+.profile-v2-modal-table-wrap {
+  width: 100% !important;
+
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.profile-v2-modal-table {
+  width: 100% !important;
+
+  border-collapse: collapse !important;
+}
+
+.profile-v2-modal-table th,
+.profile-v2-modal-table td {
+  vertical-align: middle !important;
+}
+
+
+/* ---------- Dark mode modal ---------- */
+
+body.dark-mode .profile-v2-modal {
+  background: rgba(2, 14, 21, 0.78) !important;
+}
+
+body.dark-mode .profile-v2-modal-dialog {
+  background:
+    linear-gradient(
+      145deg,
+      #122630 0%,
+      #0d2029 100%
+    ) !important;
+
+  border-color: rgba(255, 255, 255, 0.07) !important;
+
+  box-shadow:
+    18px 22px 50px rgba(0, 0, 0, 0.55),
+    -6px -6px 20px rgba(48, 75, 87, 0.08) !important;
+}
+
+body.dark-mode .profile-v2-modal-close {
+  color: #d6e7ed !important;
+  background: #18323d !important;
+}
+
+body.dark-mode .profile-v2-form-group input,
+body.dark-mode .profile-v2-form-group select,
+body.dark-mode .profile-v2-form-group textarea {
+  color: #dcebf0 !important;
+  background: #142c35 !important;
+}
+
+body.dark-mode .profile-v2-submit-button,
+body.dark-mode .profile-v2-change-form button[type="submit"] {
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0e8060 0%,
+      #14c984 100%
+    ) !important;
+}
+
+
+/* ---------- Responsive modal ---------- */
+
+@media (max-width: 700px) {
+
+  .profile-v2-modal {
+    width: 100vw !important;
+    height: 100vh !important;
+
+    padding: 12px !important;
+  }
+
+  .profile-v2-modal-dialog {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    max-height: 92vh !important;
+
+    padding: 22px 18px !important;
+
+    border-radius: 20px !important;
+  }
+
+  .profile-v2-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-v2-form-actions {
+    flex-direction: column-reverse !important;
+
+    align-items: stretch !important;
+  }
+
+  .profile-v2-outline-button,
+  .profile-v2-submit-button,
+  .profile-v2-change-form button[type="submit"] {
+    width: 100% !important;
+  }
+
+  .profile-v2-modal-table {
+    min-width: 500px !important;
+  }
+}
+
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .profile-v2-modal,
+  .profile-v2-modal-dialog,
+  .profile-v2-submit-button,
+  .profile-v2-outline-button {
+    transition: none !important;
+  }
+
+  .profile-v2-modal-close:hover,
+  .profile-v2-submit-button:hover,
+  .profile-v2-outline-button:hover {
+    transform: none !important;
+  }
+
+}
