@@ -536,489 +536,6 @@ function normalizeAnimal(
 
 
 /* ============================================================
-   ESCAPE HTML
-   ============================================================ */
-
-function esc(value) {
-
-  return String(
-    value ?? ""
-  )
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#39;"
-    );
-
-}
-
-
-/* ============================================================
-   FORMAT DATE
-   ============================================================ */
-
-function formatDate(value) {
-
-  if (!value) {
-    return "Not Added";
-  }
-
-  const date =
-    new Date(
-      value + "T00:00:00"
-    );
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-    return value;
-  }
-
-  return date.toLocaleDateString(
-    "en-GB",
-    {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    }
-  );
-
-}
-
-
-/* ============================================================
-   GET PROFILE ID
-   ============================================================ */
-
-function getProfileId() {
-
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-  return (
-    params.get("id") ||
-    params.get("animal_id") ||
-    ""
-  ).trim();
-
-}
-
-
-/* ============================================================
-   NORMALIZE OWNER
-   ============================================================ */
-
-function normalizeOwner(
-  owner
-) {
-
-  if (!owner) {
-
-    return {
-      name: "Not Added",
-      phone: "",
-      alternatePhone: ""
-    };
-
-  }
-
-  if (
-    Array.isArray(owner)
-  ) {
-    owner =
-      owner[0] || null;
-  }
-
-  return {
-
-    name:
-      owner?.name ||
-      "Not Added",
-
-    phone:
-      owner?.phone ||
-      owner?.mobile ||
-      "",
-
-    alternatePhone:
-      owner?.alternate_phone ||
-      owner?.alternatePhone ||
-      ""
-
-  };
-
-}
-
-
-/* ============================================================
-   NORMALIZE BEHAVIOUR
-   ============================================================ */
-
-function normalizeBehaviour(
-  behaviour
-) {
-
-  if (!behaviour) {
-
-    return {
-      temperament: "Not Added",
-      traits: [],
-      notes: ""
-    };
-
-  }
-
-  if (
-    Array.isArray(behaviour)
-  ) {
-    behaviour =
-      behaviour[0] || null;
-  }
-
-  const traits = [];
-
-  if (
-    behaviour?.traits &&
-    Array.isArray(
-      behaviour.traits
-    )
-  ) {
-
-    traits.push(
-      ...behaviour.traits
-    );
-
-  }
-
-  if (
-    behaviour?.temperament
-  ) {
-
-    return {
-
-      temperament:
-        behaviour.temperament,
-
-      traits,
-
-      notes:
-        behaviour.notes ||
-        behaviour.description ||
-        ""
-
-    };
-
-  }
-
-  return {
-
-    temperament:
-      behaviour?.temperament ||
-      behaviour?.behaviour ||
-      "Not Added",
-
-    traits,
-
-    notes:
-      behaviour?.notes ||
-      ""
-
-  };
-
-}
-
-
-/* ============================================================
-   NORMALIZE VACCINATIONS
-   ============================================================ */
-
-function normalizeVaccinations(
-  vaccinations
-) {
-
-  if (
-    !Array.isArray(
-      vaccinations
-    )
-  ) {
-    return [];
-  }
-
-  return vaccinations
-    .map(
-      vaccination => {
-
-        if (
-          Array.isArray(
-            vaccination
-          )
-        ) {
-
-          return vaccination;
-
-        }
-
-        return [
-
-          vaccination?.vaccine_name ||
-          vaccination?.name ||
-          vaccination?.vaccine ||
-          "Not Added",
-
-          vaccination?.vaccination_date ||
-          vaccination?.date ||
-          "",
-
-          vaccination?.next_due_date ||
-          vaccination?.next_due ||
-          "",
-
-          vaccination?.status ||
-          "RECORDED"
-
-        ];
-
-      }
-    );
-
-}
-
-
-/* ============================================================
-   NORMALIZE WEIGHT HISTORY
-   ============================================================ */
-
-function normalizeWeightHistory(
-  records
-) {
-
-  if (
-    !Array.isArray(
-      records
-    )
-  ) {
-    return [];
-  }
-
-  return records
-    .map(
-      record => {
-
-        if (
-          Array.isArray(
-            record
-          )
-        ) {
-
-          return {
-
-            weight:
-              record[0],
-
-            unit:
-              record[1] ||
-              "kg",
-
-            date:
-              record[2],
-
-            notes:
-              record[3] ||
-              ""
-
-          };
-
-        }
-
-        return {
-
-          weight:
-            record?.weight,
-
-          unit:
-            record?.unit ||
-            "kg",
-
-          date:
-            record?.recorded_date ||
-            record?.date,
-
-          notes:
-            record?.notes ||
-            ""
-
-        };
-
-      }
-    )
-    .filter(
-      record =>
-        record.weight !==
-        undefined &&
-        record.weight !==
-        null
-    );
-
-}
-
-
-/* ============================================================
-   NORMALIZE ANIMAL
-   ============================================================ */
-
-function normalizeAnimal(
-  animal
-) {
-
-  const owner =
-    normalizeOwner(
-      animal?.owners
-    );
-
-  const behaviour =
-    normalizeBehaviour(
-      animal?.behaviour_traits
-    );
-
-  return {
-
-    id:
-      animal?.id ||
-      "",
-
-    animalId:
-      animal?.animal_id ||
-      "Not Added",
-
-    name:
-      animal?.name ||
-      "Unnamed Animal",
-
-    type:
-      animal?.type ||
-      "Not Added",
-
-    breed:
-      animal?.breed ||
-      "Not Added",
-
-    gender:
-      animal?.gender ||
-      "Not Added",
-
-    dob:
-      animal?.date_of_birth ||
-      "",
-
-    photo:
-      animal?.photo_url ||
-      "",
-
-    colour:
-      animal?.colour ||
-      "Not Added",
-
-    markings:
-      animal?.markings ||
-      "Not Added",
-
-    microchipNumber:
-      animal?.microchip_number ||
-      "Not Added",
-
-    microchipProvider:
-      animal?.microchip_provider ||
-      "Not Added",
-
-    governmentReference:
-      animal?.government_reference ||
-      "Not Added",
-
-    identificationNotes:
-      animal?.identification_notes ||
-      "",
-
-    neutering:
-      animal?.neutering_status ||
-      animal?.neutered_status ||
-      "Not Added",
-
-    status:
-      animal?.status ||
-      "ACTIVE",
-
-    isLost:
-      Boolean(
-        animal?.is_lost
-      ),
-
-    parent:
-      owner.name,
-
-    phone:
-      owner.phone,
-
-    alternatePhone:
-      owner.alternatePhone,
-
-    behaviour:
-      behaviour.temperament,
-
-    behaviourTraits:
-      behaviour.traits,
-
-    behaviourNotes:
-      behaviour.notes,
-
-    location:
-      [
-        animal?.location_city,
-        animal?.location_state,
-        animal?.location_country
-      ]
-        .filter(Boolean)
-        .join(", ") ||
-      "Not Added",
-
-    mapUrl:
-      animal?.map_url ||
-      "",
-
-    vaccinations:
-      normalizeVaccinations(
-        animal?.vaccinations
-      ),
-
-    weightHistory:
-      normalizeWeightHistory(
-        animal?.weight_history
-      )
-
-  };
-
-}
-
-
-/* ============================================================
    LOAD ANIMAL FROM SUPABASE
    ============================================================ */
 
@@ -1072,30 +589,10 @@ async function loadAnimalFromSupabase() {
         .from("animals")
         .select(`
           *,
-          owners (
-            name,
-            phone,
-            alternate_phone
-          ),
-          behaviour_traits (
-            temperament,
-            traits,
-            notes
-          ),
-          vaccinations (
-            id,
-            vaccine_name,
-            vaccination_date,
-            next_due_date,
-            status
-          ),
-          weight_history (
-            id,
-            recorded_date,
-            weight,
-            unit,
-            notes
-          )
+          owners (*),
+          behaviour_traits (*),
+          vaccinations (*),
+          weight_history (*)
         `);
 
 
@@ -1213,173 +710,6 @@ async function loadAnimalFromSupabase() {
       error
     );
 
-
-    showProfileError(
-      "Unable to load this animal profile right now."
-    );
-
-  }
-
-}
-
-    /* ========================================================
-       FIRST TRY UUID
-       ======================================================== */
-
-    let result =
-      await supabaseClient
-        .from("animals")
-        .select(`
-          *,
-          owners (
-            name,
-            phone,
-            alternate_phone
-          ),
-          behaviour_traits (
-            temperament,
-            traits,
-            notes
-          ),
-          vaccinations (
-            id,
-            vaccine_name,
-            vaccination_date,
-            next_due_date,
-            status
-          ),
-          weight_history (
-            id,
-            recorded_date,
-            weight,
-            unit,
-            notes
-          )
-        `)
-        .eq(
-          "id",
-          profileId
-        )
-        .maybeSingle();
-
-
-    if (
-      result.error
-    ) {
-
-      console.error(
-        "UUID profile lookup error:",
-        result.error
-      );
-
-    }
-
-
-    animal =
-      result.data ||
-      null;
-
-
-    /* ========================================================
-       SECOND TRY ANIMAL ID
-       ======================================================== */
-
-    if (!animal) {
-
-      result =
-        await supabaseClient
-          .from("animals")
-          .select(`
-            *,
-            owners (
-              name,
-              phone,
-              alternate_phone
-            ),
-            behaviour_traits (
-              temperament,
-              traits,
-              notes
-            ),
-            vaccinations (
-              id,
-              vaccine_name,
-              vaccination_date,
-              next_due_date,
-              status
-            ),
-            weight_history (
-              id,
-              recorded_date,
-              weight,
-              unit,
-              notes
-            )
-          `)
-          .eq(
-            "animal_id",
-            profileId
-          )
-          .maybeSingle();
-
-
-      if (
-        result.error
-      ) {
-
-        console.error(
-          "Animal ID profile lookup error:",
-          result.error
-        );
-
-      }
-
-
-      animal =
-        result.data ||
-        null;
-
-    }
-
-
-    /* ========================================================
-       HANDLE NOT FOUND
-       ======================================================== */
-
-    if (!animal) {
-
-      showProfileError(
-        "The requested animal profile could not be found."
-      );
-
-      return;
-
-    }
-
-
-    /* ========================================================
-       NORMALIZE
-       ======================================================== */
-
-    currentAnimal =
-      normalizeAnimal(
-        animal
-      );
-
-
-    /* ========================================================
-       RENDER
-       ======================================================== */
-
-    renderProfile();
-
-  }
-  catch (error) {
-
-    console.error(
-      "Profile loading failed:",
-      error
-    );
 
     showProfileError(
       "Unable to load this animal profile right now."
@@ -3044,18 +2374,23 @@ function formatDisplayDate(value) {
     return "Not Added";
   }
 
+
   const date =
     new Date(
       value + "T00:00:00"
     );
+
 
   if (
     Number.isNaN(
       date.getTime()
     )
   ) {
+
     return String(value);
+
   }
+
 
   return date.toLocaleDateString(
     "en-GB",
@@ -3080,13 +2415,16 @@ function closeProfileModal() {
       ".profile-v2-modal"
     );
 
+
   if (!modal) {
     return;
   }
 
+
   modal.classList.remove(
     "show"
   );
+
 
   setTimeout(
     () => {
@@ -3237,6 +2575,7 @@ function handleProfileEscape(
 
     closeProfileModal();
 
+
     document.removeEventListener(
       "keydown",
       handleProfileEscape
@@ -3360,6 +2699,7 @@ function openBehaviourDetails() {
               NOTES
 
             </span>
+
 
             <p
               class="profile-v2-modal-text">
@@ -3525,8 +2865,10 @@ function openWeightDetails() {
     <div
       class="profile-v2-modal-table-wrap">
 
+
       <table
         class="profile-v2-modal-table">
+
 
         <thead>
 
@@ -3555,7 +2897,9 @@ function openWeightDetails() {
 
         </tbody>
 
+
       </table>
+
 
     </div>
 
@@ -3687,8 +3031,8 @@ function openVaccinationDetails() {
     <p
       class="profile-v2-modal-description">
 
-      Vaccination records associated with
-      this animal profile.
+      Vaccination records maintained as part
+      of the animal's digital health record.
 
     </p>
 
@@ -3696,8 +3040,10 @@ function openVaccinationDetails() {
     <div
       class="profile-v2-modal-table-wrap">
 
+
       <table
         class="profile-v2-modal-table">
+
 
         <thead>
 
@@ -3708,7 +3054,7 @@ function openVaccinationDetails() {
             </th>
 
             <th>
-              Date
+              Vaccination Date
             </th>
 
             <th>
@@ -3730,7 +3076,9 @@ function openVaccinationDetails() {
 
         </tbody>
 
+
       </table>
+
 
     </div>
 
@@ -3775,9 +3123,9 @@ function openChangeRequest() {
     <p
       class="profile-v2-modal-description">
 
-      If any information in this animal profile
-      needs to be corrected or updated, submit
-      the request below.
+      If any information in this profile needs
+      to be corrected or updated, submit a request
+      to the registry administrator.
 
     </p>
 
@@ -3787,34 +3135,67 @@ function openChangeRequest() {
       class="profile-v2-change-form">
 
 
-      <input
-        type="hidden"
-        name="animal_id"
-        value="${esc(a.animalId)}">
+      <div
+        class="profile-v2-form-grid">
 
 
-      <input
-        type="hidden"
-        name="animal_name"
-        value="${esc(a.name)}">
+        <div
+          class="profile-v2-form-group">
+
+          <label
+            for="changeAnimalName">
+
+            Animal
+
+          </label>
+
+          <input
+            id="changeAnimalName"
+            type="text"
+            value="${esc(a.name)}"
+            readonly>
+
+        </div>
+
+
+        <div
+          class="profile-v2-form-group">
+
+          <label
+            for="changeAnimalId">
+
+            Animal ID
+
+          </label>
+
+          <input
+            id="changeAnimalId"
+            type="text"
+            value="${esc(a.animalId)}"
+            readonly>
+
+        </div>
+
+
+      </div>
 
 
       <div
         class="profile-v2-form-group">
 
         <label
-          for="changeName">
+          for="changeRequester">
 
           Your Name
 
         </label>
 
         <input
-          id="changeName"
+          id="changeRequester"
           name="name"
           type="text"
-          required
-          placeholder="Enter your name">
+          placeholder="Enter your name"
+          required>
 
       </div>
 
@@ -3833,8 +3214,8 @@ function openChangeRequest() {
           id="changeEmail"
           name="email"
           type="email"
-          required
-          placeholder="Enter your email">
+          placeholder="Enter your email address"
+          required>
 
       </div>
 
@@ -3845,7 +3226,7 @@ function openChangeRequest() {
         <label
           for="changeType">
 
-          What needs to be changed?
+          Change Type
 
         </label>
 
@@ -3855,31 +3236,47 @@ function openChangeRequest() {
           required>
 
           <option value="">
-            Select an option
+            Select a change type
           </option>
 
-          <option value="Identity">
-            Identity Information
+          <option value="Name">
+            Animal Name
           </option>
 
-          <option value="Contact">
-            Owner / Contact Information
+          <option value="Breed">
+            Breed
           </option>
 
-          <option value="Behaviour">
-            Behaviour Information
+          <option value="Gender">
+            Gender
           </option>
 
-          <option value="Health">
-            Health Information
+          <option value="Date of Birth">
+            Date of Birth
+          </option>
+
+          <option value="Owner">
+            Owner Information
+          </option>
+
+          <option value="Phone">
+            Contact Number
           </option>
 
           <option value="Location">
             Location
           </option>
 
-          <option value="Photo">
-            Profile Photo
+          <option value="Behaviour">
+            Behaviour / Traits
+          </option>
+
+          <option value="Vaccination">
+            Vaccination
+          </option>
+
+          <option value="Weight">
+            Weight
           </option>
 
           <option value="Other">
@@ -3897,7 +3294,7 @@ function openChangeRequest() {
         <label
           for="changeMessage">
 
-          Details
+          Requested Change
 
         </label>
 
@@ -3905,21 +3302,21 @@ function openChangeRequest() {
           id="changeMessage"
           name="message"
           rows="5"
-          required
-          placeholder="Describe the information that needs to be changed..."></textarea>
+          placeholder="Describe the information that needs to be changed..."
+          required></textarea>
 
       </div>
 
 
       <div
-        id="changeFormStatus"
+        id="changeRequestStatus"
         class="profile-v2-form-status">
-
       </div>
 
 
       <div
         class="profile-v2-form-actions">
+
 
         <button
           type="button"
@@ -3933,11 +3330,12 @@ function openChangeRequest() {
 
         <button
           type="submit"
-          class="profile-v2-full-button">
+          class="profile-v2-submit-button">
 
           Submit Request
 
         </button>
+
 
       </div>
 
@@ -3983,7 +3381,7 @@ async function submitChangeRequest(
 
   const status =
     document.getElementById(
-      "changeFormStatus"
+      "changeRequestStatus"
     );
 
 
@@ -3991,6 +3389,72 @@ async function submitChangeRequest(
     form.querySelector(
       'button[type="submit"]'
     );
+
+
+  const a =
+    currentAnimal;
+
+
+  if (!a) {
+    return;
+  }
+
+
+  const requester =
+    document.getElementById(
+      "changeRequester"
+    )?.value.trim();
+
+
+  const email =
+    document.getElementById(
+      "changeEmail"
+    )?.value.trim();
+
+
+  const changeType =
+    document.getElementById(
+      "changeType"
+    )?.value;
+
+
+  const message =
+    document.getElementById(
+      "changeMessage"
+    )?.value.trim();
+
+
+  if (
+    !requester ||
+    !email ||
+    !changeType ||
+    !message
+  ) {
+
+    if (status) {
+
+      status.textContent =
+        "Please complete all required fields.";
+
+      status.className =
+        "profile-v2-form-status error";
+
+    }
+
+    return;
+
+  }
+
+
+  if (status) {
+
+    status.textContent =
+      "Submitting request...";
+
+    status.className =
+      "profile-v2-form-status";
+
+  }
 
 
   if (submitButton) {
@@ -4004,22 +3468,7 @@ async function submitChangeRequest(
   }
 
 
-  if (status) {
-
-    status.className =
-      "profile-v2-form-status";
-
-    status.textContent =
-      "Submitting your request...";
-
-  }
-
-
   try {
-
-    const formData =
-      new FormData(form);
-
 
     const response =
       await fetch(
@@ -4027,65 +3476,133 @@ async function submitChangeRequest(
         {
           method: "POST",
 
-          body: formData,
-
           headers: {
+            "Content-Type":
+              "application/json",
+
             Accept:
               "application/json"
-          }
+          },
+
+          body:
+            JSON.stringify({
+
+              animal_name:
+                a.name,
+
+              animal_id:
+                a.animalId,
+
+              animal_uuid:
+                a.id,
+
+              requester_name:
+                requester,
+
+              requester_email:
+                email,
+
+              change_type:
+                changeType,
+
+              message:
+                message,
+
+              source:
+                "Animal Digital ID Profile"
+
+            })
+
         }
       );
 
 
     if (
-      !response.ok
+      response.ok
     ) {
 
-      throw new Error(
-        "Request could not be submitted."
+      if (status) {
+
+        status.textContent =
+          "Your change request has been submitted successfully.";
+
+        status.className =
+          "profile-v2-form-status success";
+
+      }
+
+
+      form.reset();
+
+
+      setTimeout(
+        () => {
+
+          closeProfileModal();
+
+        },
+        1800
       );
 
     }
 
+    else {
 
-    if (status) {
+      let errorMessage =
+        "Unable to submit the request.";
 
-      status.className =
-        "profile-v2-form-status success";
+      try {
 
-      status.textContent =
-        "✓ Your change request has been submitted successfully.";
+        const result =
+          await response.json();
+
+        if (
+          result?.errors?.length
+        ) {
+
+          errorMessage =
+            result.errors
+              .map(
+                error =>
+                  error.message
+              )
+              .join(" ");
+
+        }
+
+      }
+
+      catch (
+        ignored
+      ) {
+        /* Keep default error message */
+      }
+
+
+      throw new Error(
+        errorMessage
+      );
 
     }
-
-
-    form.reset();
-
-
-    if (submitButton) {
-
-      submitButton.textContent =
-        "Submitted ✓";
-
-    }
-
 
   }
+
   catch (error) {
 
     console.error(
-      "Change request failed:",
+      "Change request submission failed:",
       error
     );
 
 
     if (status) {
 
+      status.textContent =
+        error.message ||
+        "Unable to submit the request. Please try again.";
+
       status.className =
         "profile-v2-form-status error";
-
-      status.textContent =
-        "Unable to submit the request. Please try again.";
 
     }
 
@@ -4138,5 +3655,22 @@ window.addEventListener(
 
 
 /* ============================================================
-   FINAL PROFILE.JS
+   UNHANDLED PROMISE ERROR
+   ============================================================ */
+
+window.addEventListener(
+  "unhandledrejection",
+  function (event) {
+
+    console.error(
+      "Profile page promise error:",
+      event.reason
+    );
+
+  }
+);
+
+
+/* ============================================================
+   PROFILE.JS COMPLETE
    ============================================================ */
