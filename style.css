@@ -6581,3 +6581,916 @@ body .footer {
   }
 
 }
+
+/* ============================================================
+   BUJJI HOMEPAGE
+   DESKTOP POLISH
+   ------------------------------------------------------------
+   Desktop only.
+   Mobile/tablet styles remain unchanged.
+   Header is intentionally NOT modified.
+   ============================================================ */
+
+@media (min-width: 1001px) {
+
+  /* ==========================================================
+     MAIN HOMEPAGE SPACING
+     ========================================================== */
+
+  .content {
+    padding-top: 24px;
+  }
+
+
+  /* ==========================================================
+     HERO
+     ========================================================== */
+
+  .home-hero {
+
+    min-height: 525px;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(500px, .95fr);
+
+    gap: 10px;
+
+    padding:
+      55px 52px 48px;
+
+    border-radius:
+      28px;
+
+  }
+
+
+  .hero-copy {
+
+    max-width:
+      610px;
+
+    padding-left:
+      5px;
+
+  }
+
+
+  .hero-eyebrow {
+
+    margin-bottom:
+      15px;
+
+    font-size:
+      12px;
+
+    letter-spacing:
+      3.5px;
+
+  }
+
+
+  .hero-title {
+
+    font-size:
+      clamp(54px, 5vw, 76px);
+
+    line-height:
+      .96;
+
+    letter-spacing:
+      -3px;
+
+  }
+
+
+  .hero-title span::after {
+
+    height:
+      6px;
+
+    bottom:
+      -11px;
+
+    right:
+      -18px;
+
+  }
+
+
+  .hero-description {
+
+    max-width:
+      550px;
+
+    margin-top:
+      29px;
+
+    font-size:
+      15px;
+
+    line-height:
+      1.7;
+
+  }
+
+
+  .hero-actions {
+
+    gap:
+      14px;
+
+    margin-top:
+      31px;
+
+  }
+
+
+  .hero-button {
+
+    min-height:
+      54px;
+
+    padding:
+      0 23px;
+
+    border-radius:
+      16px;
+
+    font-size:
+      12px;
+
+  }
+
+
+  .hero-trust {
+
+    gap:
+      28px;
+
+    margin-top:
+      29px;
+
+  }
+
+
+  .hero-trust-item {
+
+    font-size:
+      10px;
+
+  }
+
+
+  /* ==========================================================
+     HERO ANIMAL AREA
+     ========================================================== */
+
+  .hero-visual {
+
+    min-height:
+      430px;
+
+    margin-right:
+      -5px;
+
+  }
+
+
+  .hero-image-main {
+
+    width:
+      69%;
+
+    height:
+      375px;
+
+    right:
+      7%;
+
+    top:
+      27px;
+
+    border-radius:
+      32px;
+
+    transform:
+      rotate(2deg);
+
+  }
+
+
+  .hero-image-small {
+
+    width:
+      38%;
+
+    height:
+      205px;
+
+    left:
+      0;
+
+    bottom:
+      0;
+
+    border-radius:
+      27px;
+
+    border-width:
+      9px;
+
+  }
+
+
+  .hero-image-badge {
+
+    left:
+      7%;
+
+    bottom:
+      39px;
+
+    padding:
+      11px 15px;
+
+    border-radius:
+      16px;
+
+  }
+
+
+  .hero-image-badge > span {
+
+    width:
+      29px;
+
+    height:
+      29px;
+
+  }
+
+
+  .hero-image-badge strong {
+
+    font-size:
+      10px;
+
+  }
+
+
+  .hero-image-badge small {
+
+    font-size:
+      8px;
+
+  }
+
+
+  .hero-handwritten {
+
+    right:
+      -3px;
+
+    top:
+      2px;
+
+    font-size:
+      24px;
+
+  }
+
+
+  .hero-handwritten span {
+
+    font-size:
+      29px;
+
+  }
+
+
+  /* ==========================================================
+     FEATURE CARDS
+     ========================================================== */
+
+  .feature-section {
+
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    gap:
+      15px;
+
+    margin-top:
+      22px;
+
+  }
+
+
+  .feature-card {
+
+    min-height:
+      136px;
+
+    padding:
+      19px;
+
+    border-radius:
+      21px;
+
+  }
+
+
+  .feature-icon {
+
+    flex-basis:
+      58px;
+
+    width:
+      58px;
+
+    height:
+      58px;
+
+    border-radius:
+      17px;
+
+    font-size:
+      24px;
+
+  }
+
+
+  .feature-content h3 {
+
+    font-size:
+      14px;
+
+  }
+
+
+  .feature-content p {
+
+    max-width:
+      155px;
+
+    font-size:
+      10px;
+
+    line-height:
+      1.6;
+
+  }
+
+
+  .feature-arrow {
+
+    font-size:
+      21px;
+
+  }
+
+
+  /* ==========================================================
+     STATISTICS
+     ========================================================== */
+
+  .stats-section {
+
+    margin-top:
+      20px;
+
+    padding:
+      29px 25px;
+
+    border-radius:
+      22px;
+
+  }
+
+
+  .stat-item strong {
+
+    font-size:
+      32px;
+
+  }
+
+
+  .stat-item span {
+
+    margin-top:
+      7px;
+
+    font-size:
+      11px;
+
+  }
+
+
+  .stat-divider {
+
+    height:
+      46px;
+
+  }
+
+
+  /* ==========================================================
+     MISSION
+     ========================================================== */
+
+  .mission-section {
+
+    grid-template-columns:
+      1.05fr
+      1.65fr
+      .55fr;
+
+    gap:
+      30px;
+
+    min-height:
+      300px;
+
+    margin-top:
+      22px;
+
+    padding:
+      40px 44px;
+
+    border-radius:
+      27px;
+
+  }
+
+
+  .mission-eyebrow {
+
+    font-size:
+      10px;
+
+    letter-spacing:
+      3px;
+
+  }
+
+
+  .mission-copy h2 {
+
+    font-size:
+      35px;
+
+    line-height:
+      1.02;
+
+  }
+
+
+  .mission-copy p {
+
+    max-width:
+      470px;
+
+    font-size:
+      12px;
+
+  }
+
+
+  .mission-button {
+
+    margin-top:
+      21px;
+
+    padding:
+      12px 18px;
+
+    font-size:
+      10px;
+
+  }
+
+
+  .mission-values {
+
+    gap:
+      22px;
+
+  }
+
+
+  .mission-value-icon {
+
+    width:
+      70px;
+
+    height:
+      70px;
+
+    margin-bottom:
+      11px;
+
+    font-size:
+      27px;
+
+  }
+
+
+  .mission-value strong {
+
+    font-size:
+      12px;
+
+  }
+
+
+  .mission-value > span {
+
+    font-size:
+      9px;
+
+  }
+
+
+  .mission-decoration {
+
+    font-size:
+      22px;
+
+  }
+
+
+  .mission-decoration span {
+
+    font-size:
+      30px;
+
+  }
+
+
+  /* ==========================================================
+     REGISTRY HEADER
+     ========================================================== */
+
+  .registry-section {
+
+    margin-top:
+      32px;
+
+    padding-top:
+      8px;
+
+  }
+
+
+  .registry-section-head {
+
+    margin-bottom:
+      19px;
+
+  }
+
+
+  .registry-eyebrow {
+
+    margin-bottom:
+      7px;
+
+    font-size:
+      10px;
+
+    letter-spacing:
+      3px;
+
+  }
+
+
+  .registry-section-head h2 {
+
+    font-size:
+      36px;
+
+    letter-spacing:
+      -1.2px;
+
+  }
+
+
+  .registry-section-head p {
+
+    margin-top:
+      7px;
+
+    font-size:
+      12px;
+
+  }
+
+
+  .registry-live-count {
+
+    padding:
+      9px 14px;
+
+    font-size:
+      10px;
+
+  }
+
+
+  /* ==========================================================
+     SEARCH
+     ========================================================== */
+
+  .registry-search-wrap {
+
+    margin-bottom:
+      15px;
+
+  }
+
+
+  .registry-search-wrap .search {
+
+    min-height:
+      56px;
+
+    border-radius:
+      18px;
+
+    font-size:
+      11px;
+
+  }
+
+
+  .registry-search-icon {
+
+    left:
+      18px;
+
+    font-size:
+      16px;
+
+  }
+
+
+  /* ==========================================================
+     NOTICE
+     ========================================================== */
+
+  .registry-section .notice {
+
+    min-height:
+      48px;
+
+    margin-bottom:
+      20px;
+
+    padding:
+      12px 17px;
+
+    border-radius:
+      15px;
+
+  }
+
+
+  .registry-section .notice strong {
+
+    font-size:
+      9px;
+
+  }
+
+
+  .registry-section .notice span {
+
+    font-size:
+      9px;
+
+  }
+
+
+  /* ==========================================================
+     ANIMAL REGISTRY GRID
+     ========================================================== */
+
+  .registry-section .grid {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap:
+      20px;
+
+  }
+
+
+  /* ==========================================================
+     ANIMAL CARDS
+     ========================================================== */
+
+  .registry-section .pet {
+
+    grid-template-columns:
+      205px minmax(0, 1fr);
+
+    gap:
+      20px;
+
+    min-height:
+      245px;
+
+    padding:
+      16px;
+
+    border-radius:
+      24px;
+
+  }
+
+
+  .registry-section .pet-img {
+
+    width:
+      205px;
+
+    height:
+      225px;
+
+    border-radius:
+      19px;
+
+  }
+
+
+  .registry-section .pet-card-content {
+
+    padding:
+      4px 2px 3px;
+
+  }
+
+
+  .registry-section .pet-name {
+
+    font-size:
+      21px;
+
+  }
+
+
+  .registry-section .pet-id {
+
+    margin-top:
+      6px;
+
+    font-size:
+      8px;
+
+  }
+
+
+  .registry-section .pill {
+
+    padding:
+      6px 9px;
+
+    font-size:
+      7px;
+
+  }
+
+
+  .registry-section .pet-meta {
+
+    gap:
+      10px;
+
+    margin-top:
+      19px;
+
+  }
+
+
+  .registry-section .meta {
+
+    padding:
+      11px 12px;
+
+    border-radius:
+      13px;
+
+  }
+
+
+  .registry-section .meta span {
+
+    margin-bottom:
+      5px;
+
+    font-size:
+      7px;
+
+  }
+
+
+  .registry-section .meta strong {
+
+    font-size:
+      9px;
+
+  }
+
+
+  .pet-view-profile {
+
+    margin-top:
+      13px;
+
+    padding-top:
+      12px;
+
+    font-size:
+      10px;
+
+  }
+
+
+  .pet-view-profile span {
+
+    font-size:
+      17px;
+
+  }
+
+
+  /* ==========================================================
+     FOOTER
+     ========================================================== */
+
+  body .footer {
+
+    margin-top:
+      30px;
+
+    padding:
+      27px 32px;
+
+    border-radius:
+      22px;
+
+  }
+
+
+  .footer-logo {
+
+    width:
+      43px;
+
+    height:
+      43px;
+
+    border-radius:
+      13px;
+
+    font-size:
+      23px;
+
+  }
+
+
+  .footer-brand strong {
+
+    font-size:
+      13px;
+
+  }
+
+
+  .footer-brand span {
+
+    font-size:
+      8px;
+
+  }
+
+
+  .footer-links {
+
+    gap:
+      20px;
+
+  }
+
+
+  .footer-links a {
+
+    font-size:
+      9px;
+
+  }
+
+}
