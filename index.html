@@ -74,6 +74,23 @@
 
 
 <!-- =========================================================
+     THEME TOGGLE
+     Header remains unchanged.
+     ========================================================= -->
+<button
+  id="themeToggle"
+  class="theme-toggle"
+  type="button"
+  aria-label="Switch to dark mode"
+  title="Switch to dark mode"
+>
+  <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+  <span class="theme-toggle-text">Dark</span>
+</button>
+
+
+
+<!-- =========================================================
      MAIN CONTENT
      ========================================================= -->
 
@@ -827,6 +844,101 @@
 
 
 <script>
+
+
+
+/* ============================================================
+   LIGHT / DARK MODE
+   ============================================================ */
+
+(function () {
+
+  const themeToggle =
+    document.getElementById("themeToggle");
+
+  const themeIcon =
+    themeToggle?.querySelector(".theme-toggle-icon");
+
+  const themeText =
+    themeToggle?.querySelector(".theme-toggle-text");
+
+  function applyTheme(theme) {
+
+    const isDark =
+      theme === "dark";
+
+    document.body.classList.toggle(
+      "dark-mode",
+      isDark
+    );
+
+    if (themeIcon) {
+      themeIcon.textContent =
+        isDark ? "☀️" : "🌙";
+    }
+
+    if (themeText) {
+      themeText.textContent =
+        isDark ? "Light" : "Dark";
+    }
+
+    if (themeToggle) {
+      themeToggle.setAttribute(
+        "aria-label",
+        isDark
+          ? "Switch to light mode"
+          : "Switch to dark mode"
+      );
+
+      themeToggle.setAttribute(
+        "title",
+        isDark
+          ? "Switch to light mode"
+          : "Switch to dark mode"
+      );
+    }
+
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute(
+        "content",
+        isDark ? "#081521" : "#08243f"
+      );
+  }
+
+  const savedTheme =
+    localStorage.getItem(
+      "animalDigitalIdTheme"
+    );
+
+  const initialTheme =
+    savedTheme === "dark"
+      ? "dark"
+      : "light";
+
+  applyTheme(initialTheme);
+
+  themeToggle?.addEventListener(
+    "click",
+    function () {
+
+      const nextTheme =
+        document.body.classList.contains(
+          "dark-mode"
+        )
+          ? "light"
+          : "dark";
+
+      localStorage.setItem(
+        "animalDigitalIdTheme",
+        nextTheme
+      );
+
+      applyTheme(nextTheme);
+    }
+  );
+
+})();
 
 
 /* ============================================================
