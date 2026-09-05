@@ -1299,6 +1299,70 @@ function addEditorStyles() {
       gap:13px;
     }
 
+        /* ============================================================
+       IDENTITY + PHOTO LAYOUT
+       ============================================================ */
+
+    .identity-layout {
+      display:grid;
+      grid-template-columns:
+        minmax(0,1fr)
+        280px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .identity-fields {
+      display:grid;
+      grid-template-columns:
+        repeat(3,minmax(0,1fr));
+      gap:13px;
+    }
+
+    .identity-photo-card {
+      padding:14px;
+      border-radius:16px;
+      background:
+        rgba(255,255,255,.42);
+      box-shadow:
+        var(--shadow-soft);
+      min-height:100%;
+    }
+
+    .identity-photo-card-title {
+      display:flex;
+      align-items:center;
+      gap:7px;
+      margin:0 0 10px 3px;
+      color:var(--navy);
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .identity-photo-card
+    .photo-upload-box {
+      padding:10px;
+      background:
+        rgba(255,255,255,.35);
+      box-shadow:none;
+    }
+
+    .identity-photo-card
+    .photo-preview {
+      min-height:190px;
+    }
+
+    .identity-photo-card
+    .photo-upload-button {
+      font-size:10px;
+      padding:11px 8px;
+    }
+
+    .identity-photo-card
+    .photo-upload-help {
+      text-align:center;
+    }
+
     .editor-field {
       min-width:0;
     }
@@ -1529,6 +1593,16 @@ function addEditorStyles() {
           repeat(2,minmax(0,1fr));
       }
 
+            .identity-layout {
+        grid-template-columns:
+          1fr;
+      }
+
+      .identity-fields {
+        grid-template-columns:
+          repeat(2,minmax(0,1fr));
+      }
+
       .repeat-row {
         grid-template-columns:
           repeat(2,minmax(0,1fr));
@@ -1647,7 +1721,7 @@ function createEditorModal() {
       >
 
 
-        <!-- IDENTITY -->
+               <!-- IDENTITY -->
 
         <section class="editor-section">
 
@@ -1655,143 +1729,210 @@ function createEditorModal() {
             🐾 Animal Identity
           </h3>
 
-          <div class="editor-grid">
 
-            <div class="editor-field">
+          <div class="identity-layout">
 
-              <label>
-                Animal ID *
-              </label>
 
-              <input
-                id="f_animal_id"
-                required
-                placeholder="ANM-KA-2026-000001"
-              >
+            <!-- LEFT: ANIMAL DETAILS -->
+
+            <div class="identity-fields">
+
+
+              <div class="editor-field">
+
+                <label>
+                  Animal ID *
+                </label>
+
+                <input
+                  id="f_animal_id"
+                  required
+                  placeholder="ANM-KA-2026-000001"
+                >
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Name *
+                </label>
+
+                <input
+                  id="f_name"
+                  required
+                  placeholder="Animal name"
+                >
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Type *
+                </label>
+
+                <input
+                  id="f_type"
+                  required
+                  placeholder="Dog / Cat / Cow..."
+                >
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Breed
+                </label>
+
+                <input
+                  id="f_breed"
+                  placeholder="Breed"
+                >
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Gender
+                </label>
+
+                <select id="f_gender">
+
+                  <option value="">
+                    Select
+                  </option>
+
+                  <option value="Male">
+                    Male
+                  </option>
+
+                  <option value="Female">
+                    Female
+                  </option>
+
+                  <option value="Unknown">
+                    Unknown
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Date of Birth
+                </label>
+
+                <input
+                  id="f_dob"
+                  type="date"
+                >
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Colour
+                </label>
+
+                <input
+                  id="f_colour"
+                  placeholder="Colour"
+                >
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Markings
+                </label>
+
+                <input
+                  id="f_markings"
+                  placeholder="Identifying markings"
+                >
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Microchip Number
+                </label>
+
+                <input
+                  id="f_microchip"
+                >
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Microchip Provider
+                </label>
+
+                <input
+                  id="f_microchip_provider"
+                >
+
+              </div>
+
+
+              <div class="editor-field">
+
+                <label>
+                  Government Reference
+                </label>
+
+                <input
+                  id="f_government_reference"
+                >
+
+              </div>
+
+
+              <div class="editor-field full">
+
+                <label>
+                  Identification Notes
+                </label>
+
+                <textarea
+                  id="f_identification_notes"
+                  placeholder="Additional identification details..."
+                ></textarea>
+
+              </div>
+
 
             </div>
 
 
-            <div class="editor-field">
+            <!-- RIGHT: ANIMAL PHOTO -->
 
-              <label>
-                Name *
-              </label>
-
-              <input
-                id="f_name"
-                required
-                placeholder="Animal name"
-              >
-
-            </div>
+            <div class="identity-photo-card">
 
 
-            <div class="editor-field">
+              <div class="identity-photo-card-title">
+                📷 Animal Photo
+              </div>
 
-              <label>
-                Type *
-              </label>
-
-              <input
-                id="f_type"
-                required
-                placeholder="Dog / Cat / Cow..."
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Breed
-              </label>
-
-              <input
-                id="f_breed"
-                placeholder="Breed"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Gender
-              </label>
-
-              <select id="f_gender">
-
-                <option value="">
-                  Select
-                </option>
-
-                <option value="Male">
-                  Male
-                </option>
-
-                <option value="Female">
-                  Female
-                </option>
-
-                <option value="Unknown">
-                  Unknown
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Date of Birth
-              </label>
-
-              <input
-                id="f_dob"
-                type="date"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Colour
-              </label>
-
-              <input
-                id="f_colour"
-                placeholder="Colour"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Markings
-              </label>
-
-              <input
-                id="f_markings"
-                placeholder="Identifying markings"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Animal Photo
-              </label>
 
               <div class="photo-upload-box">
 
@@ -1802,6 +1943,7 @@ function createEditorModal() {
                   style="display:none"
                 >
 
+
                 <button
                   id="photoUploadButton"
                   type="button"
@@ -1810,18 +1952,23 @@ function createEditorModal() {
                   📷 Choose Photo from Laptop
                 </button>
 
+
                 <div class="photo-upload-help">
                   JPG, PNG or WebP • Maximum 5 MB
                 </div>
+
 
                 <div
                   id="photoPreview"
                   class="photo-preview"
                 >
+
                   <div class="photo-preview-empty">
                     🐾 No photo selected
                   </div>
+
                 </div>
+
 
                 <div
                   id="photoUploadStatus"
@@ -1830,69 +1977,19 @@ function createEditorModal() {
 
               </div>
 
+
               <input
                 id="f_photo"
                 type="hidden"
               >
 
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Microchip Number
-              </label>
-
-              <input
-                id="f_microchip"
-              >
 
             </div>
 
-
-            <div class="editor-field">
-
-              <label>
-                Microchip Provider
-              </label>
-
-              <input
-                id="f_microchip_provider"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Government Reference
-              </label>
-
-              <input
-                id="f_government_reference"
-              >
-
-            </div>
-
-
-            <div class="editor-field full">
-
-              <label>
-                Identification Notes
-              </label>
-
-              <textarea
-                id="f_identification_notes"
-              ></textarea>
-
-            </div>
 
           </div>
 
         </section>
-
 
         <!-- OWNER -->
 
