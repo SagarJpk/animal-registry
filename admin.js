@@ -1459,18 +1459,53 @@ function createEditorModal() {
 
             <div class="editor-field">
 
-              <label>
-                Photo URL
-              </label>
+  <label>
+    Animal Photo
+  </label>
 
-              <input
-                id="f_photo"
-                type="url"
-                placeholder="https://..."
-              >
+  <div class="photo-upload-box">
 
-            </div>
+    <input
+      id="f_photo_file"
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      style="display:none"
+    >
 
+    <button
+      id="photoUploadButton"
+      type="button"
+      class="photo-upload-button"
+    >
+      📷 Choose Photo from Laptop
+    </button>
+
+    <div class="photo-upload-help">
+      JPG, PNG or WebP • Maximum 5 MB
+    </div>
+
+    <div
+      id="photoPreview"
+      class="photo-preview"
+    >
+      <div class="photo-preview-empty">
+        🐾 No photo selected
+      </div>
+    </div>
+
+    <div
+      id="photoUploadStatus"
+      class="photo-upload-status"
+    ></div>
+
+  </div>
+
+  <input
+    id="f_photo"
+    type="hidden"
+  >
+
+</div>
 
             <div class="editor-field">
 
