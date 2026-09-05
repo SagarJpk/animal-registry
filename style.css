@@ -7881,3 +7881,40 @@ body .footer {
   }
 
 }
+/* ============================================================
+   HERO TITLE DESKTOP FINAL ADJUSTMENT
+   ============================================================ */
+
+@media (min-width: 1001px) {
+
+  .home-hero {
+    grid-template-columns:
+      minmax(0, 1.12fr)
+      minmax(440px, .88fr);
+  }
+
+  .hero-copy {
+    max-width: 640px;
+  }
+
+  .hero-title {
+    max-width: 620px;
+    font-size: clamp(50px, 4.7vw, 68px);
+    letter-spacing: -2.5px;
+  }
+
+  .hero-visual {
+    margin-left: -10px;
+  }
+
+  .hero-image-main {
+    width: 70%;
+    right: 5%;
+  }
+
+  .hero-handwritten {
+    right: -4px;
+    top: 2px;
+  }
+
+}
