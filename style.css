@@ -3229,10 +3229,20 @@ textarea:focus-visible {
 
 
   .nav {
-
-    display: none;
-
-  }
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: flex-start;
+			gap: 6px;
+			width: 100%;
+			margin-left: 0;
+			}
+			
+		.owner-login-nav-button {
+			display: inline-flex !important;
+			min-height: 34px;
+			padding: 7px 10px;
+			font-size: 9px;
+			}
 
 }
 
@@ -12003,6 +12013,31 @@ body.dark-mode .profile-v2-card .profile-header-nav .profile-v2-dashboard {
 
   .profile-v2-card .profile-header-nav > * {
     width: 100% !important;
+  }
+
+}
+
+/* ============================================================
+   MOBILE NAVIGATION
+   Keep Home + Pet Parent Login visible on phones
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 6px;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .nav a,
+  .owner-login-nav-button {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 9px;
   }
 
 }
