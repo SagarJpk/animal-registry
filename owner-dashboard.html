@@ -458,6 +458,250 @@
     }
 
     /* =========================================================
+       PET PARENT ACCOUNT
+       ========================================================= */
+
+    .parent-dashboard-theme {
+      width: 38px;
+      height: 38px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 12px;
+      color: #ffffff;
+      background: rgba(255,255,255,.08);
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .parent-dashboard-theme:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.15);
+    }
+
+    .parent-dashboard-account {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding: 15px 17px;
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow-inset);
+    }
+
+    .parent-dashboard-account-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: #e7f2f0;
+      font-size: 19px;
+    }
+
+    .parent-dashboard-account-kicker {
+      color: var(--muted);
+      font-size: 7px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .parent-dashboard-account-copy strong {
+      display: block;
+      margin-top: 4px;
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .parent-dashboard-account-copy span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 8px;
+      word-break: break-word;
+    }
+
+    .parent-dashboard-account-note {
+      max-width: 300px;
+      color: var(--muted);
+      font-size: 8px;
+      line-height: 1.5;
+      text-align: right;
+    }
+
+    body.dark-mode {
+      --bg: #081521;
+      --surface: #102631;
+      --surface-light: #16313d;
+      --surface-white: #1b3642;
+      --ink: #e4eef2;
+      --ink-soft: #b4c7cf;
+      --muted: #8ca5b1;
+      --muted-light: #6f8996;
+      --navy: #e5f1f5;
+      --navy-dark: #dbe9ee;
+      --border-soft: rgba(255,255,255,.08);
+    }
+
+    body.dark-mode {
+      color: var(--ink);
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(58,96,112,.14),
+          transparent 28%
+        ),
+        linear-gradient(
+          135deg,
+          #081521 0%,
+          #0c202c 55%,
+          #081521 100%
+        );
+    }
+
+    body.dark-mode .parent-dashboard-account {
+      background: #142d39;
+      box-shadow:
+        inset 4px 4px 9px rgba(0,0,0,.17),
+        inset -4px -4px 9px rgba(52,77,88,.08);
+    }
+
+    body.dark-mode .parent-dashboard-account-icon {
+      background: #193841;
+    }
+
+    body.dark-mode .parent-dashboard-account-copy strong {
+      color: #e5f1f5;
+    }
+
+    /* =========================================================
+       PET PARENT ACCOUNT
+       ========================================================= */
+
+    .parent-dashboard-theme {
+      width: 38px;
+      height: 38px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 12px;
+      color: #ffffff;
+      background: rgba(255,255,255,.08);
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .parent-dashboard-theme:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.15);
+    }
+
+    .parent-dashboard-account {
+      display: grid;
+      grid-template-columns: auto minmax(0,1fr) auto;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding: 15px 17px;
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow-inset);
+    }
+
+    .parent-dashboard-account-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: #e7f2f0;
+      font-size: 19px;
+    }
+
+    .parent-dashboard-account-kicker {
+      color: var(--muted);
+      font-size: 7px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .parent-dashboard-account-copy strong {
+      display: block;
+      margin-top: 4px;
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .parent-dashboard-account-copy span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 8px;
+      word-break: break-word;
+    }
+
+    .parent-dashboard-account-note {
+      max-width: 300px;
+      color: var(--muted);
+      font-size: 8px;
+      line-height: 1.5;
+      text-align: right;
+    }
+
+    body.dark-mode {
+      --bg: #081521;
+      --surface: #102631;
+      --surface-light: #16313d;
+      --surface-white: #1b3642;
+      --ink: #e4eef2;
+      --ink-soft: #b4c7cf;
+      --muted: #8ca5b1;
+      --muted-light: #6f8996;
+      --navy: #e5f1f5;
+      --navy-dark: #dbe9ee;
+      --border-soft: rgba(255,255,255,.08);
+    }
+
+    body.dark-mode {
+      color: var(--ink);
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(58,96,112,.14),
+          transparent 28%
+        ),
+        linear-gradient(
+          135deg,
+          #081521 0%,
+          #0c202c 55%,
+          #081521 100%
+        );
+    }
+
+    body.dark-mode .parent-dashboard-account {
+      background: #142d39;
+      box-shadow:
+        inset 4px 4px 9px rgba(0,0,0,.17),
+        inset -4px -4px 9px rgba(52,77,88,.08);
+    }
+
+    body.dark-mode .parent-dashboard-account-icon {
+      background: #193841;
+    }
+
+    body.dark-mode .parent-dashboard-account-copy strong {
+      color: #e5f1f5;
+    }
+
+    /* =========================================================
        MOBILE
        ========================================================= */
 
@@ -495,6 +739,16 @@
 
       .parent-dashboard-summary {
         grid-template-columns: 1fr;
+      }
+
+      .parent-dashboard-account {
+        grid-template-columns: auto minmax(0,1fr);
+      }
+
+      .parent-dashboard-account-note {
+        grid-column: 1 / -1;
+        max-width: none;
+        text-align: left;
       }
 
       .parent-dashboard-grid {
@@ -579,6 +833,16 @@
             </a>
 
             <button
+              id="dashboardThemeToggle"
+              type="button"
+              class="parent-dashboard-theme"
+              aria-label="Switch to dark mode"
+              title="Switch to dark mode"
+            >
+              🌙
+            </button>
+
+            <button
               id="logoutButton"
               type="button"
               class="parent-dashboard-logout"
@@ -630,6 +894,35 @@
           <div class="parent-dashboard-stat">
             <span>Lost Animals</span>
             <strong id="lostCount">0</strong>
+          </div>
+
+        </section>
+
+
+        <section class="parent-dashboard-account">
+
+          <div class="parent-dashboard-account-icon">
+            👤
+          </div>
+
+          <div class="parent-dashboard-account-copy">
+
+            <div class="parent-dashboard-account-kicker">
+              PET PARENT ACCOUNT
+            </div>
+
+            <strong id="accountOwnerName">
+              Pet Parent
+            </strong>
+
+            <span id="accountOwnerEmail">
+              Signed-in account
+            </span>
+
+          </div>
+
+          <div class="parent-dashboard-account-note">
+            🔐 Your animal records are protected by account-based access.
           </div>
 
         </section>
@@ -769,6 +1062,98 @@
       document.getElementById(
         "logoutButton"
       );
+
+    const dashboardThemeToggle =
+      document.getElementById(
+        "dashboardThemeToggle"
+      );
+
+    const accountOwnerName =
+      document.getElementById(
+        "accountOwnerName"
+      );
+
+    const accountOwnerEmail =
+      document.getElementById(
+        "accountOwnerEmail"
+      );
+
+
+    /* =========================================================
+       LIGHT / DARK MODE
+       ========================================================= */
+
+    function applyDashboardTheme(theme) {
+
+      const isDark =
+        theme === "dark";
+
+      document.body.classList.toggle(
+        "dark-mode",
+        isDark
+      );
+
+      if (dashboardThemeToggle) {
+        dashboardThemeToggle.textContent =
+          isDark ? "☀️" : "🌙";
+
+        dashboardThemeToggle.setAttribute(
+          "aria-label",
+          isDark
+            ? "Switch to light mode"
+            : "Switch to dark mode"
+        );
+
+        dashboardThemeToggle.setAttribute(
+          "title",
+          isDark
+            ? "Switch to light mode"
+            : "Switch to dark mode"
+        );
+      }
+
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute(
+          "content",
+          isDark
+            ? "#081521"
+            : "#08243f"
+        );
+    }
+
+
+    applyDashboardTheme(
+      localStorage.getItem(
+        "animalDigitalIdTheme"
+      ) === "dark"
+        ? "dark"
+        : "light"
+    );
+
+
+    dashboardThemeToggle?.addEventListener(
+      "click",
+      function () {
+
+        const nextTheme =
+          document.body.classList.contains(
+            "dark-mode"
+          )
+            ? "light"
+            : "dark";
+
+        localStorage.setItem(
+          "animalDigitalIdTheme",
+          nextTheme
+        );
+
+        applyDashboardTheme(
+          nextTheme
+        );
+
+      }
+    );
 
 
     /* =========================================================
@@ -1179,6 +1564,17 @@
 
         parentAccountName.textContent =
           displayName;
+
+        if (accountOwnerName) {
+          accountOwnerName.textContent =
+            displayName;
+        }
+
+        if (accountOwnerEmail) {
+          accountOwnerEmail.textContent =
+            session.user.email ||
+            "Signed-in account";
+        }
 
 
         /* =====================================================
