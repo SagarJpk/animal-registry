@@ -2992,7 +2992,7 @@ if (ownerLoginForm) {
         }
 
 
-       /* ====================================================
+      /* ====================================================
    VERIFY PET PARENT PROFILE
    ==================================================== */
 
@@ -3011,7 +3011,6 @@ const {
     )
     .maybeSingle();
 
-
 if (profileError) {
 
   console.error(
@@ -3026,7 +3025,6 @@ if (profileError) {
   );
 }
 
-
 if (!profile) {
 
   await supabaseClient.auth.signOut();
@@ -3035,7 +3033,6 @@ if (!profile) {
     "Your account is not registered."
   );
 }
-
 
 if (profile.role !== "owner") {
 
@@ -3046,29 +3043,24 @@ if (profile.role !== "owner") {
   );
 }
 
-        ownerLoginStatus.textContent =
-          "Login successful. Opening your dashboard...";
+ownerLoginStatus.textContent =
+  "Login successful. Opening your dashboard...";
 
-        ownerLoginStatus.className =
-          "owner-login-modal-status success";
+ownerLoginStatus.className =
+  "owner-login-modal-status success";
 
+ownerLoginSubmit.textContent =
+  "Success ✓";
 
-        ownerLoginSubmit.textContent =
-          "Success ✓";
+setTimeout(
+  function () {
 
+    window.location.href =
+      "./owner-dashboard.html";
 
-        setTimeout(
-          function () {
-
-            window.location.href =
-              "./owner-dashboard.html";
-
-          },
-          600
-        );
-
-      }
-
+  },
+  600
+);
 
       catch (error) {
 
