@@ -1053,7 +1053,7 @@ function renderProfile() {
       : [];
 
 
-const latestWeight =
+  const latestWeight =
   weights.length
     ? [...weights].sort(
         (a, b) => {
@@ -2422,33 +2422,33 @@ async function setupPetParentProfileNavigation() {
     }
 
 
-    const {
-      data: owner,
-      error: ownerError
-    } =
-      await supabaseClient
-        .from("owners")
-        .select(
-          "id,name,auth_user_id"
-        )
-        .eq(
-          "auth_user_id",
-          data.session.user.id
-        )
-        .maybeSingle();
+const {
+  data: profile,
+  error: profileError
+} =
+  await supabaseClient
+    .from("profiles")
+    .select(
+      "id,role"
+    )
+    .eq(
+      "id",
+      data.session.user.id
+    )
+    .maybeSingle();
 
 
-    if (
-      ownerError ||
-      !owner
-    ) {
+if (
+  profileError ||
+  !profile ||
+  profile.role !== "owner"
+) {
 
-      dashboardButton.style.display =
-        "none";
+  dashboardButton.style.display =
+    "none";
 
-      return;
-
-    }
+  return;
+}
 
 
     dashboardButton.style.display =
