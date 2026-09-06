@@ -911,49 +911,77 @@
 
 
           /* =================================================
-             VERIFY OWNER LINK
+             VERIFY PET PARENT PROFILE
              ================================================= */
 
           const {
-            data: owner,
-            error: ownerError
+            data: profile,
+            error: profileError
           } =
             await supabaseClient
-              .from("owners")
-              .select(`
-                id,
-                name,
-                auth_user_id
-              `)
-              .eq(
-                "auth_user_id",
-                data.user.id
-              )
+              .from("profiles")
+              .select("id,email,full_name,phone,role")
+              .eq("id", data.user.id)
               .maybeSingle();
 
 
-          if (ownerError) {
+          if (profileError) {
 
             console.error(
-              "Owner lookup error:",
-              ownerError
+              "Profile lookup error:",
+              profileError
             );
 
             await supabaseClient.auth.signOut();
 
             throw new Error(
-              "Unable to verify the owner account."
+              "Unable to verify your pet parent account."
             );
 
           }
 
 
-          if (!owner) {
+          if (!profile) {
 
             await supabaseClient.auth.signOut();
 
             throw new Error(
-              "Your login account is not linked to an owner record yet."
+              "Your account is not registered."
+            );
+
+          }
+
+
+          if (profile.role !== "owner") {
+
+            await supabaseClient.auth.signOut();
+
+            throw new Error(
+              "This account is not registered as a Pet Parent."
+            );
+
+          }
+
+
+          /* Confirm the session survives the successful login. */
+          const {
+            data: sessionCheck,
+            error: sessionCheckError
+          } =
+            await supabaseClient.auth.getSession();
+
+
+          if (sessionCheckError || !sessionCheck?.session) {
+
+            console.error(
+              "Session persistence check failed:",
+              sessionCheckError
+            );
+
+            await supabaseClient.auth.signOut();
+
+            throw new Error(
+              "Login succeeded, but the sign-in session could not be saved. Please refresh and try again."
             );
 
           }
