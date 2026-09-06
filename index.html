@@ -73,6 +73,15 @@
     rgba(255,255,255,.17);
 }
 
+.owner-login-nav-button.pet-parent-dashboard-link {
+  background:
+    rgba(31,208,143,.14) !important;
+  border-color:
+    rgba(31,208,143,.28) !important;
+  color:
+    #8ff0c7 !important;
+}
+
 
 /* ============================================================
    POPUP OVERLAY
@@ -843,6 +852,7 @@ body.dark-mode .owner-login-modal-field input:-webkit-autofill:active {
   </a>
 
   <button
+    id="petParentNavButton"
     type="button"
     class="owner-login-nav-button"
     onclick="openOwnerLogin()"
@@ -3090,6 +3100,112 @@ if (ownerLoginForm) {
 /* ============================================================
    INITIAL PAGE LOAD
    ============================================================ */
+
+/* ============================================================
+   PET PARENT SESSION STATE
+   Keep the signed-in session when returning to the registry.
+   ============================================================ */
+
+async function updatePetParentNavigation() {
+
+  const navButton =
+    document.getElementById(
+      "petParentNavButton"
+    );
+
+  if (!navButton) {
+    return;
+  }
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.getSession();
+
+    if (
+      error ||
+      !data ||
+      !data.session ||
+      !data.session.user
+    ) {
+
+      navButton.textContent =
+        "🔐 Pet Parent Login";
+
+      navButton.classList.remove(
+        "pet-parent-dashboard-link"
+      );
+
+      navButton.onclick =
+        openOwnerLogin;
+
+      return;
+    }
+
+    const {
+      data: owner,
+      error: ownerError
+    } =
+      await supabaseClient
+        .from("owners")
+        .select(
+          "id,name,auth_user_id"
+        )
+        .eq(
+          "auth_user_id",
+          data.session.user.id
+        )
+        .maybeSingle();
+
+    if (
+      ownerError ||
+      !owner
+    ) {
+
+      navButton.textContent =
+        "🔐 Pet Parent Login";
+
+      navButton.classList.remove(
+        "pet-parent-dashboard-link"
+      );
+
+      navButton.onclick =
+        openOwnerLogin;
+
+      return;
+    }
+
+    navButton.textContent =
+      "🐾 Pet Parent Dashboard";
+
+    navButton.classList.add(
+      "pet-parent-dashboard-link"
+    );
+
+    navButton.onclick =
+      function () {
+        window.location.href =
+          "./owner-dashboard.html";
+      };
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Pet Parent session check failed:",
+      error
+    );
+
+  }
+
+}
+
+updatePetParentNavigation();
+
 
 loadAnimals();
 
