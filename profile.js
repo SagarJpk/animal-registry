@@ -1336,54 +1336,49 @@ function renderProfile() {
           </div>
 
 
-          <nav class="nav">
+        <nav class="nav profile-header-nav">
 
-            <a href="./index.html">
-              Home
-            </a>
+  <a
+    href="./index.html"
+    class="profile-header-home"
+  >
+    Home
+  </a>
 
-          </nav>
+
+  <a
+    href="./index.html"
+    class="profile-v2-back"
+  >
+    ← Back to Registry
+  </a>
+
+
+  <button
+    id="profilePetParentDashboard"
+    type="button"
+    class="profile-v2-dashboard"
+    style="display:none"
+    onclick="goToPetParentDashboard()"
+  >
+    🐾 Pet Parent Dashboard
+  </button>
+
+
+  <button
+    type="button"
+    class="profile-v2-change"
+    onclick="openChangeRequest()"
+  >
+    📝 Request a Change
+  </button>
+
+</nav>
 
         </header>
 
 
         <main class="content profile-v2-content">
-
-
-          <!-- ==================================================
-               ACTION BAR
-          ================================================== -->
-
-          <div class="profile-v2-topbar">
-
-            <a
-              href="./index.html"
-              class="profile-v2-back">
-
-              ← Back to Registry
-
-            </a>
-
-			<button
-				id="profilePetParentDashboard"
-				type="button"
-				class="profile-v2-dashboard"
-				style="display:none"
-				onclick="goToPetParentDashboard()">
-
-				🐾 Pet Parent Dashboard
-			</button>
-
-            <button
-              type="button"
-              class="profile-v2-change"
-              onclick="openChangeRequest()">
-
-              📝 Request a Change
-
-            </button>
-
-          </div>
 
 
           <!-- ==================================================
