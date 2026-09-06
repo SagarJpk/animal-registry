@@ -3141,21 +3141,21 @@ async function updatePetParentNavigation() {
       return;
     }
 
-    const {
-      data: owner,
-      error: ownerError
-    } =
-      await supabaseClient
-        .from("owners")
-        .select(
-          "id,name,auth_user_id"
-        )
-        .eq(
-          "auth_user_id",
-          data.session.user.id
-        )
-        .maybeSingle();
-
+   const {
+  data: owner,
+  error: ownerError
+} =
+  await supabaseClient
+    .from("owners")
+    .select(
+      "id,name,auth_user_id"
+    )
+    .eq(
+      "auth_user_id",
+      data.user.id
+    )
+    .maybeSingle();
+    
     if (
       ownerError ||
       !owner
