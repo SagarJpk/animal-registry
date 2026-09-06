@@ -1364,6 +1364,15 @@ function renderProfile() {
 
             </a>
 
+			<button
+				id="profilePetParentDashboard"
+				type="button"
+				class="profile-v2-dashboard"
+				style="display:none"
+				onclick="goToPetParentDashboard()">
+
+				🐾 Pet Parent Dashboard
+			</button>
 
             <button
               type="button"
@@ -2358,8 +2367,112 @@ function renderProfile() {
 
   setupProfileTheme();
 
+  setupPetParentProfileNavigation();
+
 }
 
+/* ============================================================
+   PET PARENT PROFILE NAVIGATION
+   ============================================================ */
+
+async function setupPetParentProfileNavigation() {
+
+  const dashboardButton =
+    document.getElementById(
+      "profilePetParentDashboard"
+    );
+
+
+  if (!dashboardButton) {
+    return;
+  }
+
+
+  try {
+
+    if (!supabaseClient) {
+      return;
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (
+      error ||
+      !data ||
+      !data.session ||
+      !data.session.user
+    ) {
+
+      dashboardButton.style.display =
+        "none";
+
+      return;
+
+    }
+
+
+    const {
+      data: owner,
+      error: ownerError
+    } =
+      await supabaseClient
+        .from("owners")
+        .select(
+          "id,name,auth_user_id"
+        )
+        .eq(
+          "auth_user_id",
+          data.session.user.id
+        )
+        .maybeSingle();
+
+
+    if (
+      ownerError ||
+      !owner
+    ) {
+
+      dashboardButton.style.display =
+        "none";
+
+      return;
+
+    }
+
+
+    dashboardButton.style.display =
+      "inline-flex";
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Pet Parent profile navigation check failed:",
+      error
+    );
+
+
+    dashboardButton.style.display =
+      "none";
+
+  }
+
+}
+
+
+function goToPetParentDashboard() {
+
+  window.location.href =
+    "./owner-dashboard.html";
+
+}
 
 /* ============================================================
    PART 2 END
