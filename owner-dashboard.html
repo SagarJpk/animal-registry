@@ -1497,6 +1497,10 @@
           !session.user
         ) {
 
+          console.warn(
+            "No active Pet Parent session found."
+          );
+
           window.location.href =
             "./";
 
@@ -1600,10 +1604,8 @@ if (legacyOwnerError) {
 
 if (!legacyOwner) {
 
-  await supabaseClient.auth.signOut();
-
   throw new Error(
-    "Your profile is not yet linked to an animal ownership record."
+    "Your pet parent profile is not yet linked to an animal ownership record."
   );
 }
 
