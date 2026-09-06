@@ -11654,3 +11654,85 @@ body.dark-mode .profile-v2-change-form button[type="submit"] {
   }
 
 }
+/* ============================================================
+   PET PARENT DASHBOARD BUTTON ON PROFILE
+   ============================================================ */
+
+.profile-v2-dashboard {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 38px;
+
+  padding: 9px 15px;
+
+  border: 1px solid rgba(31,208,143,.22);
+
+  border-radius: 12px;
+
+  color: #8ff0c7;
+
+  background:
+    rgba(31,208,143,.12);
+
+  font-family: inherit;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    transform .18s ease,
+    background .18s ease,
+    box-shadow .18s ease;
+}
+
+
+.profile-v2-dashboard:hover {
+
+  transform:
+    translateY(-2px);
+
+  background:
+    rgba(31,208,143,.18);
+
+  box-shadow:
+    5px 7px 16px
+    rgba(15,130,95,.16);
+}
+
+
+.profile-v2-dashboard:active {
+
+  transform:
+    translateY(0);
+
+}
+
+
+body.dark-mode .profile-v2-dashboard {
+
+  color: #8ff0c7;
+
+  background:
+    rgba(31,208,143,.12);
+
+  border-color:
+    rgba(31,208,143,.22);
+
+}
+
+
+@media (max-width: 650px) {
+
+  .profile-v2-dashboard {
+
+    width: 100%;
+
+  }
+
+}
