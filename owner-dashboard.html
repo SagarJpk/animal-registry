@@ -1509,55 +1509,108 @@
           session.user.id;
 
 
-        /* =====================================================
-           LOAD CURRENT PET PARENT
-           ===================================================== */
+       /* =====================================================
+				LOAD CURRENT PET PARENT PROFILE
+		  ===================================================== */
 
-        const {
-          data: owner,
-          error: ownerError
-        } =
-          await supabaseClient
-            .from("owners")
-            .select(
-              "id,name,auth_user_id"
-            )
-            .eq(
-              "auth_user_id",
-              userId
-            )
-            .maybeSingle();
-
-
-        if (ownerError) {
-
-          console.error(
-            "Pet parent lookup failed:",
-            ownerError
-          );
-
-          throw new Error(
-            "Unable to load your pet parent account."
-          );
-
-        }
+const {
+  data: profile,
+  error: profileError
+} =
+  await supabaseClient
+    .from("profiles")
+    .select(
+      "id,email,full_name,phone,role"
+    )
+    .eq(
+      "id",
+      userId
+    )
+    .maybeSingle();
 
 
-        if (!owner) {
+if (profileError) {
 
-          await supabaseClient.auth.signOut();
+  console.error(
+    "Pet parent profile lookup failed:",
+    profileError
+  );
 
-          throw new Error(
-            "Your account is not linked to a pet parent record."
-          );
+  throw new Error(
+    "Unable to load your pet parent profile."
+  );
+}
 
-        }
+
+if (!profile) {
+
+  await supabaseClient.auth.signOut();
+
+  throw new Error(
+    "Your account is not registered."
+  );
+}
 
 
-        const displayName =
-          owner.name ||
-          "Pet Parent";
+if (profile.role !== "owner") {
 
+  await supabaseClient.auth.signOut();
+
+  throw new Error(
+    "This account is not registered as a Pet Parent."
+  );
+}
+
+
+/* =====================================================
+   LEGACY OWNER BRIDGE
+   -----------------------------------------------------
+   animals.owner_id still references owners.id.
+   Keep this temporary lookup until the final FK migration.
+   ===================================================== */
+
+const {
+  data: legacyOwner,
+  error: legacyOwnerError
+} =
+  await supabaseClient
+    .from("owners")
+    .select(
+      "id"
+    )
+    .eq(
+      "auth_user_id",
+      profile.id
+    )
+    .maybeSingle();
+
+
+if (legacyOwnerError) {
+
+  console.error(
+    "Legacy owner bridge lookup failed:",
+    legacyOwnerError
+  );
+
+  throw new Error(
+    "Unable to load your animal ownership link."
+  );
+}
+
+
+if (!legacyOwner) {
+
+  await supabaseClient.auth.signOut();
+
+  throw new Error(
+    "Your profile is not yet linked to an animal ownership record."
+  );
+}
+
+
+const displayName =
+  profile.full_name ||
+  "Pet Parent";
 
         parentName.textContent =
           displayName;
@@ -1601,9 +1654,9 @@
               is_lost
             `)
             .eq(
-              "owner_id",
-              owner.id
-            )
+				"owner_id",
+				legacyOwner.id
+				)
             .order(
               "name",
               {
