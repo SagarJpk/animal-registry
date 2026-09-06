@@ -1053,10 +1053,20 @@ function renderProfile() {
       : [];
 
 
-  const latestWeight =
-    weights.length
-      ? weights[0]
-      : null;
+const latestWeight =
+  weights.length
+    ? [...weights].sort(
+        (a, b) => {
+          const aDate =
+            new Date(a.date || 0).getTime();
+
+          const bDate =
+            new Date(b.date || 0).getTime();
+
+          return bDate - aDate;
+        }
+      )[0]
+    : null;
 
 
   const latestVaccine =
