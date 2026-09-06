@@ -3228,7 +3228,7 @@ textarea:focus-visible {
   }
 
 
-  .nav {
+		.nav {
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: flex-start;
@@ -3927,10 +3927,12 @@ textarea:focus-visible {
   display: grid;
 
   grid-template-columns:
-    minmax(0, 1.05fr)
-    minmax(380px, .95fr);
+    minmax(0, 1fr)
+    minmax(400px, 1fr);
 
-  gap: 30px;
+  align-items: center;
+
+  gap: 34px;
 
   min-height: 500px;
 
@@ -4027,7 +4029,9 @@ textarea:focus-visible {
 
   align-self: center;
 
-  max-width: 590px;
+  max-width: 560px;
+
+  padding-left: 4px;
 
 }
 
@@ -4337,13 +4341,13 @@ textarea:focus-visible {
 
   position: absolute;
 
-  width: 66%;
+  width: 68%;
 
   height: 345px;
 
-  right: 8%;
+  right: 6%;
 
-  top: 30px;
+  top: 28px;
 
   overflow: hidden;
 
@@ -4389,13 +4393,13 @@ textarea:focus-visible {
 
   position: absolute;
 
-  width: 36%;
+  width: 35%;
 
-  height: 190px;
+  height: 185px;
 
-  left: 1%;
+  left: 0;
 
-  bottom: 3px;
+  bottom: 5px;
 
   overflow: hidden;
 
@@ -4413,7 +4417,7 @@ textarea:focus-visible {
     rgba(18,47,64,.14);
 
   transform:
-    rotate(-4deg);
+    rotate(-2deg);
 
   z-index: 4;
 
@@ -12016,7 +12020,6 @@ body.dark-mode .profile-v2-card .profile-header-nav .profile-v2-dashboard {
   }
 
 }
-
 /* ============================================================
    MOBILE NAVIGATION
    Keep Home + Pet Parent Login visible on phones
