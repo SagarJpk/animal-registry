@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08243f">
+
+  <title>Pet Parent Dashboard | Animal Digital ID</title>
+
+  <link
+    rel="stylesheet"
+    href="./style.css?v=20260906"
+  >
+
+  <style>
+    /* =========================================================
+       PET PARENT DASHBOARD
+       ========================================================= */
+
+    .parent-dashboard-page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 30px auto;
+      padding-bottom: 40px;
+    }
+
+    .parent-dashboard-card {
+      overflow: hidden;
+      border-radius: 28px;
+      background: var(--surface);
+      box-shadow: var(--shadow-deep);
+    }
+
+    .parent-dashboard-header {
+      position: relative;
+      overflow: hidden;
+      padding: 28px 32px;
+      color: #ffffff;
+      background:
+        linear-gradient(
+          135deg,
+          #173d5d 0%,
+          #1c4a6d 60%,
+          #244f70 100%
+        );
+    }
+
+    .parent-dashboard-header::before {
+      content: "";
+      position: absolute;
+      width: 380px;
+      height: 380px;
+      right: -160px;
+      top: -250px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow:
+        0 0 0 28px rgba(255,255,255,.025),
+        0 0 0 58px rgba(255,255,255,.018);
+    }
+
+    .parent-dashboard-top {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .parent-dashboard-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .parent-dashboard-logo {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 18px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      font-size: 31px;
+      box-shadow:
+        inset 3px 3px 7px rgba(0,0,0,.12),
+        inset -3px -3px 7px rgba(255,255,255,.05);
+    }
+
+    .parent-dashboard-brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.15;
+      font-weight: 900;
+    }
+
+    .parent-dashboard-brand p {
+      margin: 5px 0 0;
+      color: rgba(255,255,255,.72);
+      font-size: 10px;
+    }
+
+    .parent-dashboard-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .parent-dashboard-home,
+    .parent-dashboard-logout {
+      min-height: 38px;
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 9px;
+      font-weight: 900;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .18s ease;
+    }
+
+    .parent-dashboard-home {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,.16);
+      color: #ffffff;
+      background: rgba(255,255,255,.08);
+    }
+
+    .parent-dashboard-logout {
+      border: 0;
+      color: #183d55;
+      background: #fffdf6;
+    }
+
+    .parent-dashboard-home:hover,
+    .parent-dashboard-logout:hover {
+      transform: translateY(-2px);
+    }
+
+    .parent-dashboard-hero {
+      position: relative;
+      z-index: 2;
+      margin-top: 28px;
+    }
+
+    .parent-dashboard-eyebrow {
+      color: #57d9ac;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .parent-dashboard-hero h2 {
+      margin: 8px 0 0;
+      color: #f5fbfd;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.02;
+      font-weight: 950;
+      letter-spacing: -1px;
+    }
+
+    .parent-dashboard-hero h2 span {
+      color: #1fd08f;
+    }
+
+    .parent-dashboard-hero p {
+      max-width: 620px;
+      margin: 11px 0 0;
+      color: rgba(255,255,255,.72);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .parent-dashboard-content {
+      padding: 32px;
+    }
+
+    .parent-dashboard-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .parent-dashboard-stat {
+      padding: 18px;
+      border-radius: 17px;
+      background: var(--surface);
+      box-shadow: var(--shadow-raised-small);
+    }
+
+    .parent-dashboard-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    .parent-dashboard-stat strong {
+      display: block;
+      margin-top: 7px;
+      color: var(--navy);
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    .parent-dashboard-section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+
+    .parent-dashboard-section-head h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    .parent-dashboard-section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .parent-dashboard-owner-name {
+      padding: 9px 13px;
+      border-radius: 999px;
+      color: #0e8060;
+      background: #e2f5ec;
+      font-size: 8px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .parent-dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .parent-animal-card {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 18px;
+      padding: 16px;
+      border-radius: 21px;
+      background: var(--surface);
+      box-shadow: var(--shadow-raised);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .parent-animal-card:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        11px 11px 24px rgba(145,158,169,.45),
+        -9px -9px 22px rgba(255,255,255,.92);
+    }
+
+    .parent-animal-image {
+      width: 150px;
+      height: 178px;
+      overflow: hidden;
+      border-radius: 17px;
+      background: #dce4e9;
+      box-shadow: var(--shadow-inset);
+    }
+
+    .parent-animal-image img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center 35%;
+    }
+
+    .parent-animal-placeholder {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      color: #7c96a3;
+      font-size: 42px;
+      background:
+        radial-gradient(circle at 30% 30%, #ffffff 0, #e0e8ec 60%);
+    }
+
+    .parent-animal-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .parent-animal-name {
+      color: var(--navy);
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    .parent-animal-id {
+      margin-top: 5px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 8px;
+      letter-spacing: .2px;
+    }
+
+    .parent-animal-status {
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: var(--green);
+      background: var(--green-light);
+      font-size: 7px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .parent-animal-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 22px;
+    }
+
+    .parent-animal-meta-item {
+      padding: 10px;
+      border-radius: 12px;
+      background: var(--surface);
+      box-shadow: var(--shadow-inset);
+    }
+
+    .parent-animal-meta-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 7px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .parent-animal-meta-item strong {
+      display: block;
+      margin-top: 4px;
+      color: var(--ink);
+      font-size: 10px;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .parent-animal-view {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      margin-top: 18px;
+      padding-top: 13px;
+      border-top: 1px solid var(--border-soft);
+      color: #0e8060;
+      font-size: 9px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .parent-animal-view span {
+      font-size: 16px;
+    }
+
+    .parent-dashboard-empty,
+    .parent-dashboard-error {
+      padding: 45px 24px;
+      border-radius: 21px;
+      text-align: center;
+      background: var(--surface);
+      box-shadow: var(--shadow-inset);
+    }
+
+    .parent-dashboard-empty .icon,
+    .parent-dashboard-error .icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .parent-dashboard-empty strong,
+    .parent-dashboard-error strong {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .parent-dashboard-empty p,
+    .parent-dashboard-error p {
+      margin: 7px auto 0;
+      max-width: 500px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.6;
+    }
+
+    .parent-dashboard-footer {
+      padding: 0 32px 28px;
+      color: var(--muted);
+      font-size: 8px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .parent-dashboard-footer strong {
+      color: var(--ink);
+    }
+
+    /* =========================================================
+       DARK MODE
+       ========================================================= */
+
+    body.dark-mode .parent-dashboard-card {
+      background: #102631;
+      box-shadow:
+        15px 18px 38px rgba(0,0,0,.42),
+        -8px -8px 20px rgba(45,72,84,.08);
+    }
+
+    body.dark-mode .parent-dashboard-content {
+      background: #102631;
+    }
+
+    body.dark-mode .parent-dashboard-stat,
+    body.dark-mode .parent-animal-card,
+    body.dark-mode .parent-dashboard-empty,
+    body.dark-mode .parent-dashboard-error,
+    body.dark-mode .parent-animal-meta-item {
+      background: #142d39;
+      box-shadow:
+        inset 4px 4px 9px rgba(0,0,0,.16),
+        inset -4px -4px 9px rgba(52,77,88,.08);
+    }
+
+    body.dark-mode .parent-dashboard-section-head h3,
+    body.dark-mode .parent-animal-name,
+    body.dark-mode .parent-animal-meta-item strong,
+    body.dark-mode .parent-dashboard-empty strong,
+    body.dark-mode .parent-dashboard-error strong {
+      color: #e5f1f5;
+    }
+
+    body.dark-mode .parent-dashboard-stat strong {
+      color: #dcebef;
+    }
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 850px) {
+      .parent-dashboard-page {
+        width: 100%;
+        margin: 0;
+      }
+
+      .parent-dashboard-card {
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .parent-dashboard-header {
+        padding: 22px 20px 25px;
+      }
+
+      .parent-dashboard-top {
+        flex-direction: column;
+      }
+
+      .parent-dashboard-actions {
+        width: 100%;
+      }
+
+      .parent-dashboard-home,
+      .parent-dashboard-logout {
+        flex: 1;
+      }
+
+      .parent-dashboard-content {
+        padding: 22px 20px 28px;
+      }
+
+      .parent-dashboard-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .parent-dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .parent-animal-card {
+        grid-template-columns: 120px minmax(0,1fr);
+        gap: 13px;
+      }
+
+      .parent-animal-image {
+        width: 120px;
+        height: 150px;
+      }
+
+      .parent-dashboard-footer {
+        padding: 0 20px 25px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .parent-dashboard-brand h1 {
+        font-size: 21px;
+      }
+
+      .parent-dashboard-hero h2 {
+        font-size: 34px;
+      }
+
+      .parent-animal-card {
+        grid-template-columns: 1fr;
+      }
+
+      .parent-animal-image {
+        width: 100%;
+        height: 220px;
+      }
+
+      .parent-animal-meta {
+        margin-top: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="parent-dashboard-page">
+    <div class="parent-dashboard-card">
+
+      <!-- HEADER -->
+      <header class="parent-dashboard-header">
+
+        <div class="parent-dashboard-top">
+
+          <div class="parent-dashboard-brand">
+
+            <div class="parent-dashboard-logo">
+              🐾
+            </div>
+
+            <div>
+              <h1>
+                ANIMAL DIGITAL ID
+              </h1>
+
+              <p>
+                Pet Parent Portal
+              </p>
+            </div>
+
+          </div>
+
+          <div class="parent-dashboard-actions">
+
+            <a
+              href="./"
+              class="parent-dashboard-home"
+            >
+              ← Registry
+            </a>
+
+            <button
+              id="logoutButton"
+              type="button"
+              class="parent-dashboard-logout"
+            >
+              Logout
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="parent-dashboard-hero">
+
+          <div class="parent-dashboard-eyebrow">
+            PET PARENT DASHBOARD
+          </div>
+
+          <h2>
+            Welcome,
+            <span id="parentName">
+              Pet Parent
+            </span>
+          </h2>
+
+          <p>
+            View the animals registered to your account and
+            open their individual Animal Digital ID profiles.
+          </p>
+
+        </div>
+
+      </header>
+
+      <!-- CONTENT -->
+      <main class="parent-dashboard-content">
+
+        <section class="parent-dashboard-summary">
+
+          <div class="parent-dashboard-stat">
+            <span>My Animals</span>
+            <strong id="animalCount">0</strong>
+          </div>
+
+          <div class="parent-dashboard-stat">
+            <span>Active Records</span>
+            <strong id="activeCount">0</strong>
+          </div>
+
+          <div class="parent-dashboard-stat">
+            <span>Lost Animals</span>
+            <strong id="lostCount">0</strong>
+          </div>
+
+        </section>
+
+
+        <section>
+
+          <div class="parent-dashboard-section-head">
+
+            <div>
+              <h3>
+                My Animals
+              </h3>
+
+              <p>
+                Animal records linked to your pet parent account.
+              </p>
+            </div>
+
+            <div
+              id="parentAccountName"
+              class="parent-dashboard-owner-name"
+            >
+              Loading...
+            </div>
+
+          </div>
+
+
+          <div
+            id="dashboardMessage"
+            class="parent-dashboard-empty"
+          >
+            <div class="icon">
+              🐾
+            </div>
+
+            <strong>
+              Loading your animals...
+            </strong>
+
+            <p>
+              Please wait while we securely load your registered records.
+            </p>
+          </div>
+
+
+          <div
+            id="animalGrid"
+            class="parent-dashboard-grid"
+            style="display:none"
+          ></div>
+
+        </section>
+
+      </main>
+
+
+      <footer class="parent-dashboard-footer">
+
+        <strong>
+          ANIMAL DIGITAL ID
+        </strong>
+
+        • Private pet parent portal •
+        Your dashboard displays only records associated
+        with your account.
+
+      </footer>
+
+    </div>
+  </div>
+
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+
+    /* =========================================================
+       SUPABASE CONFIG
+       ========================================================= */
+
+    const SUPABASE_URL =
+      "https://qnlatfajpbyefxyyehna.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_w9-d4xchiCpeOnKRas_u2Q_wrFVPOwf";
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+
+    /* =========================================================
+       ELEMENTS
+       ========================================================= */
+
+    const parentName =
+      document.getElementById(
+        "parentName"
+      );
+
+    const parentAccountName =
+      document.getElementById(
+        "parentAccountName"
+      );
+
+    const animalCount =
+      document.getElementById(
+        "animalCount"
+      );
+
+    const activeCount =
+      document.getElementById(
+        "activeCount"
+      );
+
+    const lostCount =
+      document.getElementById(
+        "lostCount"
+      );
+
+    const animalGrid =
+      document.getElementById(
+        "animalGrid"
+      );
+
+    const dashboardMessage =
+      document.getElementById(
+        "dashboardMessage"
+      );
+
+    const logoutButton =
+      document.getElementById(
+        "logoutButton"
+      );
+
+
+    /* =========================================================
+       HTML ESCAPE
+       ========================================================= */
+
+    function esc(value) {
+
+      return String(
+        value ?? ""
+      ).replace(
+        /[&<>"']/g,
+        character =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+          }[character])
+      );
+
+    }
+
+
+    /* =========================================================
+       SHOW MESSAGE
+       ========================================================= */
+
+    function showMessage(
+      icon,
+      title,
+      message,
+      isError = false
+    ) {
+
+      dashboardMessage.style.display =
+        "block";
+
+      dashboardMessage.className =
+        isError
+          ? "parent-dashboard-error"
+          : "parent-dashboard-empty";
+
+      dashboardMessage.innerHTML = `
+
+        <div class="icon">
+          ${icon}
+        </div>
+
+        <strong>
+          ${esc(title)}
+        </strong>
+
+        <p>
+          ${esc(message)}
+        </p>
+
+      `;
+
+      animalGrid.style.display =
+        "none";
+
+    }
+
+
+    /* =========================================================
+       RENDER ANIMALS
+       ========================================================= */
+
+    function renderAnimals(
+      animals
+    ) {
+
+      if (!animals.length) {
+
+        showMessage(
+          "🐾",
+          "No animals registered",
+          "There are currently no animal records linked to your pet parent account."
+        );
+
+        animalCount.textContent =
+          "0";
+
+        activeCount.textContent =
+          "0";
+
+        lostCount.textContent =
+          "0";
+
+        return;
+
+      }
+
+
+      const active =
+        animals.filter(
+          animal =>
+            String(
+              animal.status || ""
+            )
+              .toLowerCase()
+              .includes("active")
+        ).length;
+
+
+      const lost =
+        animals.filter(
+          animal =>
+            animal.is_lost === true
+        ).length;
+
+
+      animalCount.textContent =
+        animals.length;
+
+      activeCount.textContent =
+        active;
+
+      lostCount.textContent =
+        lost;
+
+
+      animalGrid.innerHTML =
+        animals
+          .map(
+            animal => {
+
+              const photo =
+                animal.photo_url
+                  ? `
+                    <img
+                      src="${esc(animal.photo_url)}"
+                      alt="${esc(animal.name)}"
+                    >
+                  `
+                  : `
+                    <div class="parent-animal-placeholder">
+                      🐾
+                    </div>
+                  `;
+
+
+              const location =
+                [
+                  animal.location_city,
+                  animal.location_state
+                ]
+                  .filter(Boolean)
+                  .join(", ") ||
+                "Not Added";
+
+
+              return `
+
+                <article
+                  class="parent-animal-card"
+                >
+
+                  <div
+                    class="parent-animal-image"
+                  >
+                    ${photo}
+                  </div>
+
+
+                  <div>
+
+                    <div
+                      class="parent-animal-top"
+                    >
+
+                      <div>
+
+                        <div
+                          class="parent-animal-name"
+                        >
+                          ${esc(animal.name)}
+                        </div>
+
+                        <div
+                          class="parent-animal-id"
+                        >
+                          ${esc(animal.animal_id)}
+                        </div>
+
+                      </div>
+
+
+                      <span
+                        class="parent-animal-status"
+                      >
+                        ✓ ${esc(
+                          animal.status ||
+                          "ACTIVE RECORD"
+                        )}
+                      </span>
+
+                    </div>
+
+
+                    <div
+                      class="parent-animal-meta"
+                    >
+
+                      <div
+                        class="parent-animal-meta-item"
+                      >
+                        <span>
+                          Type
+                        </span>
+
+                        <strong>
+                          ${esc(
+                            animal.type ||
+                            "Not Added"
+                          )}
+                        </strong>
+                      </div>
+
+
+                      <div
+                        class="parent-animal-meta-item"
+                      >
+                        <span>
+                          Breed
+                        </span>
+
+                        <strong>
+                          ${esc(
+                            animal.breed ||
+                            "Not Added"
+                          )}
+                        </strong>
+                      </div>
+
+
+                      <div
+                        class="parent-animal-meta-item"
+                      >
+                        <span>
+                          Gender
+                        </span>
+
+                        <strong>
+                          ${esc(
+                            animal.gender ||
+                            "Not Added"
+                          )}
+                        </strong>
+                      </div>
+
+
+                      <div
+                        class="parent-animal-meta-item"
+                      >
+                        <span>
+                          Location
+                        </span>
+
+                        <strong>
+                          ${esc(location)}
+                        </strong>
+                      </div>
+
+                    </div>
+
+
+                    <a
+                      class="parent-animal-view"
+                      href="./profile.html?id=${encodeURIComponent(
+                        animal.id
+                      )}"
+                    >
+
+                      <span>
+                        View Digital Profile
+                      </span>
+
+                      <span>
+                        →
+                      </span>
+
+                    </a>
+
+                  </div>
+
+                </article>
+
+              `;
+
+            }
+          )
+          .join("");
+
+
+      dashboardMessage.style.display =
+        "none";
+
+      animalGrid.style.display =
+        "grid";
+
+    }
+
+
+    /* =========================================================
+       LOAD DASHBOARD
+       ========================================================= */
+
+    async function loadDashboard() {
+
+      try {
+
+        const {
+          data: {
+            session
+          },
+          error: sessionError
+        } =
+          await supabaseClient.auth.getSession();
+
+
+        if (sessionError) {
+
+          console.error(
+            "Session error:",
+            sessionError
+          );
+
+          window.location.href =
+            "./";
+
+          return;
+
+        }
+
+
+        if (
+          !session ||
+          !session.user
+        ) {
+
+          window.location.href =
+            "./";
+
+          return;
+
+        }
+
+
+        const userId =
+          session.user.id;
+
+
+        /* =====================================================
+           LOAD CURRENT PET PARENT
+           ===================================================== */
+
+        const {
+          data: owner,
+          error: ownerError
+        } =
+          await supabaseClient
+            .from("owners")
+            .select(
+              "id,name,auth_user_id"
+            )
+            .eq(
+              "auth_user_id",
+              userId
+            )
+            .maybeSingle();
+
+
+        if (ownerError) {
+
+          console.error(
+            "Pet parent lookup failed:",
+            ownerError
+          );
+
+          throw new Error(
+            "Unable to load your pet parent account."
+          );
+
+        }
+
+
+        if (!owner) {
+
+          await supabaseClient.auth.signOut();
+
+          throw new Error(
+            "Your account is not linked to a pet parent record."
+          );
+
+        }
+
+
+        const displayName =
+          owner.name ||
+          "Pet Parent";
+
+
+        parentName.textContent =
+          displayName;
+
+        parentAccountName.textContent =
+          displayName;
+
+
+        /* =====================================================
+           LOAD ONLY THIS PET PARENT'S ANIMALS
+           ===================================================== */
+
+        const {
+          data: animals,
+          error: animalError
+        } =
+          await supabaseClient
+            .from("animals")
+            .select(`
+              id,
+              animal_id,
+              name,
+              type,
+              breed,
+              gender,
+              photo_url,
+              location_city,
+              location_state,
+              status,
+              is_lost
+            `)
+            .eq(
+              "owner_id",
+              owner.id
+            )
+            .order(
+              "name",
+              {
+                ascending: true
+              }
+            );
+
+
+        if (animalError) {
+
+          console.error(
+            "Animal dashboard lookup failed:",
+            animalError
+          );
+
+          throw new Error(
+            "Unable to load your animal records."
+          );
+
+        }
+
+
+        renderAnimals(
+          animals || []
+        );
+
+      }
+
+
+      catch (error) {
+
+        console.error(
+          "Pet Parent dashboard error:",
+          error
+        );
+
+        showMessage(
+          "⚠️",
+          "Unable to load dashboard",
+          error.message ||
+            "Please try again later.",
+          true
+        );
+
+      }
+
+    }
+
+
+    /* =========================================================
+       LOGOUT
+       ========================================================= */
+
+    logoutButton.addEventListener(
+      "click",
+      async function () {
+
+        logoutButton.disabled =
+          true;
+
+        logoutButton.textContent =
+          "Signing Out...";
+
+
+        const {
+          error
+        } =
+          await supabaseClient.auth.signOut();
+
+
+        if (error) {
+
+          console.error(
+            "Logout failed:",
+            error
+          );
+
+          logoutButton.disabled =
+            false;
+
+          logoutButton.textContent =
+            "Logout";
+
+          return;
+
+        }
+
+
+        window.location.href =
+          "./";
+
+      }
+    );
+
+
+    /* =========================================================
+       START
+       ========================================================= */
+
+    loadDashboard();
+
+  </script>
+
+</body>
+</html>
