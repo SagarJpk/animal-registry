@@ -12044,3 +12044,150 @@ body.dark-mode .profile-v2-card .profile-header-nav .profile-v2-dashboard {
   }
 
 }
+
+/* ============================================================
+   FINAL HOMEPAGE HERO BALANCE
+   Desktop symmetry adjustment
+   ============================================================ */
+
+@media (min-width: 1001px) {
+
+  .home-hero {
+    grid-template-columns:
+      minmax(0, 53%)
+      minmax(0, 47%) !important;
+
+    gap: 24px !important;
+
+    min-height: 500px;
+
+    padding:
+      48px 42px 42px !important;
+  }
+
+
+  /* -----------------------------
+     LEFT CONTENT
+     ----------------------------- */
+
+  .hero-copy {
+    min-width: 0;
+
+    max-width: 550px !important;
+
+    padding-left: 0 !important;
+
+    align-self: center;
+  }
+
+
+  .hero-title {
+    max-width: 550px !important;
+
+    font-size:
+      clamp(48px, 4.2vw, 60px) !important;
+
+    line-height:
+      0.98 !important;
+
+    letter-spacing:
+      -2.2px !important;
+
+    white-space: normal !important;
+  }
+
+
+  .hero-description {
+    max-width: 490px !important;
+
+    margin-top: 20px !important;
+  }
+
+
+  .hero-actions {
+    margin-top: 24px !important;
+  }
+
+
+  .hero-features {
+    margin-top: 20px !important;
+  }
+
+
+  /* -----------------------------
+     RIGHT VISUAL
+     ----------------------------- */
+
+  .hero-visual {
+    min-width: 0;
+
+    min-height: 410px;
+
+    margin-left: 0 !important;
+
+    margin-right: 0 !important;
+
+    align-self: center;
+  }
+
+
+  .hero-image-main {
+    width: 72% !important;
+
+    height: 350px !important;
+
+    right: 4% !important;
+
+    top: 26px !important;
+
+    transform:
+      rotate(1deg) !important;
+  }
+
+
+  .hero-image-small {
+    width: 35% !important;
+
+    height: 175px !important;
+
+    left: 1% !important;
+
+    bottom: 2px !important;
+
+    transform:
+      rotate(-2deg) !important;
+  }
+
+
+  .hero-image-badge {
+    left: 48% !important;
+
+    bottom: 68px !important;
+  }
+
+
+  .hero-handwritten {
+    right: 1% !important;
+
+    top: 0 !important;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+   Keep the existing tablet design intact
+   ============================================================ */
+
+@media (min-width: 801px) and (max-width: 1000px) {
+
+  .home-hero {
+    grid-template-columns:
+      minmax(0, 55%)
+      minmax(0, 45%) !important;
+
+    gap: 18px !important;
+  }
+
+}
