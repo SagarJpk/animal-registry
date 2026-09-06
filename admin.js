@@ -360,10 +360,10 @@ async function getAdminProfile(
   } =
     await supabaseClient
       .from(
-        "admin_users"
+        "profiles"
       )
       .select(
-        "id,email,full_name,role,is_active"
+        "id,email,full_name,phone,role"
       )
       .eq(
         "id",
@@ -379,7 +379,6 @@ async function getAdminProfile(
       error
     );
 
-
     throw new Error(
       "Unable to verify administrator permissions."
     );
@@ -394,17 +393,8 @@ async function getAdminProfile(
   }
 
 
-  if (!data.is_active) {
-
-    throw new Error(
-      "Your administrator account is inactive."
-    );
-  }
-
-
   if (
-    data.role !== "ADMIN" &&
-    data.role !== "SUPER_ADMIN"
+    data.role !== "admin"
   ) {
 
     throw new Error(
@@ -415,7 +405,6 @@ async function getAdminProfile(
 
   return data;
 }
-
 
 /* ============================================================
    LOGIN
