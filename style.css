@@ -1340,25 +1340,6 @@ a {
 }
 
 
-.label {
-
-  display: block;
-
-  margin-bottom: 7px;
-
-  color: var(--muted);
-
-  font-size: 8px;
-
-  font-weight: 750;
-
-  letter-spacing: 0.7px;
-
-  text-transform: uppercase;
-
-}
-
-
 .value {
 
   color: var(--ink);
@@ -3022,230 +3003,6 @@ textarea:focus-visible {
    MOBILE
    ========================================================= */
 
-@media (max-width: 800px) {
-
-  .page {
-
-    width: 100%;
-
-    margin: 0;
-
-    padding: 0;
-
-  }
-
-
-  .card {
-
-    border-radius: 0;
-
-    box-shadow: none;
-
-  }
-
-
-  .header {
-
-    padding: 22px 20px 24px;
-
-  }
-
-
-  .header h1 {
-
-    font-size: 21px;
-
-  }
-
-
-  .content {
-
-    padding: 23px 20px 30px;
-
-  }
-
-
-  .profile {
-
-    grid-template-columns: 1fr;
-
-    gap: 25px;
-
-  }
-
-
-  .photo-wrap {
-
-    width: min(100%, 520px);
-
-    margin: 0 auto;
-
-  }
-
-
-  .grid {
-
-    grid-template-columns: 1fr;
-
-  }
-
-
-  .pet {
-
-    grid-template-columns: 125px minmax(0,1fr);
-
-  }
-
-
-  .pet-img {
-
-    width: 125px;
-
-    height: 155px;
-
-  }
-
-
-  .owner-grid {
-
-    grid-template-columns: 1fr;
-
-  }
-
-
-  .location-box,
-  .verification {
-
-    align-items: flex-start;
-
-    flex-direction: column;
-
-  }
-
-
-  .button {
-
-    width: 100%;
-
-  }
-
-
-  .vaccination-summary-info {
-
-    grid-template-columns: 1fr;
-
-  }
-
-
-  .behaviour-summary-main {
-
-    align-items: flex-start;
-
-    flex-direction: column;
-
-  }
-
-
-  .details-button {
-
-    width: 100%;
-
-  }
-
-
-  .detail-modal,
-  .change-request {
-
-    align-items: flex-start;
-
-    padding: 12px;
-
-  }
-
-
-  .detail-modal-card,
-  .change-request-card {
-
-    max-height:
-      calc(100vh - 24px);
-
-    border-radius: 20px;
-
-  }
-
-
-  .detail-modal-header,
-  .change-request-header {
-
-    padding: 17px;
-
-  }
-
-
-  .detail-modal-body {
-
-    padding: 17px;
-
-  }
-
-
-  .form-row {
-
-    grid-template-columns: 1fr;
-
-  }
-
-
-  .request-actions {
-
-    flex-direction: column-reverse;
-
-    align-items: stretch;
-
-  }
-
-
-  .cancel-request,
-  .submit-change {
-
-    width: 100%;
-
-  }
-
-
-  .vaccination-modal,
-  .vaccination-modal-card {
-
-    width: 100%;
-
-  }
-
-
-  .vaccination-table-wrap {
-
-    max-height: 58vh;
-
-  }
-
-
-		.nav {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: flex-start;
-			gap: 6px;
-			width: 100%;
-			margin-left: 0;
-			}
-			
-		.owner-login-nav-button {
-			display: inline-flex !important;
-			min-height: 34px;
-			padding: 7px 10px;
-			font-size: 9px;
-			}
-
-}
-
 
 /* =========================================================
    SMALL MOBILE
@@ -3834,11 +3591,15 @@ textarea:focus-visible {
 }
 
 .label {
-  font-size: 9px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: .5px;
+
+  display: block;
   margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 9px;
+
+  font-weight: 750;
+  letter-spacing: .5px;
+  text-transform: uppercase;
 }
 
 .weight-value {
@@ -3886,22 +3647,6 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
-@media (max-width: 600px) {
-
-  .weight-latest {
-    align-items: flex-start;
-  }
-
-  .weight-date {
-    text-align: right;
-  }
-
-  .weight-row {
-    align-items: flex-start;
-  }
-
-}
-
 /* ============================================================
    BUJJI HOMEPAGE REDESIGN
    ------------------------------------------------------------
@@ -3919,57 +3664,6 @@ textarea:focus-visible {
 /* ============================================================
    HOMEPAGE HERO
    ============================================================ */
-
-.home-hero {
-
-  position: relative;
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(400px, 1fr);
-
-  align-items: center;
-
-  gap: 34px;
-
-  min-height: 500px;
-
-  padding: 52px 42px 45px;
-
-  overflow: hidden;
-
-  border-radius: 28px;
-
-  background:
-
-    radial-gradient(
-      circle at 78% 45%,
-      rgba(34,197,126,.18),
-      transparent 30%
-    ),
-
-    radial-gradient(
-      circle at 95% 0%,
-      rgba(36,88,120,.18),
-      transparent 35%
-    ),
-
-    linear-gradient(
-      135deg,
-      #f4faf8 0%,
-      #eaf4f2 50%,
-      #eef5f4 100%
-    );
-
-  box-shadow:
-    10px 14px 30px rgba(18,43,61,.10),
-    -8px -8px 22px rgba(255,255,255,.85);
-
-  isolation: isolate;
-
-}
 
 
 .home-hero::before {
@@ -4021,20 +3715,6 @@ textarea:focus-visible {
    HERO COPY
    ============================================================ */
 
-.hero-copy {
-
-  position: relative;
-
-  z-index: 3;
-
-  align-self: center;
-
-  max-width: 560px;
-
-  padding-left: 4px;
-
-}
-
 
 .hero-eyebrow {
 
@@ -4049,27 +3729,6 @@ textarea:focus-visible {
   letter-spacing: 3px;
 
   text-transform: uppercase;
-
-}
-
-
-.hero-title {
-
-  margin: 0;
-
-  color: #0b2941;
-
-  font-size: clamp(
-    42px,
-    5vw,
-    68px
-  );
-
-  line-height: .98;
-
-  font-weight: 900;
-
-  letter-spacing: -2.5px;
 
 }
 
@@ -4108,21 +3767,6 @@ textarea:focus-visible {
 
   transform:
     rotate(-2deg);
-
-}
-
-
-.hero-description {
-
-  max-width: 530px;
-
-  margin: 25px 0 0;
-
-  color: #536b7b;
-
-  font-size: 15px;
-
-  line-height: 1.7;
 
 }
 
@@ -4281,16 +3925,6 @@ textarea:focus-visible {
    HERO VISUAL
    ============================================================ */
 
-.hero-visual {
-
-  position: relative;
-
-  min-height: 405px;
-
-  align-self: center;
-
-}
-
 
 .hero-glow {
 
@@ -4337,39 +3971,6 @@ textarea:focus-visible {
 }
 
 
-.hero-image-main {
-
-  position: absolute;
-
-  width: 68%;
-
-  height: 345px;
-
-  right: 6%;
-
-  top: 28px;
-
-  overflow: hidden;
-
-  border-radius: 30px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #dcebe8,
-      #cbdedc
-    );
-
-  box-shadow:
-    14px 18px 34px
-    rgba(21,53,69,.17);
-
-  transform:
-    rotate(2deg);
-
-}
-
-
 .hero-image-main::after {
 
   content: "";
@@ -4385,41 +3986,6 @@ textarea:focus-visible {
     rgba(255,255,255,.35);
 
   pointer-events: none;
-
-}
-
-
-.hero-image-small {
-
-  position: absolute;
-
-  width: 35%;
-
-  height: 185px;
-
-  left: 0;
-
-  bottom: 5px;
-
-  overflow: hidden;
-
-  border-radius: 25px;
-
-  background:
-    #d9e7e5;
-
-  border:
-    8px solid
-    rgba(255,255,255,.75);
-
-  box-shadow:
-    10px 15px 27px
-    rgba(18,47,64,.14);
-
-  transform:
-    rotate(-2deg);
-
-  z-index: 4;
 
 }
 
@@ -6051,459 +5617,11 @@ body .footer {
    TABLET
    ============================================================ */
 
-@media (max-width: 800px) {
-
-
-  .home-hero {
-
-    grid-template-columns:
-      1fr;
-
-    gap: 12px;
-
-    min-height: auto;
-
-    padding:
-      38px 25px 30px;
-
-  }
-
-
-  .hero-copy {
-
-    max-width: none;
-
-  }
-
-
-  .hero-title {
-
-    font-size:
-      clamp(
-        40px,
-        8vw,
-        57px
-      );
-
-  }
-
-
-  .hero-visual {
-
-    min-height: 355px;
-
-    margin-top: 5px;
-
-  }
-
-
-  .hero-image-main {
-
-    width: 61%;
-
-    height: 295px;
-
-    right: 10%;
-
-  }
-
-
-  .hero-image-small {
-
-    width: 36%;
-
-    height: 165px;
-
-    left: 3%;
-
-    bottom: 8px;
-
-  }
-
-
-  .hero-handwritten {
-
-    right: 3%;
-
-    top: 3px;
-
-  }
-
-
-  .feature-section {
-
-    gap: 12px;
-
-  }
-
-
-  .stats-section {
-
-    grid-template-columns:
-      1fr 1fr;
-
-    gap: 20px;
-
-  }
-
-
-  .stats-section
-  .stat-divider {
-
-    display: none;
-
-  }
-
-
-  .mission-section {
-
-    padding:
-      30px 25px;
-
-  }
-
-
-  .registry-section .grid {
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-
-  body .footer {
-
-    flex-wrap: wrap;
-
-  }
-
-
-  .footer-note {
-
-    text-align: left;
-
-  }
-
-}
-
 
 
 /* ============================================================
    MOBILE
    ============================================================ */
-
-@media (max-width: 600px) {
-
-
-  .home-hero {
-
-    padding:
-      31px 19px 22px;
-
-    border-radius:
-      20px;
-
-  }
-
-
-  .hero-eyebrow {
-
-    font-size: 9px;
-
-    letter-spacing: 2.2px;
-
-  }
-
-
-  .hero-title {
-
-    font-size: 39px;
-
-    letter-spacing: -1.6px;
-
-  }
-
-
-  .hero-description {
-
-    margin-top: 20px;
-
-    font-size: 12px;
-
-    line-height: 1.6;
-
-  }
-
-
-  .hero-actions {
-
-    flex-direction: column;
-
-  }
-
-
-  .hero-button {
-
-    width: 100%;
-
-  }
-
-
-  .hero-trust {
-
-    gap: 11px;
-
-    justify-content: space-between;
-
-  }
-
-
-  .hero-trust-item {
-
-    font-size: 8px;
-
-  }
-
-
-  .hero-visual {
-
-    min-height: 300px;
-
-  }
-
-
-  .hero-image-main {
-
-    width: 69%;
-
-    height: 250px;
-
-    right: 4%;
-
-    top: 30px;
-
-  }
-
-
-  .hero-image-small {
-
-    width: 38%;
-
-    height: 135px;
-
-    left: 1%;
-
-    bottom: 2px;
-
-  }
-
-
-  .hero-image-badge {
-
-    left: 4%;
-
-    bottom: 20px;
-
-    padding: 8px 10px;
-
-  }
-
-
-  .hero-handwritten {
-
-    right: 0;
-
-    top: 0;
-
-    font-size: 15px;
-
-  }
-
-
-  .hero-handwritten span {
-
-    margin-left: 40px;
-
-  }
-
-
-  .feature-section {
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-
-  .feature-card {
-
-    min-height: 100px;
-
-  }
-
-
-  .stats-section {
-
-    grid-template-columns:
-      1fr 1fr;
-
-    padding:
-      20px 10px;
-
-  }
-
-
-  .stat-item strong {
-
-    font-size: 23px;
-
-  }
-
-
-  .stat-item span {
-
-    font-size: 8px;
-
-  }
-
-
-  .mission-section {
-
-    padding:
-      27px 20px;
-
-  }
-
-
-  .mission-copy h2 {
-
-    font-size: 26px;
-
-  }
-
-
-  .mission-values {
-
-    grid-template-columns:
-      repeat(2,1fr);
-
-    gap: 20px 10px;
-
-  }
-
-
-  .mission-value-icon {
-
-    width: 55px;
-
-    height: 55px;
-
-  }
-
-
-  .registry-section-head {
-
-    display: block;
-
-  }
-
-
-  .registry-live-count {
-
-    display: inline-block;
-
-    margin-top: 10px;
-
-  }
-
-
-  .registry-section-head h2 {
-
-    font-size: 27px;
-
-  }
-
-
-  .registry-section .pet {
-
-    grid-template-columns:
-      110px minmax(0,1fr);
-
-    gap: 12px;
-
-    padding: 11px;
-
-  }
-
-
-  .registry-section .pet-img {
-
-    width: 110px;
-
-    height: 155px;
-
-    border-radius: 14px;
-
-  }
-
-
-  .registry-section .pet-name {
-
-    font-size: 17px;
-
-  }
-
-
-  .registry-section .pet-meta {
-
-    gap: 6px;
-
-    margin-top: 12px;
-
-  }
-
-
-  .registry-section .meta {
-
-    padding:
-      8px;
-
-  }
-
-
-  .registry-section .meta span {
-
-    font-size: 6px;
-
-  }
-
-
-  .registry-section .meta strong {
-
-    font-size: 8px;
-
-  }
-
-
-  body .footer {
-
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    padding:
-      22px;
-
-  }
-
-
-  .footer-links {
-
-    gap: 12px;
-
-  }
-
-}
 
 
 
@@ -6604,6 +5722,37 @@ body .footer {
    Mobile/tablet styles remain unchanged.
    Header is intentionally NOT modified.
    ============================================================ */
+/* ============================================================
+   BUJJI HERO - FINAL DESKTOP POLISH
+   ------------------------------------------------------------
+   Desktop only.
+   Mobile design remains unchanged.
+   Header remains completely untouched.
+   ============================================================ */
+/* ============================================================
+   HERO TITLE DESKTOP FINAL ADJUSTMENT
+   ============================================================ */
+/* ============================================================
+   HERO FIX FOR LAPTOP / SMALL DESKTOP
+   801px - 1000px
+   ------------------------------------------------------------
+   Keeps mobile design unchanged.
+   Header remains untouched.
+   ============================================================ */
+
+
+/* ============================================================
+   ANIMAL DIGITAL ID
+   FINAL HERO + LIGHT / DARK MODE
+   ------------------------------------------------------------
+   Added as the final override layer.
+   Existing header styling is intentionally untouched.
+   ============================================================ */
+
+
+/* ============================================================
+   HERO: LARGE DESKTOP
+   ============================================================ */
 
 @media (min-width: 1001px) {
 
@@ -6620,267 +5769,10 @@ body .footer {
      HERO
      ========================================================== */
 
-  .home-hero {
-
-    min-height: 525px;
-
-    grid-template-columns:
-      minmax(0, 1fr)
-      minmax(500px, .95fr);
-
-    gap: 10px;
-
-    padding:
-      55px 52px 48px;
-
-    border-radius:
-      28px;
-
-  }
-
-
-  .hero-copy {
-
-    max-width:
-      610px;
-
-    padding-left:
-      5px;
-
-  }
-
-
-  .hero-eyebrow {
-
-    margin-bottom:
-      15px;
-
-    font-size:
-      12px;
-
-    letter-spacing:
-      3.5px;
-
-  }
-
-
-  .hero-title {
-
-    font-size:
-      clamp(54px, 5vw, 76px);
-
-    line-height:
-      .96;
-
-    letter-spacing:
-      -3px;
-
-  }
-
-
-  .hero-title span::after {
-
-    height:
-      6px;
-
-    bottom:
-      -11px;
-
-    right:
-      -18px;
-
-  }
-
-
-  .hero-description {
-
-    max-width:
-      550px;
-
-    margin-top:
-      29px;
-
-    font-size:
-      15px;
-
-    line-height:
-      1.7;
-
-  }
-
-
-  .hero-actions {
-
-    gap:
-      14px;
-
-    margin-top:
-      31px;
-
-  }
-
-
-  .hero-button {
-
-    min-height:
-      54px;
-
-    padding:
-      0 23px;
-
-    border-radius:
-      16px;
-
-    font-size:
-      12px;
-
-  }
-
-
-  .hero-trust {
-
-    gap:
-      28px;
-
-    margin-top:
-      29px;
-
-  }
-
-
-  .hero-trust-item {
-
-    font-size:
-      10px;
-
-  }
-
 
   /* ==========================================================
      HERO ANIMAL AREA
      ========================================================== */
-
-  .hero-visual {
-
-    min-height:
-      430px;
-
-    margin-right:
-      -5px;
-
-  }
-
-
-  .hero-image-main {
-
-    width:
-      69%;
-
-    height:
-      375px;
-
-    right:
-      7%;
-
-    top:
-      27px;
-
-    border-radius:
-      32px;
-
-    transform:
-      rotate(2deg);
-
-  }
-
-
-  .hero-image-small {
-
-    width:
-      38%;
-
-    height:
-      205px;
-
-    left:
-      0;
-
-    bottom:
-      0;
-
-    border-radius:
-      27px;
-
-    border-width:
-      9px;
-
-  }
-
-
-  .hero-image-badge {
-
-    left:
-      7%;
-
-    bottom:
-      39px;
-
-    padding:
-      11px 15px;
-
-    border-radius:
-      16px;
-
-  }
-
-
-  .hero-image-badge > span {
-
-    width:
-      29px;
-
-    height:
-      29px;
-
-  }
-
-
-  .hero-image-badge strong {
-
-    font-size:
-      10px;
-
-  }
-
-
-  .hero-image-badge small {
-
-    font-size:
-      8px;
-
-  }
-
-
-  .hero-handwritten {
-
-    right:
-      -3px;
-
-    top:
-      2px;
-
-    font-size:
-      24px;
-
-  }
-
-
-  .hero-handwritten span {
-
-    font-size:
-      29px;
-
-  }
 
 
   /* ==========================================================
@@ -7507,52 +6399,14 @@ body .footer {
 
   }
 
-}
-/* ============================================================
-   BUJJI HERO - FINAL DESKTOP POLISH
-   ------------------------------------------------------------
-   Desktop only.
-   Mobile design remains unchanged.
-   Header remains completely untouched.
-   ============================================================ */
-
-@media (min-width: 1001px) {
-
   /* ----------------------------------------------------------
      HERO CONTAINER
      ---------------------------------------------------------- */
-
-  .home-hero {
-
-    grid-template-columns:
-      minmax(0, 1.02fr)
-      minmax(470px, .98fr);
-
-    min-height:
-      500px;
-
-    padding:
-      48px 42px 42px;
-
-    gap:
-      5px;
-
-  }
 
 
   /* ----------------------------------------------------------
      HERO TEXT
      ---------------------------------------------------------- */
-
-  .hero-copy {
-
-    max-width:
-      575px;
-
-    padding-left:
-      4px;
-
-  }
 
 
   .hero-eyebrow {
@@ -7569,65 +6423,24 @@ body .footer {
   }
 
 
-  .hero-title {
-
-    max-width:
-      560px;
-
-    font-size:
-      clamp(52px, 5vw, 70px);
-
-    line-height:
-      .98;
-
-    letter-spacing:
-      -2.6px;
-
-  }
-
-
   /*
      Keep "Give Every Animal" together more naturally.
   */
 
-  .hero-title span {
-
-    margin-top:
-      2px;
-
-  }
-
 
   .hero-title span::after {
-
-    left:
-      1px;
-
-    right:
-      -14px;
-
-    bottom:
-      -8px;
 
     height:
       5px;
 
-  }
+    bottom:
+      -8px;
 
+    right:
+      -14px;
 
-  .hero-description {
-
-    max-width:
-      500px;
-
-    margin-top:
-      25px;
-
-    font-size:
-      13px;
-
-    line-height:
-      1.65;
+    left:
+      1px;
 
   }
 
@@ -7638,11 +6451,11 @@ body .footer {
 
   .hero-actions {
 
-    margin-top:
-      25px;
-
     gap:
       11px;
+
+    margin-top:
+      25px;
 
   }
 
@@ -7678,11 +6491,11 @@ body .footer {
 
   .hero-trust {
 
-    margin-top:
-      23px;
-
     gap:
       21px;
+
+    margin-top:
+      23px;
 
   }
 
@@ -7707,42 +6520,10 @@ body .footer {
      HERO VISUAL
      ---------------------------------------------------------- */
 
-  .hero-visual {
-
-    min-height:
-      410px;
-
-    margin-right:
-      3px;
-
-  }
-
 
   /* ----------------------------------------------------------
      MAIN BUJJI PHOTO
      ---------------------------------------------------------- */
-
-  .hero-image-main {
-
-    width:
-      67%;
-
-    height:
-      355px;
-
-    right:
-      8%;
-
-    top:
-      27px;
-
-    border-radius:
-      29px;
-
-    transform:
-      rotate(1.5deg);
-
-  }
 
 
   .hero-image-main img {
@@ -7757,51 +6538,10 @@ body .footer {
      SECONDARY PHOTO
      ---------------------------------------------------------- */
 
-  .hero-image-small {
-
-    width:
-      35%;
-
-    height:
-      178px;
-
-    left:
-      1%;
-
-    bottom:
-      3px;
-
-    border-width:
-      8px;
-
-    border-radius:
-      23px;
-
-    transform:
-      rotate(-4deg);
-
-  }
-
 
   /* ----------------------------------------------------------
      DIGITAL ID BADGE
      ---------------------------------------------------------- */
-
-  .hero-image-badge {
-
-    left:
-      8%;
-
-    bottom:
-      34px;
-
-    padding:
-      9px 13px;
-
-    border-radius:
-      14px;
-
-  }
 
 
   .hero-image-badge > span {
@@ -7838,22 +6578,6 @@ body .footer {
      SMALL TAG / BIG IMPACT
      ---------------------------------------------------------- */
 
-  .hero-handwritten {
-
-    right:
-      0;
-
-    top:
-      0;
-
-    font-size:
-      21px;
-
-    line-height:
-      1.12;
-
-  }
-
 
   .hero-handwritten strong {
 
@@ -7865,14 +6589,14 @@ body .footer {
 
   .hero-handwritten span {
 
+    font-size:
+      26px;
+
     margin-left:
       54px;
 
     margin-top:
       5px;
-
-    font-size:
-      26px;
 
   }
 
@@ -7894,354 +6618,121 @@ body .footer {
 
   }
 
-}
-/* ============================================================
-   HERO TITLE DESKTOP FINAL ADJUSTMENT
-   ============================================================ */
-
-@media (min-width: 1001px) {
-
   .home-hero {
-    grid-template-columns:
-      minmax(0, 1.12fr)
-      minmax(440px, .88fr);
-  }
-
-  .hero-copy {
-    max-width: 640px;
-  }
-
-  .hero-title {
-    max-width: 620px;
-    font-size: clamp(50px, 4.7vw, 68px);
-    letter-spacing: -2.5px;
-  }
-
-  .hero-visual {
-    margin-left: -10px;
-  }
-
-  .hero-image-main {
-    width: 70%;
-    right: 5%;
-  }
-
-  .hero-handwritten {
-    right: -4px;
-    top: 2px;
-  }
-
-}
-/* ============================================================
-   HERO FIX FOR LAPTOP / SMALL DESKTOP
-   801px - 1000px
-   ------------------------------------------------------------
-   Keeps mobile design unchanged.
-   Header remains untouched.
-   ============================================================ */
-
-@media (min-width: 801px) and (max-width: 1000px) {
-
-  .home-hero {
-
-    grid-template-columns:
-      minmax(0, 1.05fr)
-      minmax(350px, .95fr);
-
-    gap: 8px;
-
-    min-height: 470px;
-
-    padding:
-      42px 30px 35px;
-
-  }
-
-
-  .hero-copy {
-
-    max-width:
-      520px;
-
-  }
-
-
-  .hero-title {
-
-    max-width:
-      none;
-
-    font-size:
-      51px;
-
-    line-height:
-      .98;
-
-    letter-spacing:
-      -2px;
-
-    white-space:
-      nowrap;
-
-  }
-
-
-  .hero-title span {
-
-    display:
-      block;
-
-    white-space:
-      nowrap;
-
-  }
-
-
-  .hero-description {
-
-    max-width:
-      455px;
-
-    font-size:
-      12px;
-
-    line-height:
-      1.6;
-
-  }
-
-
-  .hero-actions {
-
-    margin-top:
-      23px;
-
-  }
-
-
-  .hero-button {
-
-    min-height:
-      48px;
-
-    padding:
-      0 17px;
-
-    font-size:
-      10px;
-
-  }
-
-
-  .hero-trust {
-
-    gap:
-      15px;
-
-    margin-top:
-      20px;
-
-  }
-
-
-  .hero-trust-item {
-
-    font-size:
-      8px;
-
-  }
-
-
-  /* ==========================================================
-     HERO IMAGE
-     ========================================================== */
-
-  .hero-visual {
-
-    min-height:
-      370px;
-
-    margin-right:
-      0;
-
-  }
-
-
-  .hero-image-main {
-
-    width:
-      70%;
-
-    height:
-      315px;
-
-    right:
-      4%;
-
-    top:
-      25px;
-
-    border-radius:
-      27px;
-
-  }
-
-
-  .hero-image-small {
-
-    width:
-      35%;
-
-    height:
-      155px;
-
-    left:
-      0;
-
-    bottom:
-      5px;
-
-    border-width:
-      7px;
-
-    border-radius:
-      21px;
-
-  }
-
-
-  .hero-image-badge {
-
-    left:
-      5%;
-
-    bottom:
-      29px;
-
-    padding:
-      8px 11px;
-
-  }
-
-
-  .hero-handwritten {
-
-    right:
-      0;
-
-    top:
-      0;
-
-    font-size:
-      18px;
-
-  }
-
-
-  .hero-handwritten strong {
-
-    font-size:
-      19px;
-
-  }
-
-
-  .hero-handwritten span {
-
-    margin-left:
-      45px;
-
-    font-size:
-      23px;
-
-  }
-
-}
-
-
-/* ============================================================
-   ANIMAL DIGITAL ID
-   FINAL HERO + LIGHT / DARK MODE
-   ------------------------------------------------------------
-   Added as the final override layer.
-   Existing header styling is intentionally untouched.
-   ============================================================ */
-
-
-/* ============================================================
-   HERO: LARGE DESKTOP
-   ============================================================ */
-
-@media (min-width: 1001px) {
-
-  .home-hero {
-    grid-template-columns:
-      minmax(0, 58%)
-      minmax(0, 42%);
-
-    gap: 0;
 
     min-height: 500px;
+    grid-template-columns:
+      minmax(0, 62%) minmax(0, 38%);
+
+    gap: 12px;
 
     padding:
       48px 42px 42px;
+
+    border-radius:
+      28px;
   }
 
   .hero-copy {
-    min-width: 0;
     max-width: 100%;
-    padding-left: 4px;
+    padding-left: 0;
+    min-width: 0;
   }
 
   .hero-title {
-    max-width: none;
 
     font-size:
-      clamp(50px, 5vw, 62px);
+      clamp(52px, 4.35vw, 58px);
 
     line-height: .98;
 
     letter-spacing:
-      -2.4px;
+      -2.1px;
+    max-width: 100%;
 
     white-space: nowrap;
   }
 
   .hero-title span {
+
+    margin-top:
+      2px;
     white-space: nowrap;
   }
 
   .hero-description {
-    max-width: 520px;
+    max-width: 500px;
+
+    margin-top:
+      25px;
+
+    font-size:
+      13px;
+
+    line-height:
+      1.65;
   }
 
   .hero-visual {
-    min-width: 0;
-    margin-left: -8px;
+
+    min-height:
+      410px;
     margin-right: 0;
+    margin-left: 0;
+    min-width: 0;
   }
 
   .hero-image-main {
-    width: 73%;
+    width: 77%;
+    height: 345px;
     right: 2%;
-    height: 350px;
-    top: 24px;
+    top: 25px;
+
+    border-radius:
+      29px;
+
+    transform:
+      rotate(1deg);
   }
 
   .hero-image-small {
-    width: 34%;
+    width: 36%;
     height: 170px;
     left: 0;
     bottom: 4px;
+
+    border-radius:
+      23px;
+
+    border-width:
+      8px;
+
+    transform:
+      rotate(-2deg);
   }
 
   .hero-image-badge {
-    left: 8%;
+    left: 40%;
+
+    bottom:
+      34px;
+
+    padding:
+      9px 13px;
+
+    border-radius:
+      14px;
   }
 
   .hero-handwritten {
     right: 0;
     top: 0;
+
+    font-size:
+      21px;
+
+    line-height:
+      1.12;
   }
 
 }
@@ -8251,82 +6742,6 @@ body .footer {
    HERO: LAPTOP / SMALL DESKTOP
    801px - 1000px
    ============================================================ */
-
-@media (min-width: 801px) and (max-width: 1000px) {
-
-  .home-hero {
-    grid-template-columns:
-      minmax(0, 57%)
-      minmax(0, 43%);
-
-    gap: 0;
-
-    min-height: 470px;
-
-    padding:
-      42px 30px 35px;
-  }
-
-  .hero-copy {
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .hero-title {
-    max-width: none;
-
-    font-size: 49px;
-
-    line-height: .98;
-
-    letter-spacing: -2px;
-
-    white-space: nowrap;
-  }
-
-  .hero-title span {
-    white-space: nowrap;
-  }
-
-  .hero-description {
-    max-width: 455px;
-  }
-
-  .hero-visual {
-    min-width: 0;
-    margin-left: -5px;
-    margin-right: 0;
-  }
-
-  .hero-image-main {
-    width: 72%;
-    height: 310px;
-    right: 2%;
-    top: 24px;
-  }
-
-  .hero-image-small {
-    width: 36%;
-    height: 150px;
-    left: 0;
-    bottom: 4px;
-  }
-
-  .hero-handwritten {
-    right: -2px;
-    top: 0;
-    font-size: 18px;
-  }
-
-  .hero-handwritten strong {
-    font-size: 19px;
-  }
-
-  .hero-handwritten span {
-    font-size: 22px;
-  }
-
-}
 
 
 /* ============================================================
@@ -8887,42 +7302,10 @@ body.dark-mode .theme-toggle {
    MOBILE THEME TOGGLE
    ============================================================ */
 
-@media (max-width: 800px) {
-
-  .theme-toggle {
-
-    right:
-      14px;
-
-    bottom:
-      14px;
-
-    min-width:
-      82px;
-
-    height:
-      40px;
-
-    padding:
-      0 12px;
-
-  }
-
-}
-
 
 /* ============================================================
    ACCESSIBILITY
    ============================================================ */
-
-@media (prefers-reduced-motion: reduce) {
-
-  .theme-toggle {
-    transition:
-      none;
-  }
-
-}
 
 
 
@@ -9423,24 +7806,6 @@ body.dark-mode .theme-toggle {
   letter-spacing: -.5px;
 }
 
-.profile-v2-section-icon {
-  width: 44px;
-  height: 44px;
-
-  flex: 0 0 auto;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 14px;
-
-  background: #e9f5f2;
-
-  font-size: 20px;
-}
-
 .profile-v2-detail-grid {
   display: grid;
 
@@ -9506,54 +7871,6 @@ body.dark-mode .theme-toggle {
   margin-bottom: 13px;
 }
 
-.profile-v2-outline-button {
-  min-height: 35px;
-
-  padding: 0 12px;
-
-  border: 1px solid #cbdde4;
-
-  border-radius: 10px;
-
-  color: #22516d;
-
-  background: #f7fbfc;
-
-  font-family: inherit;
-
-  font-size: 9px;
-
-  font-weight: 800;
-
-  cursor: pointer;
-}
-
-.profile-v2-traits {
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 7px;
-}
-
-.profile-v2-trait {
-  display: inline-flex;
-
-  align-items: center;
-
-  padding: 8px 11px;
-
-  border-radius: 999px;
-
-  color: #245b4b;
-
-  background: #dff3ea;
-
-  font-size: 9px;
-
-  font-weight: 800;
-}
-
 .profile-v2-muted {
   color: #899ba6;
 
@@ -9603,30 +7920,6 @@ body.dark-mode .theme-toggle {
   font-size: 10px;
 
   line-height: 1.35;
-}
-
-.profile-v2-full-button {
-  width: 100%;
-
-  margin-top: 13px;
-
-  min-height: 39px;
-
-  border: 0;
-
-  border-radius: 11px;
-
-  color: #147c58;
-
-  background: #e2f5ec;
-
-  font-family: inherit;
-
-  font-size: 9px;
-
-  font-weight: 900;
-
-  cursor: pointer;
 }
 
 .profile-v2-weight-highlight {
@@ -9935,65 +8228,6 @@ body.dark-mode .theme-toggle {
   max-width: 720px;
 }
 
-.profile-v2-modal-weight-list {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 8px;
-}
-
-.profile-v2-modal-weight {
-  display: flex;
-
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 15px;
-
-  padding: 13px 15px;
-
-  border-radius: 12px;
-
-  background: #edf5f7;
-}
-
-.profile-v2-modal-weight strong {
-  display: block;
-
-  color: #143e58;
-
-  font-size: 12px;
-}
-
-.profile-v2-modal-weight small {
-  display: block;
-
-  margin-top: 4px;
-
-  color: #8196a3;
-
-  font-size: 8px;
-}
-
-.profile-v2-modal-weight > span {
-  color: #607c8d;
-
-  font-size: 9px;
-
-  font-weight: 800;
-}
-
-.profile-v2-modal-empty {
-  padding: 25px;
-
-  color: #8297a4;
-
-  text-align: center;
-
-  font-size: 10px;
-}
-
 
 /* ============================================================
    DARK MODE
@@ -10088,10 +8322,6 @@ body.dark-mode .profile-v2-overview-item + .profile-v2-overview-item {
   border-left-color: rgba(255,255,255,.09);
 }
 
-body.dark-mode .profile-v2-section-icon {
-  background: #17323d;
-}
-
 body.dark-mode .profile-v2-behaviour-main,
 body.dark-mode .profile-v2-traits-area,
 body.dark-mode .profile-v2-health-stat-grid > div,
@@ -10106,17 +8336,6 @@ body.dark-mode .profile-v2-behaviour-main strong {
   color: #58d7a8;
 }
 
-body.dark-mode .profile-v2-trait {
-  color: #8be5bf;
-  background: rgba(35,195,139,.13);
-}
-
-body.dark-mode .profile-v2-outline-button {
-  color: #bdd4df;
-  background: #132a36;
-  border-color: rgba(255,255,255,.10);
-}
-
 body.dark-mode .profile-v2-muted,
 body.dark-mode .profile-v2-health-stat-grid span,
 body.dark-mode .profile-v2-weight-highlight span,
@@ -10127,11 +8346,6 @@ body.dark-mode .profile-v2-contact-grid span {
 body.dark-mode .profile-v2-location-card span,
 body.dark-mode .profile-v2-modal-weight small {
   color: #829aa7;
-}
-
-body.dark-mode .profile-v2-full-button {
-  color: #76dfb2;
-  background: rgba(35,195,139,.12);
 }
 
 body.dark-mode .profile-v2-empty-health {
@@ -10147,10 +8361,6 @@ body.dark-mode .profile-v2-location-button.disabled {
 body.dark-mode .profile-v2-footer-note,
 body.dark-mode .profile-v2-footer div:first-child span {
   color: #8199a6;
-}
-
-body.dark-mode .profile-v2-modal-weight strong {
-  color: #e2eef3;
 }
 
 body.dark-mode .profile-v2-modal-weight > span {
@@ -10191,99 +8401,6 @@ body.dark-mode .profile-v2-modal-weight > span {
 
 }
 
-@media (max-width: 650px) {
-
-  .profile-v2-topbar {
-    align-items: stretch;
-
-    flex-direction: column;
-  }
-
-  .profile-v2-back,
-  .profile-v2-change {
-    width: 100%;
-  }
-
-  .profile-v2-hero {
-    padding: 16px;
-
-    border-radius: 21px;
-  }
-
-  .profile-v2-hero-info h2 {
-    font-size: 43px;
-  }
-
-  .profile-v2-overview {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .profile-v2-overview-item:nth-child(3) {
-    border-left: 0;
-    border-top: 1px solid #dce6eb;
-  }
-
-  .profile-v2-overview-item:nth-child(4) {
-    border-top: 1px solid #dce6eb;
-  }
-
-  .profile-v2-detail-grid {
-    grid-template-columns:
-      1fr;
-  }
-
-  .profile-v2-behaviour-card {
-    grid-template-columns:
-      1fr;
-  }
-
-  .profile-v2-health-stat-grid {
-    grid-template-columns:
-      1fr;
-  }
-
-  .profile-v2-contact-grid {
-    grid-template-columns:
-      1fr;
-  }
-
-  .profile-v2-location-card {
-    align-items: stretch;
-
-    flex-direction: column;
-  }
-
-  .profile-v2-location-button {
-    justify-content: center;
-  }
-
-  .profile-v2-verification {
-    grid-template-columns:
-      1fr;
-  }
-
-  .profile-v2-qr-wrap {
-    width: 160px;
-    margin: 0 auto;
-  }
-
-  .profile-v2-footer {
-    align-items: flex-start;
-
-    flex-direction: column;
-  }
-
-  .profile-v2-footer-note {
-    text-align: left;
-  }
-
-  .profile-v2-photo-frame {
-    aspect-ratio: 1 / .95;
-  }
-
-}
-
 @media (max-width: 420px) {
 
   .profile-v2-section {
@@ -10304,82 +8421,6 @@ body.dark-mode .profile-v2-modal-weight > span {
    FINAL CLEAN VERSION
    ============================================================ */
 
-.profile-v2-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 24px;
-
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-  background: rgba(7, 25, 35, 0.72);
-
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  transition:
-    opacity 0.22s ease,
-    visibility 0.22s ease;
-}
-
-.profile-v2-modal.show {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.profile-v2-modal-backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-
-  background: transparent;
-
-  cursor: pointer;
-}
-
-.profile-v2-modal-dialog {
-  position: relative;
-  z-index: 2;
-
-  width: min(760px, 100%);
-  max-height: min(86vh, 850px);
-
-  overflow-y: auto;
-
-  padding: 30px;
-
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 26px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #f8fcfc 0%,
-      #edf5f7 100%
-    );
-
-  box-shadow:
-    18px 22px 50px rgba(5, 25, 35, 0.30),
-    -8px -8px 24px rgba(255, 255, 255, 0.75);
-
-  transform: translateY(18px) scale(0.97);
-
-  transition:
-    transform 0.22s ease;
-}
-
-.profile-v2-modal.show .profile-v2-modal-dialog {
-  transform: translateY(0) scale(1);
-}
-
 .profile-v2-modal-dialog::-webkit-scrollbar {
   width: 8px;
 }
@@ -10395,55 +8436,6 @@ body.dark-mode .profile-v2-modal-weight > span {
 
 .profile-v2-modal-content {
   width: 100%;
-}
-
-.profile-v2-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 5;
-
-  width: 38px;
-  height: 38px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border: 0;
-  border-radius: 50%;
-
-  color: #36596b;
-  background: #edf5f7;
-
-  box-shadow:
-    5px 6px 13px rgba(27, 55, 72, 0.12),
-    -4px -4px 12px rgba(255, 255, 255, 0.90);
-
-  font-family: Arial, sans-serif;
-  font-size: 23px;
-  font-weight: 700;
-  line-height: 1;
-
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-
-  transition:
-    transform 0.20s ease,
-    box-shadow 0.20s ease,
-    background 0.20s ease;
-}
-
-.profile-v2-modal-close:hover {
-  transform: rotate(90deg);
-  background: #f5fafb;
-
-  box-shadow:
-    7px 8px 17px rgba(27, 55, 72, 0.18),
-    -4px -4px 12px rgba(255, 255, 255, 0.90);
 }
 
 .profile-v2-modal-kicker {
@@ -10553,8 +8545,6 @@ body.dark-mode .profile-v2-modal-weight > span {
 .profile-v2-trait {
   display: inline-flex;
   align-items: center;
-
-  min-height: 30px;
   padding: 0 12px;
 
   border-radius: 20px;
@@ -10564,25 +8554,8 @@ body.dark-mode .profile-v2-modal-weight > span {
 
   font-size: 9px;
   font-weight: 800;
-}
 
-.profile-v2-modal-table-wrap {
-  width: 100%;
-  overflow-x: auto;
-
-  border-radius: 15px;
-
-  background: #f7fbfc;
-
-  box-shadow:
-    inset 0 0 0 1px rgba(45, 82, 100, 0.05);
-}
-
-.profile-v2-modal-table {
-  width: 100%;
-  min-width: 540px;
-
-  border-collapse: collapse;
+  min-height: 30px;
 }
 
 .profile-v2-modal-table th {
@@ -10707,48 +8680,12 @@ body.dark-mode .profile-v2-modal-weight > span {
   gap: 16px;
 }
 
-.profile-v2-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.profile-v2-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
 .profile-v2-form-group label {
   color: #5f7a89;
 
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.4px;
-}
-
-.profile-v2-form-group input,
-.profile-v2-form-group select,
-.profile-v2-form-group textarea {
-  width: 100%;
-  box-sizing: border-box;
-
-  border: 1px solid rgba(64, 103, 120, 0.12);
-  border-radius: 12px;
-
-  padding: 11px 13px;
-
-  color: #234d62;
-  background: #f8fcfc;
-
-  outline: none;
-
-  font-family: inherit;
-  font-size: 10px;
-
-  transition:
-    border-color 0.20s ease,
-    box-shadow 0.20s ease;
 }
 
 .profile-v2-form-group input::placeholder,
@@ -10788,42 +8725,24 @@ body.dark-mode .profile-v2-modal-weight > span {
   margin-top: 4px;
 }
 
-.profile-v2-outline-button,
-.profile-v2-full-button,
-.profile-v2-submit-button {
-  display: inline-flex;
-
-  align-items: center;
-  justify-content: center;
-
-  min-height: 42px;
-
-  padding: 0 17px;
-
-  border-radius: 12px;
-
-  font-family: inherit;
-  font-size: 9px;
-  font-weight: 900;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  appearance: none;
-  -webkit-appearance: none;
-
-  transition:
-    transform 0.20s ease,
-    box-shadow 0.20s ease,
-    opacity 0.20s ease;
-}
-
 .profile-v2-outline-button {
+  min-height: 35px;
+
+  padding: 0 12px;
   border: 1px solid rgba(57, 91, 106, 0.12);
+
+  border-radius: 10px;
 
   color: #496a79;
   background: #edf5f7;
+
+  font-family: inherit;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  cursor: pointer;
 
   box-shadow:
     5px 6px 13px rgba(27, 55, 72, 0.10),
@@ -10834,11 +8753,23 @@ body.dark-mode .profile-v2-modal-weight > span {
   width: 100%;
   margin-top: 13px;
 
+  min-height: 39px;
+
   border: 0;
+
+  border-radius: 11px;
 
   color: #0e8060;
 
   background: #e2f5ec;
+
+  font-family: inherit;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  cursor: pointer;
 
   box-shadow:
     5px 6px 13px rgba(27, 55, 72, 0.08);
@@ -10914,34 +8845,6 @@ body.dark-mode .profile-v2-modal-weight > span {
 /* ============================================================
    MODAL DARK MODE
    ============================================================ */
-
-body.dark-mode .profile-v2-modal {
-  background: rgba(2, 14, 21, 0.78);
-}
-
-body.dark-mode .profile-v2-modal-dialog {
-  border-color: rgba(255, 255, 255, 0.07);
-
-  background:
-    linear-gradient(
-      145deg,
-      #122630 0%,
-      #0d2029 100%
-    );
-
-  box-shadow:
-    18px 22px 50px rgba(0, 0, 0, 0.55),
-    -6px -6px 20px rgba(48, 75, 87, 0.08);
-}
-
-body.dark-mode .profile-v2-modal-close {
-  color: #d6e7ed;
-  background: #18323d;
-
-  box-shadow:
-    5px 6px 13px rgba(0, 0, 0, 0.30),
-    -4px -4px 12px rgba(52, 77, 88, 0.10);
-}
 
 body.dark-mode .profile-v2-modal-close:hover {
   background: #20414d;
@@ -11027,14 +8930,6 @@ body.dark-mode .profile-v2-empty-row {
   color: #829aa7 !important;
 }
 
-body.dark-mode .profile-v2-form-group input,
-body.dark-mode .profile-v2-form-group select,
-body.dark-mode .profile-v2-form-group textarea {
-  color: #dcebf0;
-  background: #142c35;
-  border-color: rgba(156, 190, 201, 0.14);
-}
-
 body.dark-mode .profile-v2-form-group input::placeholder,
 body.dark-mode .profile-v2-form-group textarea::placeholder {
   color: #718994;
@@ -11070,55 +8965,6 @@ body.dark-mode .profile-v2-submit-button {
 /* ============================================================
    MODAL RESPONSIVE
    ============================================================ */
-
-@media (max-width: 700px) {
-
-  .profile-v2-modal {
-    padding: 12px;
-  }
-
-  .profile-v2-modal-dialog {
-    width: 100%;
-    max-height: 92vh;
-
-    padding: 22px 18px;
-
-    border-radius: 20px;
-  }
-
-  .profile-v2-modal-content h2 {
-    margin-right: 35px;
-    font-size: 21px;
-  }
-
-  .profile-v2-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-v2-form-actions {
-    flex-direction: column-reverse;
-    align-items: stretch;
-  }
-
-  .profile-v2-outline-button,
-  .profile-v2-submit-button {
-    width: 100% !important;
-  }
-
-  .profile-v2-full-button {
-    width: 100%;
-  }
-
-  .profile-v2-modal-table {
-    min-width: 500px;
-  }
-
-  .profile-v2-modal-weight {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-}
 
 /* ============================================================
    FINAL BUTTON NORMALIZATION
@@ -11184,12 +9030,6 @@ body.dark-mode .profile-v2-submit-button {
   transform: none !important;
 }
 
-@media (max-width: 700px) {
-  .profile-v2-change-form button[type="submit"].profile-v2-submit-button {
-    width: 100% !important;
-  }
-}
-
 /* ============================================================
    PROFILE V2 FINAL STABILITY / CROSS-BROWSER OVERRIDES
    ============================================================ */
@@ -11202,18 +9042,22 @@ body.dark-mode .profile-v2-submit-button {
    missing-glyph square.
 */
 .profile-v2-section-icon {
-  position: relative !important;
 
   width: 44px !important;
   height: 44px !important;
+
+  flex: 0 0 auto !important;
 
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 
-  flex: 0 0 auto !important;
+  border-radius: 14px;
+
+  background: #e9f5f2;
 
   font-size: 0 !important;
+  position: relative !important;
   line-height: 1 !important;
 
   overflow: hidden !important;
@@ -11292,9 +9136,6 @@ body.dark-mode .profile-v2-section-icon::after {
   align-items: center !important;
   justify-content: center !important;
 
-  width: 100vw !important;
-  height: 100vh !important;
-
   padding: 24px !important;
 
   opacity: 0 !important;
@@ -11309,6 +9150,9 @@ body.dark-mode .profile-v2-section-icon::after {
   transition:
     opacity 0.22s ease,
     visibility 0.22s ease !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
 }
 
 .profile-v2-modal.show {
@@ -11332,10 +9176,7 @@ body.dark-mode .profile-v2-section-icon::after {
   z-index: 2 !important;
 
   width: min(760px, calc(100vw - 48px)) !important;
-  max-width: 760px !important;
   max-height: min(86vh, 850px) !important;
-
-  overflow-x: hidden !important;
   overflow-y: auto !important;
 
   padding: 30px !important;
@@ -11357,6 +9198,9 @@ body.dark-mode .profile-v2-section-icon::after {
   transform: translateY(18px) scale(0.97) !important;
 
   transition: transform 0.22s ease !important;
+  max-width: 760px !important;
+
+  overflow-x: hidden !important;
 }
 
 .profile-v2-modal.show .profile-v2-modal-dialog {
@@ -11380,8 +9224,6 @@ body.dark-mode .profile-v2-section-icon::after {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-
-  margin: 0 !important;
   padding: 0 !important;
 
   border: 0 !important;
@@ -11389,6 +9231,10 @@ body.dark-mode .profile-v2-section-icon::after {
 
   color: #36596b !important;
   background: #edf5f7 !important;
+
+  box-shadow:
+    5px 6px 13px rgba(27, 55, 72, 0.12),
+    -4px -4px 12px rgba(255, 255, 255, 0.90) !important;
 
   font-family: Arial, sans-serif !important;
   font-size: 23px !important;
@@ -11400,13 +9246,21 @@ body.dark-mode .profile-v2-section-icon::after {
   appearance: none !important;
   -webkit-appearance: none !important;
 
-  box-shadow:
-    5px 6px 13px rgba(27, 55, 72, 0.12),
-    -4px -4px 12px rgba(255, 255, 255, 0.90) !important;
+  transition:
+    transform 0.20s ease,
+    box-shadow 0.20s ease,
+    background 0.20s ease;
+
+  margin: 0 !important;
 }
 
 .profile-v2-modal-close:hover {
   transform: rotate(90deg) !important;
+  background: #f5fafb;
+
+  box-shadow:
+    7px 8px 17px rgba(27, 55, 72, 0.18),
+    -4px -4px 12px rgba(255, 255, 255, 0.90);
 }
 
 
@@ -11427,25 +9281,40 @@ body.dark-mode .profile-v2-section-icon::after {
 }
 
 .profile-v2-form-group {
-  min-width: 0 !important;
 
   display: flex !important;
   flex-direction: column !important;
 
   gap: 7px !important;
+  min-width: 0 !important;
 }
 
 .profile-v2-form-group input,
 .profile-v2-form-group select,
 .profile-v2-form-group textarea {
-  display: block !important;
 
   width: 100% !important;
-  max-width: 100% !important;
 
   box-sizing: border-box !important;
 
+  border: 1px solid rgba(64, 103, 120, 0.12);
+  border-radius: 12px;
+
+  padding: 11px 13px;
+
+  color: #234d62;
+  background: #f8fcfc;
+
+  outline: none;
+
   font-family: inherit !important;
+  font-size: 10px;
+
+  transition:
+    border-color 0.20s ease,
+    box-shadow 0.20s ease;
+  display: block !important;
+  max-width: 100% !important;
 }
 
 
@@ -11454,17 +9323,33 @@ body.dark-mode .profile-v2-section-icon::after {
 .profile-v2-outline-button,
 .profile-v2-full-button,
 .profile-v2-submit-button {
-  box-sizing: border-box !important;
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  padding: 0 17px;
+
+  border-radius: 12px;
 
   font-family: inherit !important;
+  font-size: 9px;
   font-weight: 900 !important;
 
   line-height: 1 !important;
 
+  cursor: pointer !important;
+
   appearance: none !important;
   -webkit-appearance: none !important;
 
-  cursor: pointer !important;
+  transition:
+    transform 0.20s ease,
+    box-shadow 0.20s ease,
+    opacity 0.20s ease;
+  box-sizing: border-box !important;
 }
 
 
@@ -11545,11 +9430,19 @@ body.dark-mode .profile-v2-section-icon::after {
   width: 100% !important;
 
   overflow-x: auto !important;
+
+  border-radius: 15px;
+
+  background: #f7fbfc;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(45, 82, 100, 0.05);
   overflow-y: visible !important;
 }
 
 .profile-v2-modal-table {
   width: 100% !important;
+  min-width: 540px;
 
   border-collapse: collapse !important;
 }
@@ -11567,14 +9460,14 @@ body.dark-mode .profile-v2-modal {
 }
 
 body.dark-mode .profile-v2-modal-dialog {
+
+  border-color: rgba(255, 255, 255, 0.07) !important;
   background:
     linear-gradient(
       145deg,
       #122630 0%,
       #0d2029 100%
     ) !important;
-
-  border-color: rgba(255, 255, 255, 0.07) !important;
 
   box-shadow:
     18px 22px 50px rgba(0, 0, 0, 0.55),
@@ -11584,6 +9477,10 @@ body.dark-mode .profile-v2-modal-dialog {
 body.dark-mode .profile-v2-modal-close {
   color: #d6e7ed !important;
   background: #18323d !important;
+
+  box-shadow:
+    5px 6px 13px rgba(0, 0, 0, 0.30),
+    -4px -4px 12px rgba(52, 77, 88, 0.10);
 }
 
 body.dark-mode .profile-v2-form-group input,
@@ -11591,6 +9488,7 @@ body.dark-mode .profile-v2-form-group select,
 body.dark-mode .profile-v2-form-group textarea {
   color: #dcebf0 !important;
   background: #142c35 !important;
+  border-color: rgba(156, 190, 201, 0.14);
 }
 
 body.dark-mode .profile-v2-submit-button,
@@ -11610,22 +9508,44 @@ body.dark-mode .profile-v2-change-form button[type="submit"] {
 
 @media (max-width: 700px) {
 
+  .profile-v2-modal-content h2 {
+    margin-right: 35px;
+    font-size: 21px;
+  }
+
+  .profile-v2-outline-button,
+  .profile-v2-submit-button {
+    width: 100% !important;
+  }
+
+  .profile-v2-full-button {
+    width: 100%;
+  }
+
+  .profile-v2-modal-weight {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .profile-v2-change-form button[type="submit"].profile-v2-submit-button {
+    width: 100% !important;
+  }
+
   .profile-v2-modal {
-    width: 100vw !important;
-    height: 100vh !important;
 
     padding: 12px !important;
+    width: 100vw !important;
+    height: 100vh !important;
   }
 
   .profile-v2-modal-dialog {
     width: 100% !important;
-    max-width: 100% !important;
 
     max-height: 92vh !important;
 
     padding: 22px 18px !important;
 
     border-radius: 20px !important;
+    max-width: 100% !important;
   }
 
   .profile-v2-form-grid {
@@ -11653,6 +9573,11 @@ body.dark-mode .profile-v2-change-form button[type="submit"] {
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
+
+  .theme-toggle {
+    transition:
+      none;
+  }
 
   .profile-v2-modal,
   .profile-v2-modal-dialog,
@@ -11737,17 +9662,6 @@ body.dark-mode .profile-v2-dashboard {
 
   border-color:
     rgba(31,208,143,.22);
-
-}
-
-
-@media (max-width: 650px) {
-
-  .profile-v2-dashboard {
-
-    width: 100%;
-
-  }
 
 }
 /* ============================================================
@@ -12003,6 +9917,101 @@ body.dark-mode .profile-v2-card .profile-header-nav .profile-v2-dashboard {
 
 @media (max-width: 650px) {
 
+  .profile-v2-topbar {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .profile-v2-back,
+  .profile-v2-change {
+    width: 100%;
+  }
+
+  .profile-v2-hero {
+    padding: 16px;
+
+    border-radius: 21px;
+  }
+
+  .profile-v2-hero-info h2 {
+    font-size: 43px;
+  }
+
+  .profile-v2-overview {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .profile-v2-overview-item:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid #dce6eb;
+  }
+
+  .profile-v2-overview-item:nth-child(4) {
+    border-top: 1px solid #dce6eb;
+  }
+
+  .profile-v2-detail-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .profile-v2-behaviour-card {
+    grid-template-columns:
+      1fr;
+  }
+
+  .profile-v2-health-stat-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .profile-v2-contact-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .profile-v2-location-card {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .profile-v2-location-button {
+    justify-content: center;
+  }
+
+  .profile-v2-verification {
+    grid-template-columns:
+      1fr;
+  }
+
+  .profile-v2-qr-wrap {
+    width: 160px;
+    margin: 0 auto;
+  }
+
+  .profile-v2-footer {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .profile-v2-footer-note {
+    text-align: left;
+  }
+
+  .profile-v2-photo-frame {
+    aspect-ratio: 1 / .95;
+  }
+
+  .profile-v2-dashboard {
+
+    width: 100%;
+
+  }
+
   .profile-v2-card .profile-header-nav {
     display: grid !important;
 
@@ -12025,7 +10034,968 @@ body.dark-mode .profile-v2-card .profile-header-nav .profile-v2-dashboard {
    Keep Home + Pet Parent Login visible on phones
    ============================================================ */
 
+/* ============================================================
+   HOMEPAGE HERO - CANONICAL LAYOUT
+   ============================================================ */
+
+.home-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(400px, .95fr);
+  align-items: center;
+  gap: 26px;
+  min-height: 500px;
+  padding: 50px 42px 44px;
+  overflow: hidden;
+  border-radius: 28px;
+
+  background:
+
+    radial-gradient(
+      circle at 78% 45%,
+      rgba(34,197,126,.18),
+      transparent 30%
+    ),
+
+    radial-gradient(
+      circle at 95% 0%,
+      rgba(36,88,120,.18),
+      transparent 35%
+    ),
+
+    linear-gradient(
+      135deg,
+      #f4faf8 0%,
+      #eaf4f2 50%,
+      #eef5f4 100%
+    );
+
+  box-shadow:
+    10px 14px 30px rgba(18,43,61,.10),
+    -8px -8px 22px rgba(255,255,255,.85);
+  isolation: isolate;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 3;
+  align-self: center;
+  max-width: 100%;
+  padding-left: 0;
+  min-width: 0;
+}
+
+.hero-title {
+
+  margin: 0;
+
+  color: #0b2941;
+
+  font-size: clamp(
+    42px,
+    5vw,
+    68px
+  );
+  line-height: .98;
+
+  font-weight: 900;
+
+  letter-spacing: -2.5px;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.hero-description {
+  max-width: 500px;
+
+  margin: 25px 0 0;
+
+  color: #536b7b;
+
+  font-size: 15px;
+
+  line-height: 1.7;
+}
+
+.hero-visual {
+  position: relative;
+  min-height: 405px;
+  align-self: center;
+  min-width: 0;
+  margin: 0;
+}
+
+.hero-image-main {
+
+  position: absolute;
+  width: 72%;
+  height: 350px;
+  right: 3%;
+  top: 26px;
+
+  overflow: hidden;
+
+  border-radius: 30px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #dcebe8,
+      #cbdedc
+    );
+
+  box-shadow:
+    14px 18px 34px
+    rgba(21,53,69,.17);
+  transform: rotate(1deg);
+}
+
+.hero-image-small {
+
+  position: absolute;
+  width: 35%;
+  height: 175px;
+  left: 0;
+  bottom: 2px;
+
+  overflow: hidden;
+
+  border-radius: 25px;
+
+  background:
+    #d9e7e5;
+
+  border:
+    8px solid
+    rgba(255,255,255,.75);
+
+  box-shadow:
+    10px 15px 27px
+    rgba(18,47,64,.14);
+  transform: rotate(-2deg);
+
+  z-index: 4;
+}
+
+@media (min-width: 801px) and (max-width: 1000px) {
+
+
+  .hero-actions {
+
+    margin-top:
+      23px;
+
+  }
+
+
+  .hero-button {
+
+    min-height:
+      48px;
+
+    padding:
+      0 17px;
+
+    font-size:
+      10px;
+
+  }
+
+
+  .hero-trust {
+
+    gap:
+      15px;
+
+    margin-top:
+      20px;
+
+  }
+
+
+  .hero-trust-item {
+
+    font-size:
+      8px;
+
+  }
+
+
+  /* ==========================================================
+     HERO IMAGE
+     ========================================================== */
+
+
+  .hero-image-badge {
+
+    left:
+      5%;
+
+    bottom:
+      29px;
+
+    padding:
+      8px 11px;
+
+  }
+
+  .hero-copy {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .hero-title span {
+
+    display:
+      block;
+    white-space: nowrap;
+  }
+
+  .hero-handwritten {
+    right: -2px;
+    top: 0;
+    font-size: 18px;
+  }
+
+  .hero-handwritten strong {
+    font-size: 19px;
+  }
+
+  .hero-handwritten span {
+
+    margin-left:
+      45px;
+    font-size: 22px;
+  }
+  .home-hero {
+    grid-template-columns: minmax(0, 60%) minmax(0, 40%);
+    gap: 10px;
+    min-height: 470px;
+    padding: 42px 30px 35px;
+  }
+
+  .hero-visual {
+    min-height: 355px;
+    margin-right: 0;
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .hero-title {
+    max-width: 100%;
+    font-size: 47px;
+
+    line-height: .98;
+
+    letter-spacing: -2px;
+    white-space: nowrap;
+  }
+
+  .hero-description {
+    max-width: 440px;
+
+    font-size:
+      12px;
+
+    line-height:
+      1.6;
+  }
+
+  .hero-image-main {
+    width: 76%;
+    height: 305px;
+    right: 2%;
+    top: 24px;
+
+    border-radius:
+      27px;
+  }
+
+  .hero-image-small {
+    width: 36%;
+    height: 150px;
+    left: 0;
+    bottom: 4px;
+
+    border-width:
+      7px;
+
+    border-radius:
+      21px;
+  }
+}
+
+@media (max-width: 800px) {
+
+  .page {
+
+    width: 100%;
+
+    margin: 0;
+
+    padding: 0;
+
+  }
+
+
+  .card {
+
+    border-radius: 0;
+
+    box-shadow: none;
+
+  }
+
+
+  .header {
+
+    padding: 22px 20px 24px;
+
+  }
+
+
+  .header h1 {
+
+    font-size: 21px;
+
+  }
+
+
+  .content {
+
+    padding: 23px 20px 30px;
+
+  }
+
+
+  .profile {
+
+    grid-template-columns: 1fr;
+
+    gap: 25px;
+
+  }
+
+
+  .photo-wrap {
+
+    width: min(100%, 520px);
+
+    margin: 0 auto;
+
+  }
+
+
+  .grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .pet {
+
+    grid-template-columns: 125px minmax(0,1fr);
+
+  }
+
+
+  .pet-img {
+
+    width: 125px;
+
+    height: 155px;
+
+  }
+
+
+  .owner-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .location-box,
+  .verification {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+  }
+
+
+  .button {
+
+    width: 100%;
+
+  }
+
+
+  .vaccination-summary-info {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .behaviour-summary-main {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+  }
+
+
+  .details-button {
+
+    width: 100%;
+
+  }
+
+
+  .detail-modal,
+  .change-request {
+
+    align-items: flex-start;
+
+    padding: 12px;
+
+  }
+
+
+  .detail-modal-card,
+  .change-request-card {
+
+    max-height:
+      calc(100vh - 24px);
+
+    border-radius: 20px;
+
+  }
+
+
+  .detail-modal-header,
+  .change-request-header {
+
+    padding: 17px;
+
+  }
+
+
+  .detail-modal-body {
+
+    padding: 17px;
+
+  }
+
+
+  .form-row {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .request-actions {
+
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+
+  }
+
+
+  .cancel-request,
+  .submit-change {
+
+    width: 100%;
+
+  }
+
+
+  .vaccination-modal,
+  .vaccination-modal-card {
+
+    width: 100%;
+
+  }
+
+
+  .vaccination-table-wrap {
+
+    max-height: 58vh;
+
+  }
+
+
+		.nav {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: flex-start;
+			gap: 6px;
+			width: 100%;
+			margin-left: 0;
+			}
+			
+		.owner-login-nav-button {
+			display: inline-flex !important;
+			min-height: 34px;
+			padding: 7px 10px;
+			font-size: 9px;
+			}
+
+
+  .feature-section {
+
+    gap: 12px;
+
+  }
+
+
+  .stats-section {
+
+    grid-template-columns:
+      1fr 1fr;
+
+    gap: 20px;
+
+  }
+
+
+  .stats-section
+  .stat-divider {
+
+    display: none;
+
+  }
+
+
+  .mission-section {
+
+    padding:
+      30px 25px;
+
+  }
+
+
+  .registry-section .grid {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  body .footer {
+
+    flex-wrap: wrap;
+
+  }
+
+
+  .footer-note {
+
+    text-align: left;
+
+  }
+
+  .theme-toggle {
+
+    right:
+      14px;
+
+    bottom:
+      14px;
+
+    min-width:
+      82px;
+
+    height:
+      40px;
+
+    padding:
+      0 12px;
+
+  }
+  .home-hero {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    min-height: auto;
+    padding: 31px 19px 22px;
+  }
+
+  .hero-copy {
+    max-width: 100%;
+  }
+
+  .hero-title {
+    font-size: 39px;
+    white-space: normal;
+    text-align: left;
+  }
+
+  .hero-description {
+    max-width: 100%;
+    margin-top: 20px;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-button {
+    width: 100%;
+  }
+
+  .hero-trust {
+    gap: 11px;
+    justify-content: space-between;
+  }
+
+  .hero-visual {
+    min-height: 300px;
+
+    margin-top: 5px;
+
+    margin-left: 0;
+
+    margin-right: 0;
+  }
+
+  .hero-image-main {
+    width: 69%;
+    height: 250px;
+    right: 4%;
+    top: 30px;
+  }
+
+  .hero-image-small {
+    width: 38%;
+    height: 135px;
+    left: 1%;
+    bottom: 2px;
+  }
+
+  .hero-image-badge {
+    left: 4%;
+    bottom: 20px;
+    padding: 8px 10px;
+  }
+
+  .hero-handwritten {
+    right: 0;
+    top: 0;
+    font-size: 15px;
+  }
+}
+
 @media (max-width: 600px) {
+
+  .weight-latest {
+    align-items: flex-start;
+  }
+
+  .weight-date {
+    text-align: right;
+  }
+
+  .weight-row {
+    align-items: flex-start;
+  }
+
+
+  .hero-eyebrow {
+
+    font-size: 9px;
+
+    letter-spacing: 2.2px;
+
+  }
+
+
+  .hero-description {
+
+    margin-top: 20px;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+
+  }
+
+
+  .hero-actions {
+
+    flex-direction: column;
+
+  }
+
+
+  .hero-button {
+
+    width: 100%;
+
+  }
+
+
+  .hero-trust {
+
+    gap: 11px;
+
+    justify-content: space-between;
+
+  }
+
+
+  .hero-trust-item {
+
+    font-size: 8px;
+
+  }
+
+
+  .hero-visual {
+
+    min-height: 300px;
+
+  }
+
+
+  .hero-image-main {
+
+    width: 69%;
+
+    height: 250px;
+
+    right: 4%;
+
+    top: 30px;
+
+  }
+
+
+  .hero-image-small {
+
+    width: 38%;
+
+    height: 135px;
+
+    left: 1%;
+
+    bottom: 2px;
+
+  }
+
+
+  .hero-image-badge {
+
+    left: 4%;
+
+    bottom: 20px;
+
+    padding: 8px 10px;
+
+  }
+
+
+  .hero-handwritten {
+
+    right: 0;
+
+    top: 0;
+
+    font-size: 15px;
+
+  }
+
+
+  .hero-handwritten span {
+
+    margin-left: 40px;
+
+  }
+
+
+  .feature-section {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .feature-card {
+
+    min-height: 100px;
+
+  }
+
+
+  .stats-section {
+
+    grid-template-columns:
+      1fr 1fr;
+
+    padding:
+      20px 10px;
+
+  }
+
+
+  .stat-item strong {
+
+    font-size: 23px;
+
+  }
+
+
+  .stat-item span {
+
+    font-size: 8px;
+
+  }
+
+
+  .mission-section {
+
+    padding:
+      27px 20px;
+
+  }
+
+
+  .mission-copy h2 {
+
+    font-size: 26px;
+
+  }
+
+
+  .mission-values {
+
+    grid-template-columns:
+      repeat(2,1fr);
+
+    gap: 20px 10px;
+
+  }
+
+
+  .mission-value-icon {
+
+    width: 55px;
+
+    height: 55px;
+
+  }
+
+
+  .registry-section-head {
+
+    display: block;
+
+  }
+
+
+  .registry-live-count {
+
+    display: inline-block;
+
+    margin-top: 10px;
+
+  }
+
+
+  .registry-section-head h2 {
+
+    font-size: 27px;
+
+  }
+
+
+  .registry-section .pet {
+
+    grid-template-columns:
+      110px minmax(0,1fr);
+
+    gap: 12px;
+
+    padding: 11px;
+
+  }
+
+
+  .registry-section .pet-img {
+
+    width: 110px;
+
+    height: 155px;
+
+    border-radius: 14px;
+
+  }
+
+
+  .registry-section .pet-name {
+
+    font-size: 17px;
+
+  }
+
+
+  .registry-section .pet-meta {
+
+    gap: 6px;
+
+    margin-top: 12px;
+
+  }
+
+
+  .registry-section .meta {
+
+    padding:
+      8px;
+
+  }
+
+
+  .registry-section .meta span {
+
+    font-size: 6px;
+
+  }
+
+
+  .registry-section .meta strong {
+
+    font-size: 8px;
+
+  }
+
+
+  body .footer {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    padding:
+      22px;
+
+  }
+
+
+  .footer-links {
+
+    gap: 12px;
+
+  }
 
   .nav {
     display: flex;
@@ -12042,152 +11012,14 @@ body.dark-mode .profile-v2-card .profile-header-nav .profile-v2-dashboard {
     padding: 7px 10px;
     font-size: 9px;
   }
-
-}
-
-/* ============================================================
-   FINAL HOMEPAGE HERO BALANCE
-   Desktop symmetry adjustment
-   ============================================================ */
-
-@media (min-width: 1001px) {
-
   .home-hero {
-    grid-template-columns:
-      minmax(0, 53%)
-      minmax(0, 47%) !important;
-
-    gap: 24px !important;
-
-    min-height: 500px;
-
-    padding:
-      48px 42px 42px !important;
+    padding: 31px 19px 22px;
+    border-radius: 20px;
   }
-
-
-  /* -----------------------------
-     LEFT CONTENT
-     ----------------------------- */
-
-  .hero-copy {
-    min-width: 0;
-
-    max-width: 550px !important;
-
-    padding-left: 0 !important;
-
-    align-self: center;
-  }
-
 
   .hero-title {
-    max-width: 550px !important;
+    font-size: 39px;
 
-    font-size:
-      clamp(48px, 4.2vw, 60px) !important;
-
-    line-height:
-      0.98 !important;
-
-    letter-spacing:
-      -2.2px !important;
-
-    white-space: normal !important;
+    letter-spacing: -1.6px;
   }
-
-
-  .hero-description {
-    max-width: 490px !important;
-
-    margin-top: 20px !important;
-  }
-
-
-  .hero-actions {
-    margin-top: 24px !important;
-  }
-
-
-  .hero-features {
-    margin-top: 20px !important;
-  }
-
-
-  /* -----------------------------
-     RIGHT VISUAL
-     ----------------------------- */
-
-  .hero-visual {
-    min-width: 0;
-
-    min-height: 410px;
-
-    margin-left: 0 !important;
-
-    margin-right: 0 !important;
-
-    align-self: center;
-  }
-
-
-  .hero-image-main {
-    width: 72% !important;
-
-    height: 350px !important;
-
-    right: 4% !important;
-
-    top: 26px !important;
-
-    transform:
-      rotate(1deg) !important;
-  }
-
-
-  .hero-image-small {
-    width: 35% !important;
-
-    height: 175px !important;
-
-    left: 1% !important;
-
-    bottom: 2px !important;
-
-    transform:
-      rotate(-2deg) !important;
-  }
-
-
-  .hero-image-badge {
-    left: 48% !important;
-
-    bottom: 68px !important;
-  }
-
-
-  .hero-handwritten {
-    right: 1% !important;
-
-    top: 0 !important;
-  }
-
-}
-
-
-/* ============================================================
-   TABLET
-   Keep the existing tablet design intact
-   ============================================================ */
-
-@media (min-width: 801px) and (max-width: 1000px) {
-
-  .home-hero {
-    grid-template-columns:
-      minmax(0, 55%)
-      minmax(0, 45%) !important;
-
-    gap: 18px !important;
-  }
-
 }
