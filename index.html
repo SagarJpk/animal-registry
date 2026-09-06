@@ -19,13 +19,598 @@
 
 <link
   rel="stylesheet"
-  href="style.css"
+  href="style.css?v=20260906"
 >
 
 <!-- Supabase -->
 <script
   src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
 ></script>
+
+<style>
+
+/* ============================================================
+   Pet Parent LOGIN POPUP
+   ============================================================ */
+
+.owner-login-nav-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 36px;
+
+  padding: 8px 13px;
+
+  border: 1px solid rgba(255,255,255,.12);
+
+  border-radius: 11px;
+
+  color: #ffffff;
+
+  background:
+    rgba(255,255,255,.10);
+
+  font-family: inherit;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    transform .18s ease,
+    background .18s ease;
+}
+
+
+.owner-login-nav-button:hover {
+  transform: translateY(-1px);
+
+  background:
+    rgba(255,255,255,.17);
+}
+
+
+/* ============================================================
+   POPUP OVERLAY
+   ============================================================ */
+
+.owner-login-modal {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 999999;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(4,18,28,.70);
+
+  backdrop-filter:
+    blur(9px);
+
+  -webkit-backdrop-filter:
+    blur(9px);
+
+  opacity: 0;
+
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    opacity .20s ease,
+    visibility .20s ease;
+}
+
+
+.owner-login-modal.show {
+  opacity: 1;
+
+  visibility: visible;
+
+  pointer-events: auto;
+}
+
+
+/* ============================================================
+   POPUP CARD
+   ============================================================ */
+
+.owner-login-modal-card {
+  position: relative;
+
+  width: min(430px, 100%);
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  padding: 32px;
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f8fbfc,
+      #e8eef1
+    );
+
+  box-shadow:
+    18px 22px 50px rgba(0,0,0,.30),
+    -8px -8px 22px rgba(255,255,255,.75);
+
+  transform:
+    translateY(18px)
+    scale(.97);
+
+  transition:
+    transform .20s ease;
+}
+
+
+.owner-login-modal.show
+.owner-login-modal-card {
+  transform:
+    translateY(0)
+    scale(1);
+}
+
+
+/* ============================================================
+   CLOSE BUTTON
+   ============================================================ */
+
+.owner-login-modal-close {
+  position: absolute;
+
+  top: 13px;
+  right: 13px;
+
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+
+  place-items: center;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  color: #587281;
+
+  background: #edf3f5;
+
+  box-shadow:
+    5px 6px 13px rgba(27,55,72,.12),
+    -4px -4px 12px rgba(255,255,255,.90);
+
+  font-size: 22px;
+
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   BRAND
+   ============================================================ */
+
+.owner-login-modal-brand {
+  text-align: center;
+
+  margin-bottom: 23px;
+}
+
+
+.owner-login-modal-logo {
+  width: 68px;
+  height: 68px;
+
+  display: grid;
+
+  place-items: center;
+
+  margin: 0 auto 13px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #173d5d,
+      #285f85
+    );
+
+  font-size: 36px;
+
+  box-shadow:
+    7px 8px 17px rgba(50,75,90,.25);
+}
+
+
+.owner-login-modal-brand h2 {
+  margin: 0;
+
+  color: #173b5b;
+
+  font-size: 22px;
+
+  font-weight: 900;
+}
+
+
+.owner-login-modal-brand p {
+  margin: 7px 0 0;
+
+  color: #778896;
+
+  font-size: 9px;
+}
+
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.owner-login-modal-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+
+.owner-login-modal-field {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+
+.owner-login-modal-field label {
+  color: #647d8b;
+
+  font-size: 8px;
+
+  font-weight: 900;
+
+  letter-spacing: .7px;
+
+  text-transform: uppercase;
+}
+
+
+.owner-login-modal-field input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  min-height: 44px;
+
+  padding: 11px 13px;
+
+  border: 1px solid rgba(70,100,115,.10);
+
+  border-radius: 12px;
+
+  outline: none;
+
+  color: #24495d;
+
+  background: #e8eef1;
+
+  font-family: inherit;
+
+  font-size: 10px;
+
+  box-shadow:
+    inset 5px 5px 10px rgba(145,158,169,.24),
+    inset -5px -5px 10px rgba(255,255,255,.88);
+}
+
+
+.owner-login-modal-field input:focus {
+  border-color:
+    rgba(14,128,96,.30);
+
+  box-shadow:
+    inset 4px 4px 8px rgba(145,158,169,.22),
+    inset -4px -4px 8px rgba(255,255,255,.88),
+    0 0 0 2px rgba(14,128,96,.08);
+}
+
+
+.owner-login-modal-password {
+  position: relative;
+}
+
+
+.owner-login-modal-password input {
+  padding-right: 48px;
+}
+
+
+.owner-login-password-toggle {
+  position: absolute;
+
+  top: 50%;
+  right: 8px;
+
+  width: 34px;
+  height: 34px;
+
+  transform: translateY(-50%);
+
+  display: grid;
+
+  place-items: center;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #6b8491;
+
+  cursor: pointer;
+}
+
+
+.owner-login-modal-submit {
+  width: 100%;
+
+  min-height: 44px;
+
+  margin-top: 3px;
+
+  border: 0;
+
+  border-radius: 13px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0e8060,
+      #14c984
+    );
+
+  font-family: inherit;
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  box-shadow:
+    7px 8px 17px rgba(15,130,95,.22);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    opacity .18s ease;
+}
+
+
+.owner-login-modal-submit:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    9px 11px 22px rgba(15,130,95,.28);
+}
+
+
+.owner-login-modal-submit:disabled {
+  opacity: .60;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* ============================================================
+   FORGOT PASSWORD
+   ============================================================ */
+
+.owner-login-modal-forgot {
+  display: block;
+
+  width: max-content;
+
+  margin: 0 auto;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #3d7298;
+
+  font-family: inherit;
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.owner-login-modal-forgot:hover {
+  text-decoration: underline;
+}
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+.owner-login-modal-status {
+  min-height: 18px;
+
+  margin-top: 1px;
+
+  color: #718996;
+
+  font-size: 9px;
+
+  line-height: 1.5;
+
+  text-align: center;
+}
+
+
+.owner-login-modal-status.error {
+  color: #b44b4b;
+
+  font-weight: 800;
+}
+
+
+.owner-login-modal-status.success {
+  color: #0e8060;
+
+  font-weight: 800;
+}
+
+
+.owner-login-modal-back {
+  display: block;
+
+  margin-top: 17px;
+
+  color: #607988;
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  text-align: center;
+
+  text-decoration: none;
+
+}
+
+
+.owner-login-modal-back:hover {
+  color: #3d7298;
+
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+
+body.dark-mode .owner-login-modal-card {
+  background:
+    linear-gradient(
+      145deg,
+      #102631,
+      #0d2029
+    );
+
+  box-shadow:
+    18px 22px 50px rgba(0,0,0,.52),
+    -7px -7px 20px rgba(45,72,84,.08);
+}
+
+
+body.dark-mode .owner-login-modal-close {
+  color: #d5e5ea;
+
+  background: #18323d;
+
+  box-shadow:
+    5px 6px 13px rgba(0,0,0,.25),
+    -4px -4px 12px rgba(52,77,88,.08);
+}
+
+
+body.dark-mode .owner-login-modal-brand h2 {
+  color: #e5f1f5;
+}
+
+
+body.dark-mode .owner-login-modal-forgot {
+  color: #8ebbd4;
+}
+
+
+body.dark-mode .owner-login-modal-brand p,
+body.dark-mode .owner-login-modal-field label,
+body.dark-mode .owner-login-modal-back {
+  color: #91aab7;
+}
+
+
+body.dark-mode .owner-login-modal-field input {
+  color: #dcebf0;
+
+  background: #142d39;
+
+  border-color:
+    rgba(156,190,201,.12);
+
+  box-shadow:
+    inset 5px 5px 10px rgba(0,0,0,.20),
+    inset -5px -5px 10px rgba(52,77,88,.08);
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+  .owner-login-modal {
+    padding: 12px;
+  }
+
+
+  .owner-login-modal-card {
+    padding: 25px 18px;
+
+    border-radius: 21px;
+
+    max-height: 92vh;
+  }
+
+
+  .owner-login-modal-brand h2 {
+    font-size: 20px;
+  }
+
+
+  .owner-login-nav-button {
+    min-height: 34px;
+
+    padding:
+      7px 10px;
+  }
+
+}
+
+</style>
 
 </head>
 
@@ -64,13 +649,19 @@
 
   <nav class="nav">
 
-    <a href="./">
-      Home
-    </a>
+  <a href="./">
+    Home
+  </a>
 
-  </nav>
+  <button
+    type="button"
+    class="owner-login-nav-button"
+    onclick="openOwnerLogin()"
+  >
+    🔐 Pet Parent Login
+  </button>
 
-</header>
+</nav>
 
 
 <!-- =========================================================
@@ -762,7 +1353,141 @@
 
 </main>
 
+<!-- ============================================================
+     Pet Parent LOGIN POPUP
+     ============================================================ -->
 
+<div
+  id="ownerLoginModal"
+  class="owner-login-modal"
+  aria-hidden="true"
+>
+
+  <div
+    class="owner-login-modal-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ownerLoginTitle"
+  >
+
+    <button
+      type="button"
+      class="owner-login-modal-close"
+      onclick="closeOwnerLogin()"
+      aria-label="Close owner login"
+    >
+      ×
+    </button>
+
+
+    <div class="owner-login-modal-brand">
+
+      <div class="owner-login-modal-logo">
+        🐾
+      </div>
+
+      <h2 id="ownerLoginTitle">
+        Pet Parent Login
+      </h2>
+
+      <p>
+        Secure access to your registered animals
+      </p>
+
+    </div>
+
+
+    <form
+      id="ownerLoginModalForm"
+      class="owner-login-modal-form"
+    >
+
+      <div class="owner-login-modal-field">
+
+        <label for="ownerLoginEmail">
+          Email Address
+        </label>
+
+        <input
+          id="ownerLoginEmail"
+          type="email"
+          autocomplete="email"
+          placeholder="Enter your email address"
+          required
+        >
+
+      </div>
+
+
+      <div class="owner-login-modal-field">
+
+        <label for="ownerLoginPassword">
+          Password
+        </label>
+
+        <div class="owner-login-modal-password">
+
+          <input
+            id="ownerLoginPassword"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required
+          >
+
+          <button
+            type="button"
+            id="ownerLoginPasswordToggle"
+            class="owner-login-password-toggle"
+            aria-label="Show password"
+          >
+            👁
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="ownerLoginModalStatus"
+        class="owner-login-modal-status"
+        aria-live="polite"
+      ></div>
+
+
+      <button
+        type="submit"
+        id="ownerLoginModalSubmit"
+        class="owner-login-modal-submit"
+      >
+        Sign In
+      </button>
+
+
+      <button
+        type="button"
+        id="ownerForgotPassword"
+        class="owner-login-modal-forgot"
+      >
+        Forgot Password?
+      </button>
+
+
+    </form>
+
+
+    <a
+      href="./"
+      class="owner-login-modal-back"
+      onclick="closeOwnerLogin()"
+    >
+      ← Back to Animal Registry
+    </a>
+
+  </div>
+
+</div>
 
 <!-- =========================================================
      FOOTER
@@ -1714,10 +2439,467 @@ search.addEventListener(
   render
 );
 
+/* ============================================================
+   OWNER LOGIN POPUP
+   ============================================================ */
+
+const ownerLoginModal =
+  document.getElementById(
+    "ownerLoginModal"
+  );
+
+
+const ownerLoginForm =
+  document.getElementById(
+    "ownerLoginModalForm"
+  );
+
+
+const ownerLoginEmail =
+  document.getElementById(
+    "ownerLoginEmail"
+  );
+
+
+const ownerLoginPassword =
+  document.getElementById(
+    "ownerLoginPassword"
+  );
+
+
+const ownerLoginSubmit =
+  document.getElementById(
+    "ownerLoginModalSubmit"
+  );
+
+
+const ownerLoginStatus =
+  document.getElementById(
+    "ownerLoginModalStatus"
+  );
+
+
+const ownerLoginPasswordToggle =
+  document.getElementById(
+    "ownerLoginPasswordToggle"
+  );
+
+
+const ownerForgotPassword =
+  document.getElementById(
+    "ownerForgotPassword"
+  );
+
+
+function openOwnerLogin() {
+
+  if (!ownerLoginModal) {
+    return;
+  }
+
+
+  ownerLoginModal.classList.add(
+    "show"
+  );
+
+
+  ownerLoginModal.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+
+  document.body.style.overflow =
+    "hidden";
+
+
+  setTimeout(
+    function () {
+
+      if (ownerLoginEmail) {
+        ownerLoginEmail.focus();
+      }
+
+    },
+    100
+  );
+
+}
+
+
+function closeOwnerLogin() {
+
+  if (!ownerLoginModal) {
+    return;
+  }
+
+
+  ownerLoginModal.classList.remove(
+    "show"
+  );
+
+
+  ownerLoginModal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+
+  document.body.style.overflow =
+    "";
+
+}
+
+
+if (ownerLoginModal) {
+
+  ownerLoginModal.addEventListener(
+    "click",
+    function (event) {
+
+      if (
+        event.target ===
+        ownerLoginModal
+      ) {
+
+        closeOwnerLogin();
+
+      }
+
+    }
+  );
+
+}
+
+
+if (ownerLoginPasswordToggle) {
+
+  ownerLoginPasswordToggle.addEventListener(
+    "click",
+    function () {
+
+      const showing =
+        ownerLoginPassword.type ===
+        "text";
+
+
+      ownerLoginPassword.type =
+        showing
+          ? "password"
+          : "text";
+
+
+      ownerLoginPasswordToggle.textContent =
+        showing
+          ? "👁"
+          : "🙈";
+
+    }
+  );
+
+}
+
+
+document.addEventListener(
+  "keydown",
+  function (event) {
+
+    if (
+      event.key === "Escape" &&
+      ownerLoginModal &&
+      ownerLoginModal.classList.contains("show")
+    ) {
+
+      closeOwnerLogin();
+
+    }
+
+  }
+);
 
 
 /* ============================================================
-   INITIAL LOAD
+   FORGOT PASSWORD
+   ============================================================ */
+
+if (ownerForgotPassword) {
+
+  ownerForgotPassword.addEventListener(
+    "click",
+    async function () {
+
+      const email =
+        ownerLoginEmail?.value.trim();
+
+      if (!email) {
+
+        ownerLoginStatus.textContent =
+          "Enter your email address first.";
+
+        ownerLoginStatus.className =
+          "owner-login-modal-status error";
+
+        ownerLoginEmail?.focus();
+
+        return;
+      }
+
+      ownerForgotPassword.disabled = true;
+
+      ownerForgotPassword.textContent =
+        "Sending reset email...";
+
+      ownerLoginStatus.textContent =
+        "Sending password reset instructions...";
+
+      ownerLoginStatus.className =
+        "owner-login-modal-status";
+
+      try {
+
+        const { error } =
+          await supabaseClient.auth.resetPasswordForEmail(
+            email,
+            {
+              redirectTo:
+                window.location.origin +
+                window.location.pathname
+            }
+          );
+
+        if (error) {
+          throw error;
+        }
+
+        ownerLoginStatus.textContent =
+          "Password reset instructions have been sent to your email.";
+
+        ownerLoginStatus.className =
+          "owner-login-modal-status success";
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Password reset failed:",
+          error
+        );
+
+        ownerLoginStatus.textContent =
+          error.message ||
+          "Unable to send the password reset email.";
+
+        ownerLoginStatus.className =
+          "owner-login-modal-status error";
+
+      }
+
+      finally {
+
+        ownerForgotPassword.disabled = false;
+
+        ownerForgotPassword.textContent =
+          "Forgot Password?";
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   OWNER AUTHENTICATION
+   ============================================================ */
+
+if (ownerLoginForm) {
+
+  ownerLoginForm.addEventListener(
+    "submit",
+    async function (event) {
+
+      event.preventDefault();
+
+
+      const email =
+        ownerLoginEmail.value.trim();
+
+
+      const password =
+        ownerLoginPassword.value;
+
+
+      if (
+        !email ||
+        !password
+      ) {
+
+        ownerLoginStatus.textContent =
+          "Please enter your email address and password.";
+
+        ownerLoginStatus.className =
+          "owner-login-modal-status error";
+
+        return;
+
+      }
+
+
+      ownerLoginSubmit.disabled =
+        true;
+
+
+      ownerLoginSubmit.textContent =
+        "Signing In...";
+
+
+      ownerLoginStatus.textContent =
+        "Checking your account...";
+
+      ownerLoginStatus.className =
+        "owner-login-modal-status";
+
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
+
+        if (error) {
+
+          throw error;
+
+        }
+
+
+        if (
+          !data ||
+          !data.user
+        ) {
+
+          throw new Error(
+            "Unable to identify your account."
+          );
+
+        }
+
+
+        /* ====================================================
+           VERIFY OWNER LINK
+           ==================================================== */
+
+        const {
+          data: owner,
+          error: ownerError
+        } =
+          await supabaseClient
+            .from("owners")
+            .select(
+              "id,name,auth_user_id"
+            )
+            .eq(
+              "auth_user_id",
+              data.user.id
+            )
+            .maybeSingle();
+
+
+        if (ownerError) {
+
+          console.error(
+            "Owner verification error:",
+            ownerError
+          );
+
+
+          await supabaseClient.auth.signOut();
+
+
+          throw new Error(
+            "Unable to verify the owner account."
+          );
+
+        }
+
+
+        if (!owner) {
+
+          await supabaseClient.auth.signOut();
+
+
+          throw new Error(
+            "Your account is not linked to an owner record."
+          );
+
+        }
+
+
+        ownerLoginStatus.textContent =
+          "Login successful. Opening your dashboard...";
+
+        ownerLoginStatus.className =
+          "owner-login-modal-status success";
+
+
+        ownerLoginSubmit.textContent =
+          "Success ✓";
+
+
+        setTimeout(
+          function () {
+
+            window.location.href =
+              "./owner-dashboard.html";
+
+          },
+          600
+        );
+
+      }
+
+
+      catch (error) {
+
+        console.error(
+          "Owner login failed:",
+          error
+        );
+
+
+        ownerLoginStatus.textContent =
+          error.message ||
+          "Unable to sign in. Please check your credentials.";
+
+        ownerLoginStatus.className =
+          "owner-login-modal-status error";
+
+
+        ownerLoginSubmit.disabled =
+          false;
+
+
+        ownerLoginSubmit.textContent =
+          "Sign In";
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   INITIAL PAGE LOAD
    ============================================================ */
 
 loadAnimals();
