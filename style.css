@@ -11736,3 +11736,273 @@ body.dark-mode .profile-v2-dashboard {
   }
 
 }
+/* ============================================================
+   PROFILE HEADER NAVIGATION
+   Keep profile actions beside Home
+   ============================================================ */
+
+.profile-v2-card .header {
+  flex-wrap: wrap !important;
+}
+
+
+.profile-v2-card .profile-header-nav {
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  flex-wrap: wrap !important;
+
+  gap: 9px !important;
+
+  margin-left: auto !important;
+
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+
+/* HOME */
+
+.profile-v2-card .profile-header-home {
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  min-height: 38px !important;
+
+  padding: 9px 15px !important;
+
+  border: 1px solid rgba(255,255,255,.08) !important;
+
+  border-radius: 12px !important;
+
+  color: #ffffff !important;
+
+  background:
+    rgba(255,255,255,.08) !important;
+
+  font-family: inherit !important;
+
+  font-size: 9px !important;
+
+  font-weight: 900 !important;
+
+  text-decoration: none !important;
+
+  cursor: pointer !important;
+
+  transition:
+    transform .18s ease,
+    background .18s ease !important;
+}
+
+
+.profile-v2-card .profile-header-home:hover {
+  transform: translateY(-2px) !important;
+
+  background:
+    rgba(255,255,255,.14) !important;
+}
+
+
+/* BACK TO REGISTRY */
+
+.profile-v2-card .profile-header-nav .profile-v2-back {
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: auto !important;
+
+  min-height: 38px !important;
+
+  padding: 9px 15px !important;
+
+  border-radius: 12px !important;
+
+  color: #1a4f72 !important;
+
+  background: #edf5f8 !important;
+
+  font-size: 9px !important;
+
+  font-weight: 900 !important;
+
+  text-decoration: none !important;
+
+  white-space: nowrap !important;
+
+  box-shadow:
+    5px 6px 13px rgba(27,55,72,.12),
+    -4px -4px 12px rgba(255,255,255,.9) !important;
+}
+
+
+/* PET PARENT DASHBOARD */
+
+.profile-v2-card .profile-header-nav .profile-v2-dashboard {
+  align-items: center !important;
+  justify-content: center !important;
+
+  min-height: 38px !important;
+
+  padding: 9px 15px !important;
+
+  border: 1px solid rgba(31,208,143,.22) !important;
+
+  border-radius: 12px !important;
+
+  color: #8ff0c7 !important;
+
+  background:
+    rgba(31,208,143,.12) !important;
+
+  font-family: inherit !important;
+
+  font-size: 9px !important;
+
+  font-weight: 900 !important;
+
+  white-space: nowrap !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+
+  transition:
+    transform .18s ease,
+    background .18s ease !important;
+}
+
+
+.profile-v2-card .profile-header-nav .profile-v2-dashboard:hover {
+  transform: translateY(-2px) !important;
+
+  background:
+    rgba(31,208,143,.18) !important;
+}
+
+
+/* REQUEST A CHANGE */
+
+.profile-v2-card .profile-header-nav .profile-v2-change {
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  min-height: 38px !important;
+
+  padding: 9px 15px !important;
+
+  border: 0 !important;
+
+  border-radius: 12px !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0e8060,
+      #14c984
+    ) !important;
+
+  font-family: inherit !important;
+
+  font-size: 9px !important;
+
+  font-weight: 900 !important;
+
+  white-space: nowrap !important;
+
+  cursor: pointer !important;
+
+  box-shadow:
+    6px 7px 15px rgba(15,130,95,.23) !important;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease !important;
+}
+
+
+.profile-v2-card .profile-header-nav .profile-v2-change:hover {
+  transform: translateY(-2px) !important;
+
+  box-shadow:
+    8px 10px 20px rgba(15,130,95,.28) !important;
+}
+
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+
+body.dark-mode .profile-v2-card .profile-header-nav .profile-v2-back {
+  color: #c6dce5 !important;
+
+  background: #132a36 !important;
+
+  box-shadow:
+    5px 6px 13px rgba(0,0,0,.25),
+    -4px -4px 12px rgba(52,77,88,.08) !important;
+}
+
+
+body.dark-mode .profile-v2-card .profile-header-home {
+  color: #ffffff !important;
+
+  background:
+    rgba(255,255,255,.07) !important;
+}
+
+
+body.dark-mode .profile-v2-card .profile-header-nav .profile-v2-dashboard {
+  color: #8ff0c7 !important;
+
+  background:
+    rgba(31,208,143,.12) !important;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 850px) {
+
+  .profile-v2-card .profile-header-nav {
+    width: 100% !important;
+
+    margin-left: 0 !important;
+
+    justify-content: flex-start !important;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .profile-v2-card .profile-header-nav {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    width: 100% !important;
+
+    gap: 8px !important;
+  }
+
+
+  .profile-v2-card .profile-header-nav > * {
+    width: 100% !important;
+  }
+
+}
