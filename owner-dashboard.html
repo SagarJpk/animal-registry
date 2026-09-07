@@ -1013,10 +1013,18 @@
       "sb_publishable_w9-d4xchiCpeOnKRas_u2Q_wrFVPOwf";
 
     const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-      );
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage
+      }
+    }
+  );
 
 
     /* =========================================================
