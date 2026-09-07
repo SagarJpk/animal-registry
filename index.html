@@ -3077,15 +3077,45 @@ if (ownerLoginForm) {
         ownerLoginSubmit.textContent =
           "Success ✓";
 
-        setTimeout(
-          function () {
+       setTimeout(
+  async function () {
 
-            window.location.href =
-              "./owner-dashboard.html";
+    const {
+      data: sessionCheck,
+      error: sessionCheckError
+    } =
+      await supabaseClient.auth.getSession();
 
-          },
-          600
-        );
+    console.log(
+      "SESSION BEFORE DASHBOARD REDIRECT:",
+      sessionCheck?.session
+    );
+
+    if (sessionCheckError || !sessionCheck?.session) {
+
+      ownerLoginStatus.textContent =
+        "Login succeeded, but the session could not be saved. Please try again.";
+
+      ownerLoginStatus.className =
+        "owner-login-modal-status error";
+
+      ownerLoginSubmit.disabled = false;
+      ownerLoginSubmit.textContent = "Sign In";
+
+      console.error(
+        "Session persistence check failed:",
+        sessionCheckError
+      );
+
+      return;
+    }
+
+    window.location.href =
+      "./owner-dashboard.html";
+
+  },
+  800
+);
 
       }
 
