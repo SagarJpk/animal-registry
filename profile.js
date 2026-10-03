@@ -1289,8 +1289,8 @@ function renderProfile() {
         `;
 
 
-  const qrUrl =
-    `${location.origin}${location.pathname}?id=${encodeURIComponent(a.id)}`;
+ const qrUrl =
+  `https://sagarjpk.github.io/animal-registry/profile.html?id=${encodeURIComponent(a.id)}`;
 
 
   /* ==========================================================
@@ -2418,9 +2418,8 @@ function getAnimalDigitalIdUrl() {
     return window.location.href;
   }
 
-  return (
-    `${window.location.origin}` +
-    `${window.location.pathname}` +
+   return (
+    `https://sagarjpk.github.io/animal-registry/profile.html` +
     `?id=${encodeURIComponent(a.id)}`
   );
 
