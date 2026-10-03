@@ -9594,6 +9594,373 @@ body.dark-mode .profile-v2-change-form button[type="submit"] {
 
 }
 /* ============================================================
+   DIGITAL ID ACTION BUTTONS
+   ============================================================ */
+
+.profile-v2-action {
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 38px;
+
+  padding: 9px 15px;
+
+  border: 1px solid
+    rgba(255,255,255,.14);
+
+  border-radius: 12px;
+
+  color: #ffffff;
+
+  background:
+    rgba(255,255,255,.08);
+
+  font-family: inherit;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  text-decoration: none;
+
+  transition:
+    transform .18s ease,
+    background .18s ease,
+    box-shadow .18s ease;
+
+}
+
+
+.profile-v2-action:hover {
+
+  transform:
+    translateY(-2px);
+
+  background:
+    rgba(255,255,255,.15);
+
+  box-shadow:
+    5px 7px 16px
+    rgba(0,0,0,.14);
+
+}
+
+
+.profile-v2-action:active {
+
+  transform:
+    translateY(0);
+
+}
+
+
+.profile-v2-print {
+
+  border-color:
+    rgba(234,217,165,.34);
+
+  color:
+    #f6e4a8;
+
+}
+
+
+.profile-v2-share {
+
+  border-color:
+    rgba(124,224,183,.28);
+
+  color:
+    #9ee8c8;
+
+}
+
+
+/* ============================================================
+   LIVE VERIFICATION BUTTON
+   ============================================================ */
+
+.profile-v2-verify-button {
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  min-height: 30px;
+
+  margin-top: 9px;
+
+  padding: 7px 9px;
+
+  border: 1px solid
+    rgba(36,88,120,.18);
+
+  border-radius: 9px;
+
+  background:
+    #edf4f7;
+
+  color:
+    #214f73;
+
+  font-family: inherit;
+
+  font-size: 8px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    transform .16s ease,
+    box-shadow .16s ease,
+    background .16s ease;
+
+}
+
+
+.profile-v2-verify-button:hover {
+
+  transform:
+    translateY(-1px);
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    3px 4px 9px
+    rgba(30,65,82,.14);
+
+}
+
+
+.profile-v2-verify-button:active {
+
+  transform:
+    translateY(0);
+
+}
+
+
+/* ============================================================
+   ACTION TOAST
+   ============================================================ */
+
+.profile-action-toast {
+
+  position: fixed;
+
+  left: 50%;
+
+  bottom: 28px;
+
+  z-index: 99999;
+
+  max-width:
+    min(420px, calc(100vw - 32px));
+
+  padding: 12px 16px;
+
+  border-radius: 13px;
+
+  background:
+    #173b5b;
+
+  color:
+    #ffffff;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  line-height: 1.4;
+
+  text-align: center;
+
+  box-shadow:
+    8px 10px 24px
+    rgba(23,59,91,.24);
+
+  opacity: 0;
+
+  transform:
+    translate(-50%, 14px);
+
+  pointer-events: none;
+
+  transition:
+    opacity .2s ease,
+    transform .2s ease;
+
+}
+
+
+.profile-action-toast.show {
+
+  opacity: 1;
+
+  transform:
+    translate(-50%, 0);
+
+}
+
+
+/* ============================================================
+   DIGITAL ID PRINT LAYOUT
+   ============================================================ */
+
+@media print {
+
+  @page {
+
+    size: A4 portrait;
+
+    margin: 10mm;
+
+  }
+
+
+  html,
+  body {
+
+    width: 100%;
+
+    min-height: auto;
+
+  }
+
+
+  body {
+
+    background: #ffffff !important;
+
+    color: #111111 !important;
+
+  }
+
+
+  .page {
+
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+  }
+
+
+  .card {
+
+    width: 100% !important;
+
+    overflow: visible !important;
+
+    border-radius: 0 !important;
+
+    background: #ffffff !important;
+
+    box-shadow: none !important;
+
+  }
+
+
+  .profile-header-nav,
+  #profileThemeToggle,
+  .profile-action-toast,
+  .profile-v2-action,
+  .profile-v2-change,
+  .profile-v2-dashboard,
+  .profile-v2-verify-button {
+
+    display: none !important;
+
+  }
+
+
+  .header {
+
+    break-inside: avoid;
+
+    padding: 18px 20px 20px !important;
+
+    background:
+      #173d5d !important;
+
+    -webkit-print-color-adjust: exact;
+
+    print-color-adjust: exact;
+
+  }
+
+
+  .profile-v2-content {
+
+    padding: 20px !important;
+
+  }
+
+
+  .profile-v2-notice,
+  .profile-v2-hero,
+  .profile-v2-overview,
+  .profile-v2-section,
+  .profile-v2-verification,
+  .profile-v2-footer {
+
+    break-inside: avoid;
+
+  }
+
+
+  .profile-v2-photo-frame {
+
+    box-shadow: none !important;
+
+  }
+
+
+  .profile-v2-section {
+
+    page-break-inside: avoid;
+
+  }
+
+
+  .profile-v2-verification {
+
+    -webkit-print-color-adjust: exact;
+
+    print-color-adjust: exact;
+
+  }
+
+
+  .profile-v2-qr-wrap {
+
+    break-inside: avoid;
+
+  }
+
+
+  .profile-v2-footer {
+
+    margin-top: 18px !important;
+
+  }
+
+}
+
+
+/* ============================================================
    PET PARENT DASHBOARD BUTTON ON PROFILE
    ============================================================ */
 
@@ -11022,4 +11389,113 @@ body.dark-mode .profile-v2-card .profile-header-nav .profile-v2-dashboard {
 
     letter-spacing: -1.6px;
   }
+}
+
+
+/* ============================================================
+   DIGITAL ID ACTIONS - MOBILE
+   ============================================================ */
+
+@media (max-width: 700px) {
+
+  .profile-header-nav {
+
+    width: 100%;
+
+    flex-wrap: wrap;
+
+    justify-content: flex-start;
+
+    gap: 7px;
+
+  }
+
+
+  .profile-header-nav > a,
+  .profile-header-nav > button {
+
+    flex: 0 0 auto;
+
+    min-height: 36px;
+
+    padding:
+      8px 10px;
+
+    font-size: 8px;
+
+  }
+
+
+  .profile-v2-verification {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .profile-v2-qr-wrap {
+
+    width: 180px;
+
+    max-width: 100%;
+
+    justify-self: center;
+
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .profile-header-nav > a,
+  .profile-header-nav > button {
+
+    flex: 1 1 calc(50% - 7px);
+
+    min-width: 0;
+
+  }
+
+
+  .profile-v2-verify-button {
+
+    font-size: 8px;
+
+  }
+
+
+  .profile-action-toast {
+
+    bottom: 18px;
+
+  }
+
+}
+
+
+/* ============================================================
+   DARK MODE ACTIONS
+   ============================================================ */
+
+body.dark-mode .profile-v2-verify-button {
+
+  background:
+    #dcecf2;
+
+  color:
+    #173b5b;
+
+}
+
+
+body.dark-mode .profile-action-toast {
+
+  background:
+    #0d263a;
+
+  box-shadow:
+    8px 10px 24px
+    rgba(0,0,0,.32);
+
 }
