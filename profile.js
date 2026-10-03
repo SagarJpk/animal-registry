@@ -1377,6 +1377,26 @@ function renderProfile() {
 
   <button
     type="button"
+    class="profile-v2-action profile-v2-print"
+    onclick="printAnimalDigitalId()"
+    title="Print or save this Digital ID as PDF"
+  >
+    🖨️ Print / PDF
+  </button>
+
+
+  <button
+    type="button"
+    class="profile-v2-action profile-v2-share"
+    onclick="shareAnimalDigitalId()"
+    title="Share this Digital ID"
+  >
+    ↗️ Share
+  </button>
+
+
+  <button
+    type="button"
     class="profile-v2-change"
     onclick="openChangeRequest()"
   >
@@ -2255,6 +2275,15 @@ function renderProfile() {
               </span>
 
 
+              <button
+                type="button"
+                class="profile-v2-verify-button"
+                onclick="openLiveVerification()"
+              >
+                🔎 Open Live Verification
+              </button>
+
+
             </div>
 
 
@@ -2375,6 +2404,232 @@ function renderProfile() {
   setupPetParentProfileNavigation();
 
 }
+
+/* ============================================================
+   DIGITAL ID ACTIONS
+   Print, PDF, Share and Live Verification
+   ============================================================ */
+
+function getAnimalDigitalIdUrl() {
+
+  const a = currentAnimal;
+
+  if (!a || !a.id) {
+    return window.location.href;
+  }
+
+  return (
+    `${window.location.origin}` +
+    `${window.location.pathname}` +
+    `?id=${encodeURIComponent(a.id)}`
+  );
+
+}
+
+
+/* ============================================================
+   PRINT / SAVE AS PDF
+   ============================================================ */
+
+function printAnimalDigitalId() {
+
+  if (!currentAnimal) {
+    showProfileToast(
+      "Animal Digital ID is still loading."
+    );
+    return;
+  }
+
+  window.print();
+
+}
+
+
+/* ============================================================
+   SHARE DIGITAL ID
+   ============================================================ */
+
+async function shareAnimalDigitalId() {
+
+  const a = currentAnimal;
+
+  if (!a) {
+    showProfileToast(
+      "Animal Digital ID is still loading."
+    );
+    return;
+  }
+
+  const url =
+    getAnimalDigitalIdUrl();
+
+  const shareData = {
+    title:
+      `${a.name} | Animal Digital ID`,
+    text:
+      `View the verified Digital ID for ${a.name} (${a.animalId}).`,
+    url
+  };
+
+
+  try {
+
+    if (
+      navigator.share &&
+      typeof navigator.share === "function"
+    ) {
+
+      await navigator.share(
+        shareData
+      );
+
+      return;
+
+    }
+
+
+    if (
+      navigator.clipboard &&
+      window.isSecureContext
+    ) {
+
+      await navigator.clipboard.writeText(
+        url
+      );
+
+      showProfileToast(
+        "Digital ID link copied to clipboard."
+      );
+
+      return;
+
+    }
+
+
+    const temporaryInput =
+      document.createElement("textarea");
+
+    temporaryInput.value = url;
+
+    temporaryInput.style.position =
+      "fixed";
+    temporaryInput.style.opacity =
+      "0";
+
+    document.body.appendChild(
+      temporaryInput
+    );
+
+    temporaryInput.select();
+
+    document.execCommand(
+      "copy"
+    );
+
+    temporaryInput.remove();
+
+    showProfileToast(
+      "Digital ID link copied to clipboard."
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Digital ID sharing failed:",
+      error
+    );
+
+    showProfileToast(
+      "Unable to share the Digital ID right now."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   OPEN LIVE VERIFICATION
+   ============================================================ */
+
+function openLiveVerification() {
+
+  const url =
+    getAnimalDigitalIdUrl();
+
+  window.open(
+    url,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+}
+
+
+/* ============================================================
+   SMALL ACTION TOAST
+   ============================================================ */
+
+function showProfileToast(
+  message
+) {
+
+  const existing =
+    document.getElementById(
+      "profileActionToast"
+    );
+
+  if (existing) {
+    existing.remove();
+  }
+
+
+  const toast =
+    document.createElement("div");
+
+  toast.id =
+    "profileActionToast";
+
+  toast.className =
+    "profile-action-toast";
+
+  toast.textContent =
+    message;
+
+  document.body.appendChild(
+    toast
+  );
+
+
+  requestAnimationFrame(
+    () => {
+      toast.classList.add(
+        "show"
+      );
+    }
+  );
+
+
+  window.setTimeout(
+    () => {
+
+      toast.classList.remove(
+        "show"
+      );
+
+      window.setTimeout(
+        () => toast.remove(),
+        220
+      );
+
+    },
+    2600
+  );
+
+}
+
 
 /* ============================================================
    PET PARENT PROFILE NAVIGATION
