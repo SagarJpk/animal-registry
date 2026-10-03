@@ -3682,6 +3682,36 @@ function openChangeRequest() {
 
 
       <div
+        class="profile-v2-form-group">
+
+        <label
+          for="changeAttachment">
+
+          Supporting Document <span style="font-weight:600;opacity:.65">(Optional)</span>
+
+        </label>
+
+        <input
+          id="changeAttachment"
+          type="file"
+          accept="application/pdf,image/jpeg,image/png"
+          onchange="handleChangeRequestAttachment(this)">
+
+        <small
+          id="changeAttachmentHelp"
+          style="display:block;color:#718996;font-size:8px;line-height:1.5">
+          PDF, JPG or PNG • Maximum 5 MB • Vaccination records, medical reports, ownership documents or supporting photos
+        </small>
+
+        <div
+          id="changeAttachmentName"
+          style="display:none;padding:9px 11px;border-radius:10px;background:#eef7f4;color:#0e8060;font-size:8px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        </div>
+
+      </div>
+
+
+      <div
         id="changeRequestStatus"
         class="profile-v2-form-status">
       </div>
@@ -3734,6 +3764,151 @@ function openChangeRequest() {
     submitChangeRequest
   );
 
+}
+
+
+/* ============================================================
+   SUBMIT CHANGE REQUEST
+   ============================================================ */
+
+function handleChangeRequestAttachment(input) {
+
+  const file =
+    input?.files?.[0];
+
+  const nameBox =
+    document.getElementById(
+      "changeAttachmentName"
+    );
+
+  const status =
+    document.getElementById(
+      "changeRequestStatus"
+    );
+
+  if (!file) {
+    if (nameBox) {
+      nameBox.style.display = "none";
+      nameBox.textContent = "";
+    }
+    return;
+  }
+
+  const allowedTypes = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png"
+  ];
+
+  const maxSize =
+    5 * 1024 * 1024;
+
+  if (!allowedTypes.includes(file.type)) {
+    input.value = "";
+
+    if (nameBox) {
+      nameBox.style.display = "none";
+      nameBox.textContent = "";
+    }
+
+    if (status) {
+      status.textContent =
+        "Please select a PDF, JPG or PNG file.";
+      status.className =
+        "profile-v2-form-status error";
+    }
+
+    return;
+  }
+
+  if (file.size > maxSize) {
+    input.value = "";
+
+    if (nameBox) {
+      nameBox.style.display = "none";
+      nameBox.textContent = "";
+    }
+
+    if (status) {
+      status.textContent =
+        "The attachment must be 5 MB or smaller.";
+      status.className =
+        "profile-v2-form-status error";
+    }
+
+    return;
+  }
+
+  if (nameBox) {
+    nameBox.style.display = "block";
+    nameBox.textContent =
+      `📎 ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+  }
+
+  if (status) {
+    status.textContent = "";
+    status.className =
+      "profile-v2-form-status";
+  }
+}
+
+
+async function uploadChangeRequestAttachment(
+  file,
+  animalId
+) {
+
+  if (!file) {
+    return null;
+  }
+
+  const safeName =
+    String(file.name || "attachment")
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .slice(-120);
+
+  const uniqueId =
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+  const path =
+    `change-requests/${encodeURIComponent(animalId || "animal")}/${uniqueId}-${safeName}`;
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .storage
+    .from("change-request-attachments")
+    .upload(
+      path,
+      file,
+      {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type
+      }
+    );
+
+  if (error) {
+    console.error(
+      "Change request attachment upload failed:",
+      error
+    );
+
+    throw new Error(
+      "The supporting document could not be uploaded. Please try again."
+    );
+  }
+
+  return {
+    path: data?.path || path,
+    name: file.name,
+    type: file.type,
+    size: file.size
+  };
 }
 
 
@@ -3797,6 +3972,16 @@ async function submitChangeRequest(
     )?.value.trim();
 
 
+  const attachmentInput =
+    document.getElementById(
+      "changeAttachment"
+    );
+
+
+  const attachment =
+    attachmentInput?.files?.[0] || null;
+
+
   if (
     !requester ||
     !email ||
@@ -3819,10 +4004,51 @@ async function submitChangeRequest(
   }
 
 
+  const allowedTypes = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png"
+  ];
+
+  const maxSize =
+    5 * 1024 * 1024;
+
+
+  if (attachment) {
+
+    if (!allowedTypes.includes(attachment.type)) {
+
+      if (status) {
+        status.textContent =
+          "Please select a PDF, JPG or PNG file.";
+        status.className =
+          "profile-v2-form-status error";
+      }
+
+      return;
+    }
+
+
+    if (attachment.size > maxSize) {
+
+      if (status) {
+        status.textContent =
+          "The attachment must be 5 MB or smaller.";
+        status.className =
+          "profile-v2-form-status error";
+      }
+
+      return;
+    }
+  }
+
+
   if (status) {
 
     status.textContent =
-      "Submitting request...";
+      attachment
+        ? "Uploading supporting document..."
+        : "Submitting request...";
 
     status.className =
       "profile-v2-form-status";
@@ -3836,12 +4062,29 @@ async function submitChangeRequest(
       true;
 
     submitButton.textContent =
-      "Submitting...";
+      attachment
+        ? "Uploading..."
+        : "Submitting...";
 
   }
 
 
   try {
+
+    const uploadedAttachment =
+      await uploadChangeRequestAttachment(
+        attachment,
+        a.animalId || a.id
+      );
+
+
+    if (status) {
+
+      status.textContent =
+        "Submitting request...";
+
+    }
+
 
     const response =
       await fetch(
@@ -3881,6 +4124,27 @@ async function submitChangeRequest(
               message:
                 message,
 
+              attachment_name:
+                uploadedAttachment?.name ||
+                "No attachment",
+
+              attachment_type:
+                uploadedAttachment?.type ||
+                "",
+
+              attachment_size:
+                uploadedAttachment?.size ||
+                0,
+
+              attachment_path:
+                uploadedAttachment?.path ||
+                "",
+
+              attachment_storage:
+                uploadedAttachment
+                  ? "Supabase Storage / change-request-attachments"
+                  : "None",
+
               source:
                 "Animal Digital ID Profile"
 
@@ -3897,7 +4161,9 @@ async function submitChangeRequest(
       if (status) {
 
         status.textContent =
-          "Your change request has been submitted successfully.";
+          uploadedAttachment
+            ? "Your change request and supporting document have been submitted successfully."
+            : "Your change request has been submitted successfully.";
 
         status.className =
           "profile-v2-form-status success";
@@ -3907,6 +4173,16 @@ async function submitChangeRequest(
 
       form.reset();
 
+      const nameBox =
+        document.getElementById(
+          "changeAttachmentName"
+        );
+
+      if (nameBox) {
+        nameBox.style.display = "none";
+        nameBox.textContent = "";
+      }
+
 
       setTimeout(
         () => {
@@ -3914,7 +4190,7 @@ async function submitChangeRequest(
           closeProfileModal();
 
         },
-        1800
+        2200
       );
 
     }
@@ -3993,7 +4269,6 @@ async function submitChangeRequest(
   }
 
 }
-
 
 /* ============================================================
    INITIALIZE PROFILE
