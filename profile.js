@@ -4101,7 +4101,11 @@ async function submitChangeRequest(
           a.animalId,
 
         animal_uuid:
-          a.id,
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    String(a.id || "")
+  )
+    ? a.id
+    : null,
 
         animal_name:
           a.name,
