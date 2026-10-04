@@ -722,6 +722,201 @@
       font-size: 11px;
     }
 
+
+    /* =========================================================
+       CHANGE REQUESTS
+       ========================================================= */
+
+    .change-requests-card {
+      margin-bottom: 20px;
+      padding: 20px;
+      border-radius: 23px;
+      background: var(--surface);
+      box-shadow: var(--shadow-raised);
+    }
+
+    .change-requests-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .change-requests-head h3 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 15px;
+    }
+
+    .change-requests-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .change-request-badge {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: #fff;
+      background: #b84c4c;
+      font-size: 9px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .change-request-badge.visible {
+      display: inline-flex;
+    }
+
+    .change-request-item {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 15px;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 17px;
+      background: rgba(255,255,255,.28);
+      box-shadow: var(--shadow-inset);
+    }
+
+    .change-request-main {
+      min-width: 0;
+    }
+
+    .change-request-title {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .change-request-title strong {
+      color: var(--navy);
+      font-size: 13px;
+    }
+
+    .change-request-status {
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: #8b3030;
+      background: #f8e5e5;
+      font-size: 7px;
+      font-weight: 900;
+    }
+
+    .change-request-meta {
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.6;
+    }
+
+    .change-request-message {
+      margin-top: 9px;
+      padding: 10px 11px;
+      border-radius: 11px;
+      color: var(--text);
+      background: rgba(255,255,255,.34);
+      font-size: 9px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .change-request-attachment {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 9px;
+      color: #2d8a62;
+      font-size: 9px;
+      font-weight: 850;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .change-request-actions {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .change-request-action {
+      min-width: 115px;
+      padding: 9px 11px;
+      border: 0;
+      border-radius: 11px;
+      font: inherit;
+      font-size: 8px;
+      font-weight: 850;
+      cursor: pointer;
+      color: #fff;
+      background: #2d8a62;
+    }
+
+    .change-request-action.secondary {
+      color: var(--navy);
+      background: rgba(255,255,255,.62);
+    }
+
+    .change-request-empty {
+      padding: 25px;
+      border-radius: 16px;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255,255,255,.18);
+      box-shadow: var(--shadow-inset);
+      font-size: 10px;
+    }
+
+    .stat-card.change-request-stat {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .stat-card.change-request-stat.has-new {
+      box-shadow: 0 0 0 2px rgba(184,76,76,.20), var(--shadow-raised);
+    }
+
+    .stat-new-dot {
+      display: none;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #c93434;
+      box-shadow: 0 0 0 4px rgba(201,52,52,.10);
+    }
+
+    .stat-new-dot.visible {
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .change-requests-card {
+        padding: 14px;
+        border-radius: 19px;
+      }
+      .change-requests-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .change-request-item {
+        grid-template-columns: 1fr;
+      }
+      .change-request-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+
     /* =========================================================
        RESPONSIVE
        ========================================================= */
@@ -1090,7 +1285,17 @@
           </div>
 
 
-          <div class="stat-card">
+          <div
+            id="changeRequestStatCard"
+            class="stat-card change-request-stat"
+            role="button"
+            tabindex="0"
+            title="View pending change requests">
+
+            <span
+              id="changeRequestNewDot"
+              class="stat-new-dot"
+              aria-hidden="true"></span>
 
             <div class="stat-label">
               CHANGE REQUESTS
@@ -1107,6 +1312,37 @@
               Requests awaiting review
             </div>
 
+          </div>
+
+        </section>
+
+
+
+        <!-- CHANGE REQUESTS -->
+
+        <section
+          id="changeRequestsSection"
+          class="change-requests-card">
+
+          <div class="change-requests-head">
+
+            <div>
+              <h3>Change Requests</h3>
+              <p>Review requests submitted from animal digital profiles.</p>
+            </div>
+
+            <span
+              id="changeRequestBadge"
+              class="change-request-badge">
+              🔔 <span id="changeRequestBadgeText">0 new</span>
+            </span>
+
+          </div>
+
+          <div id="changeRequestList">
+            <div class="change-request-empty">
+              No pending change requests.
+            </div>
           </div>
 
         </section>
