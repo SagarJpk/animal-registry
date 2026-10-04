@@ -22,6 +22,64 @@
   href="style.css?v=20260906"
 >
 
+<style>
+/* ============================================================
+   HERO TITLE FIX
+   Keep "Animal an Identity" together on line 2.
+   This override intentionally sits after style.css so the
+   existing responsive CSS cannot turn the green phrase into
+   a third line.
+   ============================================================ */
+.hero-title {
+  white-space: normal !important;
+}
+
+.hero-title > span {
+  display: inline !important;
+  width: auto !important;
+  white-space: nowrap !important;
+  color: #16c784 !important;
+  position: relative !important;
+}
+
+.hero-title > span::after {
+  display: block !important;
+  content: "" !important;
+  position: absolute !important;
+  left: 2px !important;
+  right: -12px !important;
+  bottom: -9px !important;
+  height: 5px !important;
+  border-radius: 50% !important;
+  background: #4ce3ad !important;
+  transform: rotate(-2deg) !important;
+}
+
+@media (min-width: 1001px) {
+  .hero-title {
+    font-size: clamp(48px, 5vw, 62px) !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .hero-title {
+    font-size: clamp(40px, 8vw, 57px) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 39px !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero-title {
+    font-size: 34px !important;
+  }
+}
+</style>
+
 <!-- Supabase -->
 <script
   src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
@@ -905,7 +963,7 @@ body.dark-mode .owner-login-modal-field input:-webkit-autofill:active {
     <h2 class="hero-title">
 
       Give Every<br>
-      Animal <span style="display:inline;">an Identity</span>
+      Animal&nbsp;<span>an Identity</span>
 
     </h2>
 
