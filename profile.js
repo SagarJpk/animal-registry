@@ -4086,6 +4086,79 @@ async function submitChangeRequest(
     }
 
 
+    /* ========================================================
+       SAVE REQUEST TO SUPABASE
+       This powers the Admin Center notification/list.
+       ======================================================== */
+
+    const {
+      error: changeRequestError
+    } = await supabaseClient
+      .from("change_requests")
+      .insert({
+
+        animal_id:
+          a.animalId,
+
+        animal_uuid:
+          a.id,
+
+        animal_name:
+          a.name,
+
+        requester_name:
+          requester,
+
+        requester_email:
+          email,
+
+        change_type:
+          changeType,
+
+        message:
+          message,
+
+        attachment_name:
+          uploadedAttachment?.name ||
+          "",
+
+        attachment_type:
+          uploadedAttachment?.type ||
+          "",
+
+        attachment_size:
+          uploadedAttachment?.size ||
+          0,
+
+        attachment_path:
+          uploadedAttachment?.path ||
+          "",
+
+        attachment_storage:
+          uploadedAttachment
+            ? "Supabase Storage / change-request-attachments"
+            : "None",
+
+        status:
+          "PENDING"
+
+      });
+
+
+    if (changeRequestError) {
+
+      console.error(
+        "Supabase change request save failed:",
+        changeRequestError
+      );
+
+      throw new Error(
+        "The request could not be saved to the Admin Center. Please try again."
+      );
+
+    }
+
+
     const response =
       await fetch(
         "https://formspree.io/f/xrpgegka",
