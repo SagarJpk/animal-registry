@@ -406,6 +406,7 @@ async function getAdminProfile(
   return data;
 }
 
+
 /* ============================================================
    LOGIN
    ============================================================ */
@@ -608,6 +609,8 @@ async function loadDashboard() {
     true
   );
 
+  ensureChangeRequestPanel();
+
 
   try {
 
@@ -764,28 +767,1058 @@ function updateAnimalStats(
    CHANGE REQUESTS
    ============================================================ */
 
-async function loadChangeRequests() {
+const CHANGE_REQUEST_PUBLIC_PROFILE_URL =
+  "https://sagarjpk.github.io/animal-registry/profile.html?id=";
+
+let changeRequestsCache = [];
+
+
+function ensureChangeRequestStyles() {
+
+  if (
+    document.getElementById(
+      "changeRequestAdminStyles"
+    )
+  ) {
+    return;
+  }
+
+
+  const style =
+    document.createElement(
+      "style"
+    );
+
+
+  style.id =
+    "changeRequestAdminStyles";
+
+
+  style.textContent = `
+    .change-request-stat{
+      position:relative;
+      cursor:pointer
+    }
+
+    .change-request-notification{
+      position:absolute;
+      top:10px;
+      right:10px;
+      min-width:20px;
+      height:20px;
+      padding:0 5px;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      background:#c53d4d;
+      color:#fff;
+      font-size:8px;
+      font-weight:900;
+      box-shadow:0 4px 10px rgba(197,61,77,.28)
+    }
+
+    .change-request-panel{
+      margin-top:18px;
+      padding:18px;
+      border-radius:20px;
+      background:var(--surface);
+      box-shadow:var(--shadow-soft)
+    }
+
+    .change-request-panel-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px
+    }
+
+    .change-request-panel-title{
+      color:var(--navy);
+      font-size:15px;
+      font-weight:900
+    }
+
+    .change-request-panel-subtitle{
+      margin-top:3px;
+      color:var(--muted);
+      font-size:9px
+    }
+
+    .change-request-refresh,
+    .change-request-action{
+      border:0;
+      border-radius:9px;
+      padding:8px 10px;
+      background:var(--surface);
+      color:var(--navy);
+      box-shadow:var(--shadow-soft);
+      font-size:8px;
+      font-weight:900;
+      cursor:pointer
+    }
+
+    .change-request-item{
+      display:grid;
+      grid-template-columns:54px minmax(0,1fr) auto;
+      gap:13px;
+      align-items:start;
+      padding:13px;
+      margin-top:10px;
+      border-radius:15px;
+      background:rgba(255,255,255,.35);
+      box-shadow:var(--shadow-inset)
+    }
+
+    .change-request-item:first-child{
+      margin-top:0
+    }
+
+    .change-request-photo{
+      width:54px;
+      height:64px;
+      overflow:hidden;
+      border-radius:11px;
+      background:#dce4e9;
+      display:grid;
+      place-items:center;
+      color:var(--muted);
+      font-size:20px
+    }
+
+    .change-request-photo img{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit:cover
+    }
+
+    .change-request-top{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap
+    }
+
+    .change-request-animal{
+      color:var(--navy);
+      font-size:12px;
+      font-weight:900
+    }
+
+    .change-request-badge{
+      display:inline-flex;
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(197,61,77,.12);
+      color:#a53a48;
+      font-size:7px;
+      font-weight:900
+    }
+
+    .change-request-id{
+      margin-top:3px;
+      color:var(--muted);
+      font-size:9px;
+      font-weight:700
+    }
+
+    .change-request-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px 13px;
+      margin-top:8px;
+      color:var(--muted);
+      font-size:8px
+    }
+
+    .change-request-message{
+      margin-top:9px;
+      padding:9px 10px;
+      border-radius:10px;
+      background:rgba(36,85,121,.06);
+      color:var(--text);
+      font-size:9px;
+      line-height:1.55;
+      white-space:pre-wrap;
+      word-break:break-word
+    }
+
+    .change-request-actions{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      min-width:120px
+    }
+
+    .change-request-action.primary{
+      color:#fff;
+      background:linear-gradient(
+        135deg,
+        #245579,
+        #173d5d
+      )
+    }
+
+    .change-request-action.review{
+      color:#287651;
+      background:rgba(45,138,98,.10)
+    }
+
+    .change-request-action.reject{
+      color:#a64040;
+      background:rgba(184,76,76,.10)
+    }
+
+    .change-request-action:disabled{
+      opacity:.55;
+      cursor:default
+    }
+
+    .change-request-empty,
+    .change-request-loading{
+      padding:18px;
+      border-radius:14px;
+      color:var(--muted);
+      text-align:center;
+      font-size:9px
+    }
+
+    .change-request-empty{
+      background:rgba(45,138,98,.06)
+    }
+
+    .change-request-attachment{
+      display:inline-flex;
+      margin-top:8px;
+      color:#245579;
+      font-size:8px;
+      font-weight:800
+    }
+
+    @media(max-width:700px){
+
+      .change-request-item{
+        grid-template-columns:
+          46px
+          minmax(0,1fr)
+      }
+
+      .change-request-photo{
+        width:46px;
+        height:56px
+      }
+
+      .change-request-actions{
+        grid-column:1/-1;
+        flex-direction:row;
+        flex-wrap:wrap;
+        min-width:0
+      }
+
+    }
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+}
+
+
+function ensureChangeRequestPanel() {
+
+  ensureChangeRequestStyles();
+
+
+  const statsSection =
+    changeRequests
+      ?.closest(
+        ".stat-card"
+      )
+      ?.parentElement;
+
+
+  if (!statsSection) {
+    return null;
+  }
+
+
+  let panel =
+    document.getElementById(
+      "changeRequestPanel"
+    );
+
+
+  if (panel) {
+    return panel;
+  }
+
+
+  panel =
+    document.createElement(
+      "section"
+    );
+
+
+  panel.id =
+    "changeRequestPanel";
+
+
+  panel.className =
+    "change-request-panel";
+
+
+  panel.innerHTML = `
+    <div class="change-request-panel-header">
+
+      <div>
+
+        <div class="change-request-panel-title">
+          🔔 Change Requests
+        </div>
+
+        <div class="change-request-panel-subtitle">
+          Review requests submitted from Animal Digital ID profiles.
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="change-request-refresh"
+        onclick="loadChangeRequests()"
+      >
+        ↻ Refresh
+      </button>
+
+    </div>
+
+    <div id="changeRequestList">
+
+      <div class="change-request-loading">
+        Loading change requests...
+      </div>
+
+    </div>
+  `;
+
+
+  statsSection.insertAdjacentElement(
+    "afterend",
+    panel
+  );
+
+
+  const statCard =
+    changeRequests.closest(
+      ".stat-card"
+    );
+
+
+  if (statCard) {
+
+    statCard.classList.add(
+      "change-request-stat"
+    );
+
+
+    statCard.title =
+      "Open change requests";
+
+
+    statCard.addEventListener(
+      "click",
+      () =>
+        panel.scrollIntoView({
+          behavior:
+            "smooth",
+          block:
+            "start"
+        })
+    );
+
+
+    const badge =
+      document.createElement(
+        "span"
+      );
+
+
+    badge.id =
+      "changeRequestNotification";
+
+
+    badge.className =
+      "change-request-notification";
+
+
+    statCard.appendChild(
+      badge
+    );
+  }
+
+
+  return panel;
+}
+
+
+function updateChangeRequestNotification(
+  count
+) {
+
+  const safeCount =
+    Number(
+      count
+    ) || 0;
+
+
+  changeRequests.textContent =
+    safeCount;
+
+
+  const badge =
+    document.getElementById(
+      "changeRequestNotification"
+    );
+
+
+  if (badge) {
+
+    badge.textContent =
+      safeCount > 99
+        ? "99+"
+        : String(
+            safeCount
+          );
+
+
+    badge.style.display =
+      safeCount > 0
+        ? "inline-flex"
+        : "none";
+  }
+
+
+  document.title =
+    safeCount > 0
+      ? `(${safeCount}) Animal Digital ID Admin`
+      : "Animal Digital ID Admin";
+}
+
+
+function formatChangeRequestDate(
+  value
+) {
+
+  if (!value) {
+    return "Not available";
+  }
+
+
+  const date =
+    new Date(
+      value
+    );
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return String(
+      value
+    );
+  }
+
+
+  return date.toLocaleString(
+    "en-IN",
+    {
+      dateStyle:
+        "medium",
+      timeStyle:
+        "short"
+    }
+  );
+}
+
+
+async function getChangeRequestAttachmentUrl(
+  path
+) {
+
+  if (!path) {
+    return "";
+  }
+
 
   const {
-    count,
+    data,
     error
+  } =
+    await supabaseClient.storage
+      .from(
+        "change-request-attachments"
+      )
+      .createSignedUrl(
+        path,
+        1800
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Attachment URL error:",
+      error
+    );
+
+
+    return "";
+  }
+
+
+  return data?.signedUrl ||
+    "";
+}
+
+
+async function loadChangeRequestAttachmentUrl(
+  requestId,
+  path
+) {
+
+  const button =
+    document.querySelector(
+      `[data-attachment-request="${requestId}"]`
+    );
+
+
+  if (!button) {
+    return;
+  }
+
+
+  button.disabled =
+    true;
+
+
+  button.textContent =
+    "OPENING...";
+
+
+  try {
+
+    const url =
+      await getChangeRequestAttachmentUrl(
+        path
+      );
+
+
+    if (!url) {
+
+      throw new Error(
+        "Unable to create a secure attachment link."
+      );
+    }
+
+
+    window.open(
+      url,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Attachment open error:",
+      error
+    );
+
+
+    alert(
+      error.message ||
+      "Unable to open the attachment."
+    );
+
+
+  } finally {
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      "📎 OPEN DOCUMENT";
+  }
+}
+
+
+function renderChangeRequests(
+  requests
+) {
+
+  ensureChangeRequestPanel();
+
+
+  const list =
+    document.getElementById(
+      "changeRequestList"
+    );
+
+
+  if (!list) {
+    return;
+  }
+
+
+  if (!requests.length) {
+
+    list.innerHTML = `
+      <div class="change-request-empty">
+        ✓ No pending change requests.
+        The registry is up to date.
+      </div>
+    `;
+
+
+    return;
+  }
+
+
+  list.innerHTML =
+    requests
+      .map(
+        request => {
+
+          const animal =
+            animalsCache.find(
+              item =>
+                item.id ===
+                  request.animal_uuid ||
+                item.animal_id ===
+                  request.animal_id
+            );
+
+
+          const photo =
+            animal?.photo_url ||
+            "";
+
+
+          const profileUrl =
+            request.animal_uuid
+              ? `${CHANGE_REQUEST_PUBLIC_PROFILE_URL}${encodeURIComponent(
+                  request.animal_uuid
+                )}`
+              : "";
+
+
+          const photoHtml =
+            photo
+              ? `
+                <img
+                  src="${escapeHtml(
+                    photo
+                  )}"
+                  alt="${escapeHtml(
+                    request.animal_name
+                  )}"
+                >
+              `
+              : `
+                <span>
+                  🐾
+                </span>
+              `;
+
+
+          const viewButton =
+            profileUrl
+              ? `
+                <button
+                  type="button"
+                  class="change-request-action"
+                  onclick="window.open(
+                    '${escapeHtml(
+                      profileUrl
+                    )}',
+                    '_blank',
+                    'noopener,noreferrer'
+                  )"
+                >
+                  VIEW ANIMAL
+                </button>
+              `
+              : "";
+
+
+          const attachmentButton =
+            request.attachment_path
+              ? `
+                <button
+                  type="button"
+                  class="change-request-action primary"
+                  data-attachment-request="${escapeHtml(
+                    request.id
+                  )}"
+                  onclick="loadChangeRequestAttachmentUrl(
+                    '${escapeHtml(
+                      request.id
+                    )}',
+                    '${escapeHtml(
+                      request.attachment_path
+                    )}'
+                  )"
+                >
+                  📎 OPEN DOCUMENT
+                </button>
+              `
+              : "";
+
+
+          const attachmentInfo =
+            request.attachment_name
+              ? `
+                <div class="change-request-attachment">
+                  📎 ${escapeHtml(
+                    request.attachment_name
+                  )}
+                </div>
+              `
+              : "";
+
+
+          return `
+            <article
+              class="change-request-item"
+            >
+
+              <div
+                class="change-request-photo"
+              >
+                ${photoHtml}
+              </div>
+
+
+              <div>
+
+                <div
+                  class="change-request-top"
+                >
+
+                  <span
+                    class="change-request-animal"
+                  >
+                    ${escapeHtml(
+                      request.animal_name
+                    )}
+                  </span>
+
+                  <span
+                    class="change-request-badge"
+                  >
+                    ${escapeHtml(
+                      request.status ||
+                      "PENDING"
+                    )}
+                  </span>
+
+                </div>
+
+
+                <div
+                  class="change-request-id"
+                >
+                  ${escapeHtml(
+                    request.animal_id
+                  )}
+                </div>
+
+
+                <div
+                  class="change-request-meta"
+                >
+
+                  <span>
+                    👤 ${escapeHtml(
+                      request.requester_name
+                    )}
+                  </span>
+
+                  <span>
+                    ✉ ${escapeHtml(
+                      request.requester_email
+                    )}
+                  </span>
+
+                  <span>
+                    📝 ${escapeHtml(
+                      request.change_type
+                    )}
+                  </span>
+
+                  <span>
+                    🕒 ${escapeHtml(
+                      formatChangeRequestDate(
+                        request.created_at
+                      )
+                    )}
+                  </span>
+
+                </div>
+
+
+                <div
+                  class="change-request-message"
+                >
+                  ${escapeHtml(
+                    request.message
+                  )}
+                </div>
+
+
+                ${attachmentInfo}
+
+              </div>
+
+
+              <div
+                class="change-request-actions"
+              >
+
+                ${viewButton}
+
+                ${attachmentButton}
+
+
+                <button
+                  type="button"
+                  class="change-request-action review"
+                  data-review-request="${escapeHtml(
+                    request.id
+                  )}"
+                  onclick="updateChangeRequestStatus(
+                    '${escapeHtml(
+                      request.id
+                    )}',
+                    'REVIEWED'
+                  )"
+                >
+                  ✓ MARK REVIEWED
+                </button>
+
+
+                <button
+                  type="button"
+                  class="change-request-action reject"
+                  data-reject-request="${escapeHtml(
+                    request.id
+                  )}"
+                  onclick="updateChangeRequestStatus(
+                    '${escapeHtml(
+                      request.id
+                    )}',
+                    'REJECTED'
+                  )"
+                >
+                  REJECT
+                </button>
+
+              </div>
+
+            </article>
+          `;
+        }
+      )
+      .join("");
+}
+
+
+async function updateChangeRequestStatus(
+  requestId,
+  status
+) {
+
+  if (
+    !requestId ||
+    ![
+      "REVIEWED",
+      "REJECTED"
+    ].includes(
+      status
+    )
+  ) {
+    return;
+  }
+
+
+  const request =
+    changeRequestsCache.find(
+      item =>
+        item.id ===
+        requestId
+    );
+
+
+  if (!request) {
+    return;
+  }
+
+
+  const actionText =
+    status === "REVIEWED"
+      ? "mark this request as reviewed"
+      : "reject this request";
+
+
+  if (
+    !window.confirm(
+      `Are you sure you want to ${actionText}?`
+    )
+  ) {
+    return;
+  }
+
+
+  const buttons =
+    document.querySelectorAll(
+      `[data-review-request="${requestId}"],
+       [data-reject-request="${requestId}"]`
+    );
+
+
+  buttons.forEach(
+    button =>
+      button.disabled =
+        true
+  );
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "change_requests"
+        )
+        .update({
+          status,
+          reviewed_at:
+            new Date().toISOString(),
+          reviewed_by:
+            currentUser?.id ||
+            null
+        })
+        .eq(
+          "id",
+          requestId
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    await loadChangeRequests();
+
+
+  } catch (error) {
+
+    console.error(
+      "Change request update error:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Unable to update the change request."
+    );
+
+
+    buttons.forEach(
+      button =>
+        button.disabled =
+          false
+    );
+  }
+}
+
+
+async function loadChangeRequests() {
+
+  ensureChangeRequestPanel();
+
+
+  const list =
+    document.getElementById(
+      "changeRequestList"
+    );
+
+
+  if (list) {
+
+    list.innerHTML = `
+      <div class="change-request-loading">
+        Loading change requests...
+      </div>
+    `;
+  }
+
+
+  const {
+    data,
+    error,
+    count
   } =
     await supabaseClient
       .from(
         "change_requests"
       )
       .select(
-        "id",
+        `
+          id,
+          animal_id,
+          animal_uuid,
+          animal_name,
+          requester_name,
+          requester_email,
+          change_type,
+          message,
+          attachment_name,
+          attachment_type,
+          attachment_size,
+          attachment_path,
+          attachment_storage,
+          status,
+          created_at,
+          reviewed_at,
+          reviewed_by
+        `,
         {
           count:
-            "exact",
-          head:
-            true
+            "exact"
         }
       )
       .eq(
         "status",
         "PENDING"
+      )
+      .order(
+        "created_at",
+        {
+          ascending:
+            false
+        }
       );
 
 
@@ -797,16 +1830,53 @@ async function loadChangeRequests() {
     );
 
 
-    changeRequests.textContent =
-      "0";
+    changeRequestsCache =
+      [];
+
+
+    updateChangeRequestNotification(
+      0
+    );
+
+
+    if (list) {
+
+      list.innerHTML = `
+        <div
+          class="change-request-empty"
+          style="
+            color:#a64040;
+            background:
+              rgba(184,76,76,.08)
+          "
+        >
+          Unable to load change requests.
+          ${escapeHtml(
+            error.message ||
+            "Please check the change_requests table and RLS policies."
+          )}
+        </div>
+      `;
+    }
 
 
     return;
   }
 
 
-  changeRequests.textContent =
-    count || 0;
+  changeRequestsCache =
+    data || [];
+
+
+  updateChangeRequestNotification(
+    count ||
+    changeRequestsCache.length
+  );
+
+
+  renderChangeRequests(
+    changeRequestsCache
+  );
 }
 
 
@@ -1028,7 +2098,8 @@ function renderAnimalCard(
           <strong
             style="
               color:var(--navy);
-              font-size:14px;
+              font-size:15px;
+              font-weight:900;
             "
           >
             ${escapeHtml(
@@ -1039,39 +2110,30 @@ function renderAnimalCard(
 
           <span
             style="
-              display:inline-flex;
               padding:4px 8px;
               border-radius:999px;
-              background:rgba(45,138,98,.12);
-              color:#287651;
-              font-size:8px;
-              font-weight:800;
+              background:
+                ${
+                  animal.is_lost
+                    ? "rgba(184,76,76,.12)"
+                    : "rgba(45,138,98,.10)"
+                };
+              color:
+                ${
+                  animal.is_lost
+                    ? "#a64040"
+                    : "#287651"
+                };
+              font-size:7px;
+              font-weight:900;
             "
           >
-            ${escapeHtml(
-              animal.status
-            )}
+            ${
+              animal.is_lost
+                ? "LOST"
+                : "ACTIVE"
+            }
           </span>
-
-
-          ${
-            animal.is_lost
-              ? `
-                <span
-                  style="
-                    padding:4px 8px;
-                    border-radius:999px;
-                    background:rgba(184,76,76,.14);
-                    color:#a64040;
-                    font-size:8px;
-                    font-weight:800;
-                  "
-                >
-                  LOST
-                </span>
-              `
-              : ""
-          }
 
         </div>
 
@@ -1080,7 +2142,7 @@ function renderAnimalCard(
           style="
             margin-top:4px;
             color:var(--muted);
-            font-size:10px;
+            font-size:9px;
             font-weight:700;
           "
         >
@@ -1092,58 +2154,107 @@ function renderAnimalCard(
 
         <div
           style="
-            margin-top:7px;
             display:flex;
-            gap:12px;
             flex-wrap:wrap;
+            gap:8px 14px;
+            margin-top:8px;
             color:var(--muted);
-            font-size:9px;
+            font-size:8px;
           "
         >
 
           <span>
-            ${escapeHtml(
-              animal.type ||
-              "—"
+            🐾 ${escapeHtml(
+              animal.type
             )}
           </span>
 
           <span>
-            ${escapeHtml(
+            🧬 ${escapeHtml(
               animal.breed ||
-              "—"
+              "Not specified"
             )}
           </span>
 
           <span>
-            ${escapeHtml(
-              location ||
-              "Location not added"
+            ⚥ ${escapeHtml(
+              animal.gender ||
+              "Not specified"
             )}
           </span>
+
+          ${
+            location
+              ? `
+                <span>
+                  📍 ${escapeHtml(
+                    location
+                  )}
+                </span>
+              `
+              : ""
+          }
 
         </div>
 
       </div>
 
 
-      <div>
+      <div
+        style="
+          display:flex;
+          flex-direction:column;
+          gap:7px;
+          align-items:stretch;
+        "
+      >
 
         <button
           type="button"
-          onclick="openAnimalEditor('${animal.id}')"
+          onclick="openEditAnimal('${escapeHtml(
+            animal.id
+          )}')"
           style="
             border:0;
-            border-radius:11px;
-            padding:9px 13px;
+            border-radius:9px;
+            padding:8px 11px;
             background:var(--surface);
             color:var(--navy);
             box-shadow:var(--shadow-soft);
-            font-size:9px;
-            font-weight:800;
+            font-size:8px;
+            font-weight:900;
+            cursor:pointer;
           "
         >
           EDIT
+        </button>
+
+
+        <button
+          type="button"
+          onclick="openAnimalProfile('${escapeHtml(
+            animal.id
+          )}')"
+          style="
+            border:0;
+            border-radius:9px;
+            padding:8px 11px;
+            background:
+              linear-gradient(
+                135deg,
+                #245579,
+                #173d5d
+              );
+            color:#fff;
+            box-shadow:
+              0 5px 12px
+              rgba(23,61,93,.18);
+            font-size:8px;
+            font-weight:900;
+            cursor:pointer;
+          "
+        >
+          VIEW ID
         </button>
 
       </div>
@@ -1151,1299 +2262,562 @@ function renderAnimalCard(
     </div>
   `;
 }
-
-
 /* ============================================================
-   LOADING
+   ANIMAL PROFILE
    ============================================================ */
 
-function setLoading(
-  isLoading
+function openAnimalProfile(
+  animalId
 ) {
 
-  loading.style.display =
-    isLoading
-      ? "block"
-      : "none";
-}
-
-
-/* ============================================================
-   EDITOR STYLES
-   ============================================================ */
-
-function addEditorStyles() {
-
-  if (
-    document.getElementById(
-      "animalEditorStyles"
-    )
-  ) {
-
+  if (!animalId) {
     return;
   }
 
 
-  const style =
-    document.createElement(
-      "style"
-    );
-
-
-  style.id =
-    "animalEditorStyles";
-
-
-  style.textContent = `
-
-    .animal-modal {
-      position:fixed;
-      inset:0;
-      z-index:9999;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      background:rgba(8,36,63,.45);
-      backdrop-filter:blur(8px);
-    }
-
-    .animal-modal.open {
-      display:flex;
-    }
-
-    .animal-modal-card {
-      width:100%;
-      max-width:1050px;
-      max-height:92vh;
-      overflow:auto;
-      border-radius:26px;
-      background:var(--surface);
-      box-shadow:
-        16px 16px 35px rgba(20,35,48,.30),
-        -10px -10px 25px rgba(255,255,255,.85);
-    }
-
-    .animal-modal-header {
-      position:sticky;
-      top:0;
-      z-index:3;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:15px;
-      padding:20px 24px;
-      color:#fff;
-      background:
-        linear-gradient(
-          135deg,
-          #173d5d,
-          #245579
-        );
-    }
-
-    .animal-modal-header h2 {
-      margin:0;
-      font-size:17px;
-    }
-
-    .animal-modal-header p {
-      margin:4px 0 0;
-      font-size:9px;
-      opacity:.75;
-    }
-
-    .modal-close {
-      width:36px;
-      height:36px;
-      border:0;
-      border-radius:12px;
-      color:#fff;
-      background:rgba(255,255,255,.12);
-      font-size:20px;
-    }
-
-    .animal-editor-body {
-      padding:22px;
-    }
-
-    .editor-section {
-      margin-bottom:20px;
-      padding:18px;
-      border-radius:19px;
-      background:var(--surface);
-      box-shadow:var(--shadow-soft);
-    }
-
-    .editor-section h3 {
-      margin:0 0 14px;
-      color:var(--navy);
-      font-size:13px;
-    }
-
-    .editor-grid {
-      display:grid;
-      grid-template-columns:
-        repeat(3,minmax(0,1fr));
-      gap:13px;
-    }
-
-        /* ============================================================
-       IDENTITY + PHOTO LAYOUT
-       ============================================================ */
-
-    .identity-layout {
-      display:grid;
-      grid-template-columns:
-        minmax(0,1fr)
-        280px;
-      gap:18px;
-      align-items:start;
-    }
-
-    .identity-fields {
-      display:grid;
-      grid-template-columns:
-        repeat(3,minmax(0,1fr));
-      gap:13px;
-    }
-
-    .identity-photo-card {
-      padding:14px;
-      border-radius:16px;
-      background:
-        rgba(255,255,255,.42);
-      box-shadow:
-        var(--shadow-soft);
-      min-height:100%;
-    }
-
-    .identity-photo-card-title {
-      display:flex;
-      align-items:center;
-      gap:7px;
-      margin:0 0 10px 3px;
-      color:var(--navy);
-      font-size:12px;
-      font-weight:800;
-    }
-
-    .identity-photo-card
-    .photo-upload-box {
-      padding:10px;
-      background:
-        rgba(255,255,255,.35);
-      box-shadow:none;
-    }
-
-    .identity-photo-card
-    .photo-preview {
-      min-height:190px;
-    }
-
-    .identity-photo-card
-    .photo-upload-button {
-      font-size:10px;
-      padding:11px 8px;
-    }
-
-    .identity-photo-card
-    .photo-upload-help {
-      text-align:center;
-    }
-
-    .editor-field {
-      min-width:0;
-    }
-
-    .editor-field.full {
-      grid-column:1/-1;
-    }
-
-    .editor-field label {
-      display:block;
-      margin:0 0 6px 3px;
-      color:var(--muted);
-      font-size:9px;
-      font-weight:700;
-    }
-
-    .editor-field input,
-    .editor-field select,
-    .editor-field textarea {
-      width:100%;
-      border:0;
-      outline:0;
-      border-radius:11px;
-      padding:10px 11px;
-      color:var(--text);
-      background:var(--surface);
-      box-shadow:var(--shadow-inset);
-      font-size:10px;
-    }
-
-    .editor-field textarea {
-      min-height:70px;
-      resize:vertical;
-    }
-
-    .photo-upload-box {
-      padding:12px;
-      border-radius:14px;
-      background:rgba(255,255,255,.25);
-      box-shadow:var(--shadow-inset);
-    }
-
-    .photo-upload-button {
-      width:100%;
-      border:0;
-      border-radius:11px;
-      padding:11px 13px;
-      color:#fff;
-      background:
-        linear-gradient(
-          135deg,
-          #245579,
-          #173d5d
-        );
-      box-shadow:var(--shadow-soft);
-      font-size:10px;
-      font-weight:800;
-      cursor:pointer;
-    }
-
-    .photo-upload-button:hover {
-      transform:translateY(-1px);
-    }
-
-    .photo-upload-help {
-      margin-top:7px;
-      text-align:center;
-      color:var(--muted);
-      font-size:8px;
-    }
-
-    .photo-preview {
-      margin-top:10px;
-      width:100%;
-      min-height:120px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      border-radius:12px;
-      background:#dce4e9;
-      box-shadow:var(--shadow-inset);
-    }
-
-    .photo-preview img {
-      display:block;
-      width:100%;
-      max-height:180px;
-      object-fit:cover;
-      border-radius:10px;
-    }
-
-    .photo-preview-empty {
-      padding:25px 10px;
-      color:var(--muted);
-      font-size:10px;
-      text-align:center;
-    }
-
-    .photo-upload-status {
-      margin-top:7px;
-      min-height:16px;
-      font-size:9px;
-      font-weight:700;
-      text-align:center;
-    }
-
-    .editor-checks {
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .editor-check {
-      display:flex;
-      align-items:center;
-      gap:7px;
-      padding:9px 11px;
-      border-radius:11px;
-      background:var(--surface);
-      box-shadow:var(--shadow-soft);
-      font-size:9px;
-      color:var(--text);
-    }
-
-    .editor-check input {
-      accent-color:#245579;
-    }
-
-    .repeat-row {
-      display:grid;
-      grid-template-columns:
-        1.2fr 1fr 1fr 1fr;
-      gap:9px;
-      margin-bottom:9px;
-      padding:11px;
-      border-radius:13px;
-      background:rgba(255,255,255,.25);
-      box-shadow:var(--shadow-inset);
-    }
-
-    .repeat-row input,
-    .repeat-row select {
-      width:100%;
-      border:0;
-      outline:0;
-      border-radius:9px;
-      padding:8px;
-      background:var(--surface);
-      box-shadow:var(--shadow-soft);
-      font-size:9px;
-    }
-
-    .repeat-remove {
-      border:0;
-      border-radius:9px;
-      color:#a64040;
-      background:rgba(184,76,76,.10);
-      font-size:9px;
-      font-weight:800;
-    }
-
-    .editor-add {
-      border:0;
-      border-radius:10px;
-      padding:9px 12px;
-      color:var(--navy);
-      background:var(--surface);
-      box-shadow:var(--shadow-soft);
-      font-size:9px;
-      font-weight:800;
-    }
-
-    .editor-footer {
-      position:sticky;
-      bottom:0;
-      z-index:3;
-      display:flex;
-      justify-content:flex-end;
-      gap:10px;
-      padding:15px 22px;
-      background:rgba(232,237,241,.94);
-      backdrop-filter:blur(8px);
-    }
-
-    .editor-cancel,
-    .editor-save {
-      border:0;
-      border-radius:12px;
-      padding:11px 17px;
-      font-size:10px;
-      font-weight:800;
-    }
-
-    .editor-cancel {
-      color:var(--navy);
-      background:var(--surface);
-      box-shadow:var(--shadow-soft);
-    }
-
-    .editor-save {
-      color:#fff;
-      background:
-        linear-gradient(
-          135deg,
-          #245579,
-          #173d5d
-        );
-      box-shadow:var(--shadow-soft);
-    }
-
-    .editor-save:disabled {
-      opacity:.6;
-    }
-
-    .editor-message {
-      margin-right:auto;
-      align-self:center;
-      color:#b84c4c;
-      font-size:10px;
-      font-weight:700;
-    }
-
-    @media(max-width:800px) {
-
-      .editor-grid {
-        grid-template-columns:
-          repeat(2,minmax(0,1fr));
-      }
-
-            .identity-layout {
-        grid-template-columns:
-          1fr;
-      }
-
-      .identity-fields {
-        grid-template-columns:
-          repeat(2,minmax(0,1fr));
-      }
-
-      .repeat-row {
-        grid-template-columns:
-          repeat(2,minmax(0,1fr));
-      }
-    }
-
-    @media(max-width:560px) {
-
-      .animal-modal {
-        padding:8px;
-      }
-
-      .animal-modal-card {
-        max-height:96vh;
-        border-radius:19px;
-      }
-
-      .animal-modal-header {
-        padding:15px;
-      }
-
-      .animal-editor-body {
-        padding:13px;
-      }
-
-      .editor-section {
-        padding:13px;
-      }
-
-      .editor-grid {
-        grid-template-columns:1fr;
-      }
-
-      .repeat-row {
-        grid-template-columns:1fr;
-      }
-
-      .editor-footer {
-        padding:12px;
-      }
-    }
-  `;
-
-
-  document.head.appendChild(
-    style
+  const url =
+    `./profile.html?id=${encodeURIComponent(
+      animalId
+    )}`;
+
+
+  window.open(
+    url,
+    "_blank"
   );
 }
 
 
 /* ============================================================
-   CREATE EDITOR MODAL
+   ADD / EDIT ANIMAL MODAL
    ============================================================ */
 
-function createEditorModal() {
+function getAnimalModal() {
 
-  if (
+  let modal =
     document.getElementById(
-      "animalEditorModal"
-    )
-  ) {
+      "animalModal"
+    );
 
-    return;
+
+  if (modal) {
+    return modal;
   }
 
 
-  addEditorStyles();
-
-
-  const modal =
+  modal =
     document.createElement(
       "div"
     );
 
 
   modal.id =
-    "animalEditorModal";
-
-
-  modal.className =
-    "animal-modal";
+    "animalModal";
 
 
   modal.innerHTML = `
+    <div
+      id="animalModalBackdrop"
+      style="
+        position:fixed;
+        inset:0;
+        z-index:9998;
+        background:rgba(15,35,50,.42);
+        backdrop-filter:blur(5px);
+      "
+    ></div>
 
-    <div class="animal-modal-card">
 
-      <div class="animal-modal-header">
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:9999;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:18px;
+        overflow:auto;
+      "
+    >
 
-        <div>
+      <div
+        id="animalModalCard"
+        style="
+          width:min(760px,100%);
+          max-height:92vh;
+          overflow:auto;
+          padding:22px;
+          border-radius:24px;
+          background:var(--surface);
+          box-shadow:
+            0 25px 70px
+            rgba(15,35,50,.25);
+        "
+      >
 
-          <h2 id="editorTitle">
-            Add Animal
-          </h2>
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:18px;
+          "
+        >
 
-          <p>
-            Animal Digital ID Registry
-          </p>
+          <div>
+
+            <div
+              id="animalModalTitle"
+              style="
+                color:var(--navy);
+                font-size:18px;
+                font-weight:900;
+              "
+            >
+              Add Animal
+            </div>
+
+            <div
+              style="
+                margin-top:3px;
+                color:var(--muted);
+                font-size:9px;
+              "
+            >
+              Create or update an Animal Digital ID record.
+            </div>
+
+          </div>
+
+
+          <button
+            type="button"
+            onclick="closeAnimalModal()"
+            style="
+              width:34px;
+              height:34px;
+              border:0;
+              border-radius:50%;
+              background:var(--surface);
+              color:var(--navy);
+              box-shadow:var(--shadow-soft);
+              cursor:pointer;
+              font-size:16px;
+            "
+          >
+            ×
+          </button>
 
         </div>
 
-        <button
-          id="modalClose"
-          class="modal-close"
-          type="button"
+
+        <form
+          id="animalForm"
+          onsubmit="saveAnimal(event)"
         >
-          ×
-        </button>
 
-      </div>
-
-
-      <form
-        id="animalEditorForm"
-        class="animal-editor-body"
-      >
-
-
-               <!-- IDENTITY -->
-
-        <section class="editor-section">
-
-          <h3>
-            🐾 Animal Identity
-          </h3>
-
-
-          <div class="identity-layout">
-
-
-            <!-- LEFT: ANIMAL DETAILS -->
-
-            <div class="identity-fields">
-
-
-              <div class="editor-field">
-
-                <label>
-                  Animal ID *
-                </label>
-
-                <input
-                  id="f_animal_id"
-                  required
-                  placeholder="ANM-KA-2026-000001"
-                >
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Name *
-                </label>
-
-                <input
-                  id="f_name"
-                  required
-                  placeholder="Animal name"
-                >
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Type *
-                </label>
-
-                <input
-                  id="f_type"
-                  required
-                  placeholder="Dog / Cat / Cow..."
-                >
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Breed
-                </label>
-
-                <input
-                  id="f_breed"
-                  placeholder="Breed"
-                >
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Gender
-                </label>
-
-                <select id="f_gender">
-
-                  <option value="">
-                    Select
-                  </option>
-
-                  <option value="Male">
-                    Male
-                  </option>
-
-                  <option value="Female">
-                    Female
-                  </option>
-
-                  <option value="Unknown">
-                    Unknown
-                  </option>
-
-                </select>
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Date of Birth
-                </label>
-
-                <input
-                  id="f_dob"
-                  type="date"
-                >
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Colour
-                </label>
-
-                <input
-                  id="f_colour"
-                  placeholder="Colour"
-                >
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Markings
-                </label>
-
-                <input
-                  id="f_markings"
-                  placeholder="Identifying markings"
-                >
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Microchip Number
-                </label>
-
-                <input
-                  id="f_microchip"
-                >
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Microchip Provider
-                </label>
-
-                <input
-                  id="f_microchip_provider"
-                >
-
-              </div>
-
-
-              <div class="editor-field">
-
-                <label>
-                  Government Reference
-                </label>
-
-                <input
-                  id="f_government_reference"
-                >
-
-              </div>
-
-
-              <div class="editor-field full">
-
-                <label>
-                  Identification Notes
-                </label>
-
-                <textarea
-                  id="f_identification_notes"
-                  placeholder="Additional identification details..."
-                ></textarea>
-
-              </div>
-
-
-            </div>
-
-
-            <!-- RIGHT: ANIMAL PHOTO -->
-
-            <div class="identity-photo-card">
-
-
-              <div class="identity-photo-card-title">
-                📷 Animal Photo
-              </div>
-
-
-              <div class="photo-upload-box">
-
-                <input
-                  id="f_photo_file"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  style="display:none"
-                >
-
-
-                <button
-                  id="photoUploadButton"
-                  type="button"
-                  class="photo-upload-button"
-                >
-                  📷 Choose Photo from Laptop
-                </button>
-
-
-                <div class="photo-upload-help">
-                  JPG, PNG or WebP • Maximum 5 MB
-                </div>
-
-
-                <div
-                  id="photoPreview"
-                  class="photo-preview"
-                >
-
-                  <div class="photo-preview-empty">
-                    🐾 No photo selected
-                  </div>
-
-                </div>
-
-
-                <div
-                  id="photoUploadStatus"
-                  class="photo-upload-status"
-                ></div>
-
-              </div>
-
-
-              <input
-                id="f_photo"
-                type="hidden"
+          <input
+            type="hidden"
+            id="animalFormId"
+          >
+
+
+          <div
+            style="
+              display:grid;
+              grid-template-columns:
+                repeat(2,minmax(0,1fr));
+              gap:13px;
+            "
+          >
+
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
               >
-
-
-            </div>
-
-
-          </div>
-
-        </section>
-
-        <!-- OWNER -->
-
-        <section class="editor-section">
-
-          <h3>
-            👤 Owner
-          </h3>
-
-          <div class="editor-grid">
-
-            <div class="editor-field">
-
-              <label>
-                Owner Name
+                Animal ID
               </label>
 
               <input
-                id="f_owner_name"
+                id="animalFormAnimalId"
+                required
+                placeholder="e.g. ADI-0001"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
-
             </div>
 
 
-            <div class="editor-field">
-
-              <label>
-                Phone
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Animal Name
               </label>
 
               <input
-                id="f_owner_phone"
-                type="tel"
+                id="animalFormName"
+                required
+                placeholder="Animal name"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
-
             </div>
 
 
-            <div class="editor-field">
-
-              <label>
-                Alternate Phone
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Type
               </label>
 
               <input
-                id="f_owner_alt"
-                type="tel"
+                id="animalFormType"
+                placeholder="Dog, Cat, Horse..."
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
-
             </div>
 
 
-            <div class="editor-field">
-
-              <label>
-                Email
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Breed
               </label>
 
               <input
-                id="f_owner_email"
-                type="email"
+                id="animalFormBreed"
+                placeholder="Breed"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
-
             </div>
 
 
-            <div class="editor-field">
-
-              <label>
-                City
-              </label>
-
-              <input
-                id="f_owner_city"
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
               >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                State
+                Gender
               </label>
 
-              <input
-                id="f_owner_state"
+              <select
+                id="animalFormGender"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Country
-              </label>
-
-              <input
-                id="f_owner_country"
-                value="India"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Postal Code
-              </label>
-
-              <input
-                id="f_owner_postal"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Emergency Contact
-              </label>
-
-              <input
-                id="f_emergency_name"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Emergency Phone
-              </label>
-
-              <input
-                id="f_emergency_phone"
-                type="tel"
-              >
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        <!-- LOCATION -->
-
-        <section class="editor-section">
-
-          <h3>
-            📍 Location
-          </h3>
-
-          <div class="editor-grid">
-
-            <div class="editor-field">
-
-              <label>
-                City
-              </label>
-
-              <input
-                id="f_location_city"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                State
-              </label>
-
-              <input
-                id="f_location_state"
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Country
-              </label>
-
-              <input
-                id="f_location_country"
-                value="India"
-              >
-
-            </div>
-
-
-            <div class="editor-field full">
-
-              <label>
-                Google Maps URL
-              </label>
-
-              <input
-                id="f_map_url"
-                type="url"
-                placeholder="https://maps.google.com/..."
-              >
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        <!-- BEHAVIOUR -->
-
-        <section class="editor-section">
-
-          <h3>
-            🧠 Behaviour & Temperament
-          </h3>
-
-          <div class="editor-grid">
-
-            <div class="editor-field">
-
-              <label>
-                Temperament
-              </label>
-
-              <input
-                id="f_temperament"
-                placeholder="Friendly / Cautious..."
-              >
-
-            </div>
-
-
-            <div class="editor-field">
-
-              <label>
-                Energy Level
-              </label>
-
-              <select id="f_energy">
-
                 <option value="">
-                  Select
+                  Select gender
                 </option>
 
-                <option value="Low">
-                  Low
+                <option value="Male">
+                  Male
                 </option>
 
-                <option value="Moderate">
-                  Moderate
+                <option value="Female">
+                  Female
                 </option>
 
-                <option value="High">
-                  High
+                <option value="Unknown">
+                  Unknown
                 </option>
-
               </select>
-
             </div>
 
 
-            <div class="editor-field">
-
-              <label>
-                Stranger Friendliness
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Date of Birth
               </label>
 
               <input
-                id="f_stranger"
+                id="animalFormDob"
+                type="date"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
-
             </div>
 
 
-            <div class="editor-field">
-
-              <label>
-                Leash Behaviour
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Colour
               </label>
 
               <input
-                id="f_leash"
+                id="animalFormColour"
+                placeholder="Colour"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
-
             </div>
 
 
-            <div class="editor-field">
-
-              <label>
-                Handling Behaviour
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Markings
               </label>
 
               <input
-                id="f_handling"
+                id="animalFormMarkings"
+                placeholder="Distinctive markings"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
-
             </div>
 
 
-            <div class="editor-field">
-
-              <label>
-                Food Preferences
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Microchip Number
               </label>
 
               <input
-                id="f_food"
+                id="animalFormMicrochip"
+                placeholder="Microchip number"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
-
             </div>
 
 
-            <div class="editor-field full">
-
-              <div class="editor-checks">
-
-                <label class="editor-check">
-
-                  <input
-                    id="f_children"
-                    type="checkbox"
-                  >
-
-                  Good with children
-
-                </label>
-
-
-                <label class="editor-check">
-
-                  <input
-                    id="f_dogs"
-                    type="checkbox"
-                  >
-
-                  Good with dogs
-
-                </label>
-
-
-                <label class="editor-check">
-
-                  <input
-                    id="f_cats"
-                    type="checkbox"
-                  >
-
-                  Good with cats
-
-                </label>
-
-              </div>
-
-            </div>
-
-
-            <div class="editor-field full">
-
-              <label>
-                Behaviour Special Instructions
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Microchip Provider
               </label>
 
-              <textarea
-                id="f_behaviour_instructions"
-              ></textarea>
-
+              <input
+                id="animalFormMicrochipProvider"
+                placeholder="Provider"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
             </div>
 
-          </div>
 
-        </section>
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Government Reference
+              </label>
 
-
-        <!-- VACCINATIONS -->
-
-        <section class="editor-section">
-
-          <h3>
-            💉 Vaccinations
-          </h3>
-
-          <div id="vaccinationRows"></div>
-
-          <button
-            id="addVaccination"
-            class="editor-add"
-            type="button"
-          >
-            ＋ Add Vaccination
-          </button>
-
-        </section>
-
-
-        <!-- MEDICAL -->
-
-        <section class="editor-section">
-
-          <h3>
-            🏥 Medical Records
-          </h3>
-
-          <div id="medicalRows"></div>
-
-          <button
-            id="addMedical"
-            class="editor-add"
-            type="button"
-          >
-            ＋ Add Medical Record
-          </button>
-
-        </section>
+              <input
+                id="animalFormGovernmentReference"
+                placeholder="Reference number"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
+            </div>
 
 
-        <!-- WEIGHT -->
-
-        <section class="editor-section">
-
-          <h3>
-            ⚖️ Weight History
-          </h3>
-
-          <div id="weightRows"></div>
-
-          <button
-            id="addWeight"
-            class="editor-add"
-            type="button"
-          >
-            ＋ Add Weight Record
-          </button>
-
-        </section>
-
-
-        <!-- REGISTRY -->
-
-        <section class="editor-section">
-
-          <h3>
-            ⚙️ Registry Settings
-          </h3>
-
-          <div class="editor-grid">
-
-            <div class="editor-field">
-
-              <label>
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
                 Status
               </label>
 
-              <select id="f_status">
+              <select
+                id="animalFormStatus"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
 
                 <option value="ACTIVE RECORD">
                   ACTIVE RECORD
@@ -2453,129 +2827,463 @@ function createEditorModal() {
                   INACTIVE
                 </option>
 
-                <option value="TRANSFERRED">
-                  TRANSFERRED
-                </option>
-
-                <option value="DECEASED">
-                  DECEASED
-                </option>
-
                 <option value="ARCHIVED">
                   ARCHIVED
                 </option>
 
               </select>
-
             </div>
 
 
-            <div class="editor-field">
-
-              <label>
-                Registration Date
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                City
               </label>
 
               <input
-                id="f_registration_date"
-                type="date"
+                id="animalFormCity"
+                placeholder="City"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
               >
+            </div>
+
+
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                State
+              </label>
+
+              <input
+                id="animalFormState"
+                placeholder="State"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
+            </div>
+
+
+            <div>
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Country
+              </label>
+
+              <input
+                id="animalFormCountry"
+                placeholder="Country"
+                value="India"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
+            </div>
+
+
+            <div
+              style="
+                grid-column:1/-1;
+              "
+            >
+
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Map URL
+              </label>
+
+              <input
+                id="animalFormMapUrl"
+                placeholder="Google Maps URL"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              />
 
             </div>
 
 
-            <div class="editor-field">
+            <div
+              style="
+                grid-column:1/-1;
+              "
+            >
 
-              <label>
-                Visibility
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Identification Notes
               </label>
 
-              <div class="editor-checks">
+              <textarea
+                id="animalFormIdentificationNotes"
+                rows="3"
+                placeholder="Identification details..."
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  resize:vertical;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                  font-family:inherit;
+                "
+              ></textarea>
 
-                <label class="editor-check">
-
-                  <input
-                    id="f_public"
-                    type="checkbox"
-                    checked
-                  >
-
-                  Public Profile
-
-                </label>
+            </div>
 
 
-                <label class="editor-check">
+            <div
+              style="
+                grid-column:1/-1;
+              "
+            >
 
-                  <input
-                    id="f_lost"
-                    type="checkbox"
-                  >
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Special Instructions
+              </label>
 
-                  Lost Mode
+              <textarea
+                id="animalFormSpecialInstructions"
+                rows="3"
+                placeholder="Special care or handling instructions..."
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  resize:vertical;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                  font-family:inherit;
+                "
+              ></textarea>
 
-                </label>
+            </div>
 
+
+            <div
+              style="
+                grid-column:1/-1;
+              "
+            >
+
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Notes
+              </label>
+
+              <textarea
+                id="animalFormNotes"
+                rows="3"
+                placeholder="Additional notes..."
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  resize:vertical;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                  font-family:inherit;
+                "
+              ></textarea>
+
+            </div>
+
+
+            <div
+              style="
+                grid-column:1/-1;
+                padding:13px;
+                border-radius:14px;
+                background:rgba(36,85,121,.05);
+                box-shadow:var(--shadow-inset);
+              "
+            >
+
+              <div
+                style="
+                  color:var(--navy);
+                  font-size:9px;
+                  font-weight:900;
+                  margin-bottom:8px;
+                "
+              >
+                Animal Photo
+              </div>
+
+
+              <div
+                id="animalPhotoPreview"
+                style="
+                  width:110px;
+                  height:125px;
+                  overflow:hidden;
+                  border-radius:13px;
+                  background:#dce4e9;
+                  display:grid;
+                  place-items:center;
+                  margin-bottom:10px;
+                "
+              >
+                <span
+                  style="
+                    font-size:30px;
+                  "
+                >
+                  🐾
+                </span>
+              </div>
+
+
+              <input
+                id="animalPhotoInput"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onchange="handleAnimalPhoto(this)"
+                style="
+                  width:100%;
+                  font-size:9px;
+                "
+              />
+
+
+              <div
+                style="
+                  margin-top:6px;
+                  color:var(--muted);
+                  font-size:8px;
+                  line-height:1.5;
+                "
+              >
+                JPG, PNG or WebP • Maximum 5 MB
               </div>
 
             </div>
 
 
-            <div class="editor-field full">
+            <div
+              style="
+                grid-column:1/-1;
+                display:flex;
+                gap:10px;
+                align-items:center;
+                margin-top:5px;
+              "
+            >
 
-              <label>
-                Special Instructions
+              <label
+                style="
+                  display:flex;
+                  align-items:center;
+                  gap:7px;
+                  color:var(--navy);
+                  font-size:9px;
+                  font-weight:800;
+                  cursor:pointer;
+                "
+              >
+
+                <input
+                  id="animalFormPublic"
+                  type="checkbox"
+                  checked
+                />
+
+                Public Digital ID
+
               </label>
 
-              <textarea
-                id="f_special"
-              ></textarea>
 
-            </div>
+              <label
+                style="
+                  display:flex;
+                  align-items:center;
+                  gap:7px;
+                  color:var(--navy);
+                  font-size:9px;
+                  font-weight:800;
+                  cursor:pointer;
+                "
+              >
 
+                <input
+                  id="animalFormLost"
+                  type="checkbox"
+                />
 
-            <div class="editor-field full">
+                Mark as Lost
 
-              <label>
-                Internal Notes
               </label>
-
-              <textarea
-                id="f_notes"
-              ></textarea>
 
             </div>
 
           </div>
 
-        </section>
+
+          <div
+            id="animalFormMessage"
+            style="
+              min-height:18px;
+              margin-top:12px;
+              color:#a64040;
+              font-size:9px;
+              line-height:1.5;
+            "
+          ></div>
 
 
-      </form>
+          <div
+            style="
+              display:flex;
+              justify-content:flex-end;
+              gap:9px;
+              margin-top:5px;
+            "
+          >
+
+            <button
+              type="button"
+              onclick="closeAnimalModal()"
+              style="
+                border:0;
+                border-radius:10px;
+                padding:10px 14px;
+                background:var(--surface);
+                color:var(--navy);
+                box-shadow:var(--shadow-soft);
+                font-size:8px;
+                font-weight:900;
+                cursor:pointer;
+              "
+            >
+              CANCEL
+            </button>
 
 
-      <div class="editor-footer">
+            <button
+              id="animalSaveButton"
+              type="submit"
+              style="
+                border:0;
+                border-radius:10px;
+                padding:10px 16px;
+                background:
+                  linear-gradient(
+                    135deg,
+                    #245579,
+                    #173d5d
+                  );
+                color:#fff;
+                box-shadow:
+                  0 6px 15px
+                  rgba(23,61,93,.20);
+                font-size:8px;
+                font-weight:900;
+                cursor:pointer;
+              "
+            >
+              SAVE ANIMAL
+            </button>
 
-        <div
-          id="editorMessage"
-          class="editor-message"
-        ></div>
+          </div>
 
-        <button
-          id="editorCancel"
-          class="editor-cancel"
-          type="button"
-        >
-          Cancel
-        </button>
-
-        <button
-          id="editorSave"
-          class="editor-save"
-          type="button"
-        >
-          SAVE ANIMAL
-        </button>
+        </form>
 
       </div>
 
@@ -2588,894 +3296,114 @@ function createEditorModal() {
   );
 
 
-  /* ============================================================
-     PHOTO UPLOAD EVENTS
-     ============================================================ */
-
-  document
-    .getElementById(
-      "photoUploadButton"
-    )
-    .addEventListener(
-      "click",
-      () => {
-
-        document
-          .getElementById(
-            "f_photo_file"
-          )
-          .click();
-
-      }
-    );
-
-
-  document
-    .getElementById(
-      "f_photo_file"
-    )
-    .addEventListener(
-      "change",
-      event => {
-
-        const file =
-          event.target.files?.[0];
-
-
-        const status =
-          document.getElementById(
-            "photoUploadStatus"
-          );
-
-
-        const preview =
-          document.getElementById(
-            "photoPreview"
-          );
-
-
-        status.textContent =
-          "";
-
-        status.style.color =
-          "#b84c4c";
-
-
-        if (!file) {
-
-          selectedPhotoFile =
-            null;
-
-          return;
-        }
-
-
-        const allowedTypes = [
-          "image/jpeg",
-          "image/png",
-          "image/webp"
-        ];
-
-
-        if (
-          !allowedTypes.includes(
-            file.type
-          )
-        ) {
-
-          status.textContent =
-            "Please select JPG, PNG or WebP.";
-
-
-          event.target.value =
-            "";
-
-
-          selectedPhotoFile =
-            null;
-
-
-          return;
-        }
-
-
-        if (
-          file.size >
-          MAX_PHOTO_SIZE
-        ) {
-
-          status.textContent =
-            "Photo must be 5 MB or smaller.";
-
-
-          event.target.value =
-            "";
-
-
-          selectedPhotoFile =
-            null;
-
-
-          return;
-        }
-
-
-        selectedPhotoFile =
-          file;
-
-
-        const reader =
-          new FileReader();
-
-
-        reader.onload =
-          event => {
-
-            preview.innerHTML = `
-              <img
-                src="${event.target.result}"
-                alt="Selected animal photo"
-              >
-            `;
-
-
-            status.style.color =
-              "#2d8a62";
-
-
-            status.textContent =
-              `✓ ${file.name} selected`;
-          };
-
-
-        reader.readAsDataURL(
-          file
-        );
-
-      }
-    );
-
-
-  document
-    .getElementById(
-      "modalClose"
-    )
-    .addEventListener(
-      "click",
-      closeAnimalEditor
-    );
-
-
-  document
-    .getElementById(
-      "editorCancel"
-    )
-    .addEventListener(
-      "click",
-      closeAnimalEditor
-    );
-
-
-  document
-    .getElementById(
-      "editorSave"
-    )
-    .addEventListener(
-      "click",
-      saveAnimal
-    );
-
-
-  document
-    .getElementById(
-      "addVaccination"
-    )
-    .addEventListener(
-      "click",
-      () =>
-        addVaccinationRow()
-    );
-
-
-  document
-    .getElementById(
-      "addMedical"
-    )
-    .addEventListener(
-      "click",
-      () =>
-        addMedicalRow()
-    );
-
-
-  document
-    .getElementById(
-      "addWeight"
-    )
-    .addEventListener(
-      "click",
-      () =>
-        addWeightRow()
-    );
-
-
-  modal.addEventListener(
-    "click",
-    event => {
-
-      if (
-        event.target ===
-        modal
-      ) {
-
-        closeAnimalEditor();
-
-      }
-    }
-  );
-}
-/* ============================================================
-   FIELD HELPER
-   ============================================================ */
-
-function setField(
-  id,
-  value
-) {
-
-  const element =
-    document.getElementById(id);
-
-
-  if (!element) {
-    return;
-  }
-
-
-  if (
-    element.type ===
-    "checkbox"
-  ) {
-
-    element.checked =
-      Boolean(value);
-
-    return;
-  }
-
-
-  element.value =
-    value ?? "";
+  return modal;
 }
 
 
 /* ============================================================
-   GET FIELD
+   OPEN ADD ANIMAL
    ============================================================ */
 
-function getField(
-  id
-) {
+function openAddAnimal() {
 
-  const element =
-    document.getElementById(id);
+  editingAnimalId =
+    null;
 
+  selectedPhotoFile =
+    null;
 
-  if (!element) {
-    return "";
-  }
+  currentPhotoUrl =
+    "";
 
-
-  if (
-    element.type ===
-    "checkbox"
-  ) {
-
-    return element.checked;
-  }
-
-
-  return element.value.trim();
-}
-
-
-/* ============================================================
-   ADD VACCINATION ROW
-   ============================================================ */
-
-function addVaccinationRow(
-  record = null
-) {
-
-  const container =
-    document.getElementById(
-      "vaccinationRows"
-    );
-
-
-  const row =
-    document.createElement(
-      "div"
-    );
-
-
-  row.className =
-    "repeat-row vaccination-row";
-
-
-  row.innerHTML = `
-
-    <input
-      data-field="vaccine"
-      placeholder="Vaccine name"
-      value="${escapeHtml(record?.vaccine_name || "")}"
-    >
-
-    <input
-      data-field="date"
-      type="date"
-      value="${escapeHtml(record?.vaccination_date || "")}"
-    >
-
-    <input
-      data-field="next"
-      type="date"
-      value="${escapeHtml(record?.next_due_date || "")}"
-    >
-
-    <input
-      data-field="batch"
-      placeholder="Batch / Lot"
-      value="${escapeHtml(record?.batch_number || "")}"
-    >
-
-    <input
-      data-field="manufacturer"
-      placeholder="Manufacturer"
-      value="${escapeHtml(record?.manufacturer || "")}"
-    >
-
-    <input
-      data-field="clinic"
-      placeholder="Clinic"
-      value="${escapeHtml(record?.clinic_name || "")}"
-    >
-
-    <input
-      data-field="vet"
-      placeholder="Veterinarian"
-      value="${escapeHtml(record?.veterinarian_name || "")}"
-    >
-
-    <select data-field="status">
-
-      <option value="RECORDED"
-        ${
-          record?.status === "RECORDED"
-            ? "selected"
-            : ""
-        }>
-        RECORDED
-      </option>
-
-      <option value="LATEST"
-        ${
-          record?.status === "LATEST"
-            ? "selected"
-            : ""
-        }>
-        LATEST
-      </option>
-
-      <option value="EXPIRED"
-        ${
-          record?.status === "EXPIRED"
-            ? "selected"
-            : ""
-        }>
-        EXPIRED
-      </option>
-
-    </select>
-
-    <button
-      type="button"
-      class="repeat-remove"
-    >
-      REMOVE
-    </button>
-  `;
-
-
-  row
-    .querySelector(
-      ".repeat-remove"
-    )
-    .addEventListener(
-      "click",
-      () =>
-        row.remove()
-    );
-
-
-  container.appendChild(
-    row
-  );
-}
-
-
-/* ============================================================
-   ADD MEDICAL ROW
-   ============================================================ */
-
-function addMedicalRow(
-  record = null
-) {
-
-  const container =
-    document.getElementById(
-      "medicalRows"
-    );
-
-
-  const row =
-    document.createElement(
-      "div"
-    );
-
-
-  row.className =
-    "repeat-row medical-row";
-
-
-  row.style.gridTemplateColumns =
-    "1fr 1fr 1fr 1fr";
-
-
-  row.innerHTML = `
-
-    <input
-      data-field="date"
-      type="date"
-      value="${escapeHtml(record?.record_date || "")}"
-    >
-
-    <input
-      data-field="type"
-      placeholder="Record type"
-      value="${escapeHtml(record?.record_type || "")}"
-    >
-
-    <input
-      data-field="diagnosis"
-      placeholder="Diagnosis"
-      value="${escapeHtml(record?.diagnosis || "")}"
-    >
-
-    <input
-      data-field="treatment"
-      placeholder="Treatment"
-      value="${escapeHtml(record?.treatment || "")}"
-    >
-
-    <input
-      data-field="medication"
-      placeholder="Medication"
-      value="${escapeHtml(record?.medication || "")}"
-    >
-
-    <input
-      data-field="clinic"
-      placeholder="Clinic"
-      value="${escapeHtml(record?.clinic_name || "")}"
-    >
-
-    <input
-      data-field="vet"
-      placeholder="Veterinarian"
-      value="${escapeHtml(record?.veterinarian_name || "")}"
-    >
-
-    <button
-      type="button"
-      class="repeat-remove"
-    >
-      REMOVE
-    </button>
-  `;
-
-
-  row
-    .querySelector(
-      ".repeat-remove"
-    )
-    .addEventListener(
-      "click",
-      () =>
-        row.remove()
-    );
-
-
-  container.appendChild(
-    row
-  );
-}
-
-
-/* ============================================================
-   ADD WEIGHT ROW
-   ============================================================ */
-
-function addWeightRow(
-  record = null
-) {
-
-  const container =
-    document.getElementById(
-      "weightRows"
-    );
-
-
-  const row =
-    document.createElement(
-      "div"
-    );
-
-
-  row.className =
-    "repeat-row weight-row";
-
-
-  row.innerHTML = `
-
-    <input
-      data-field="date"
-      type="date"
-      value="${escapeHtml(record?.recorded_date || "")}"
-    >
-
-    <input
-      data-field="weight"
-      type="number"
-      step="0.01"
-      placeholder="Weight"
-      value="${escapeHtml(record?.weight || "")}"
-    >
-
-    <select data-field="unit">
-
-      <option value="kg"
-        ${
-          !record?.unit ||
-          record?.unit === "kg"
-            ? "selected"
-            : ""
-        }>
-        kg
-      </option>
-
-      <option value="lb"
-        ${
-          record?.unit === "lb"
-            ? "selected"
-            : ""
-        }>
-        lb
-      </option>
-
-    </select>
-
-    <button
-      type="button"
-      class="repeat-remove"
-    >
-      REMOVE
-    </button>
-  `;
-
-
-  row
-    .querySelector(
-      ".repeat-remove"
-    )
-    .addEventListener(
-      "click",
-      () =>
-        row.remove()
-    );
-
-
-  container.appendChild(
-    row
-  );
-}
-
-
-/* ============================================================
-   LOAD OWNER
-   ============================================================ */
-
-async function loadOwner(
-  ownerId
-) {
-
-  if (!ownerId) {
-    return null;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("owners")
-      .select("*")
-      .eq(
-        "id",
-        ownerId
-      )
-      .maybeSingle();
-
-
-  if (error) {
-
-    console.error(
-      "Owner loading error:",
-      error
-    );
-
-    return null;
-  }
-
-
-  return data;
-}
-
-
-/* ============================================================
-   LOAD CHILD RECORDS
-   ============================================================ */
-
-async function loadChildRecords(
-  animalId
-) {
-
-  const [
-    behaviourResult,
-    vaccinationsResult,
-    medicalResult,
-    weightResult
-  ] = await Promise.all([
-
-    supabaseClient
-      .from("behaviour_traits")
-      .select("*")
-      .eq(
-        "animal_id",
-        animalId
-      )
-      .maybeSingle(),
-
-    supabaseClient
-      .from("vaccinations")
-      .select("*")
-      .eq(
-        "animal_id",
-        animalId
-      )
-      .order(
-        "vaccination_date",
-        {
-          ascending: false
-        }
-      ),
-
-    supabaseClient
-      .from("medical_records")
-      .select("*")
-      .eq(
-        "animal_id",
-        animalId
-      )
-      .order(
-        "record_date",
-        {
-          ascending: false
-        }
-      ),
-
-    supabaseClient
-      .from("weight_history")
-      .select("*")
-      .eq(
-        "animal_id",
-        animalId
-      )
-      .order(
-        "recorded_date",
-        {
-          ascending: false
-        }
-      )
-  ]);
-
-
-  return {
-
-    behaviour:
-      behaviourResult.data || null,
-
-    vaccinations:
-      vaccinationsResult.data || [],
-
-    medical:
-      medicalResult.data || [],
-
-    weight:
-      weightResult.data || []
-
-  };
-}
-
-
-/* ============================================================
-   OPEN ADD EDITOR
-   ============================================================ */
-
-async function openAddAnimal() {
-
-  createEditorModal();
-
-  editingAnimalId = null;
 
   const modal =
-    document.getElementById(
-      "animalEditorModal"
-    );
+    getAnimalModal();
 
 
   document.getElementById(
-    "editorTitle"
+    "animalModalTitle"
   ).textContent =
     "Add Animal";
 
 
   document.getElementById(
-    "animalEditorForm"
+    "animalForm"
   ).reset();
 
 
-  /* ============================================================
-     RESET PHOTO FOR NEW ANIMAL
-     ============================================================ */
-
-  selectedPhotoFile = null;
-
-  currentPhotoUrl = "";
-
-
-  const photoFileInput =
-    document.getElementById(
-      "f_photo_file"
-    );
-
-
-  const photoPreview =
-    document.getElementById(
-      "photoPreview"
-    );
-
-
-  const photoStatus =
-    document.getElementById(
-      "photoUploadStatus"
-    );
-
-
-  if (photoFileInput) {
-
-    photoFileInput.value = "";
-
-  }
-
-
-  if (photoPreview) {
-
-    photoPreview.innerHTML = `
-      <div class="photo-preview-empty">
-        🐾 No photo selected
-      </div>
-    `;
-
-  }
-
-
-  if (photoStatus) {
-
-    photoStatus.textContent = "";
-
-  }
-
-
-  setField(
-    "f_photo",
-    ""
-  );
-
-
   document.getElementById(
-    "f_owner_country"
+    "animalFormCountry"
   ).value =
     "India";
 
 
   document.getElementById(
-    "f_location_country"
-  ).value =
-    "India";
-
-
-  document.getElementById(
-    "f_registration_date"
-  ).value =
-    new Date()
-      .toISOString()
-      .slice(0, 10);
-
-
-  document.getElementById(
-    "f_status"
-  ).value =
-    "ACTIVE RECORD";
-
-
-  document.getElementById(
-    "f_public"
+    "animalFormPublic"
   ).checked =
     true;
 
 
   document.getElementById(
-    "vaccinationRows"
-  ).innerHTML = "";
+    "animalFormLost"
+  ).checked =
+    false;
 
 
   document.getElementById(
-    "medicalRows"
-  ).innerHTML = "";
+    "animalFormMessage"
+  ).textContent =
+    "";
 
 
   document.getElementById(
-    "weightRows"
-  ).innerHTML = "";
+    "animalPhotoPreview"
+  ).innerHTML = `
+    <span
+      style="
+        font-size:30px;
+      "
+    >
+      🐾
+    </span>
+  `;
 
 
   document.getElementById(
-    "editorMessage"
-  ).textContent = "";
+    "animalPhotoInput"
+  ).value =
+    "";
 
 
-  modal.classList.add(
-    "open"
-  );
+  document.getElementById(
+    "animalFormId"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "animalSaveButton"
+  ).textContent =
+    "SAVE ANIMAL";
+
+
+  modal.style.display =
+    "block";
 }
 
 
 /* ============================================================
-   OPEN EDITOR
+   OPEN EDIT ANIMAL
    ============================================================ */
 
-async function openAnimalEditor(
+function openEditAnimal(
   animalId
 ) {
-
-  createEditorModal();
 
   const animal =
     animalsCache.find(
       item =>
-        item.id === animalId
+        item.id ===
+        animalId
     );
 
 
@@ -3493,1136 +3421,372 @@ async function openAnimalEditor(
     animal.id;
 
 
+  selectedPhotoFile =
+    null;
+
+
+  currentPhotoUrl =
+    animal.photo_url ||
+    "";
+
+
   const modal =
-    document.getElementById(
-      "animalEditorModal"
-    );
+    getAnimalModal();
 
 
   document.getElementById(
-    "editorTitle"
+    "animalModalTitle"
   ).textContent =
-    `Edit Animal • ${animal.name}`;
+    "Edit Animal";
 
 
-  setField(
-    "f_animal_id",
-    animal.animal_id
-  );
+  document.getElementById(
+    "animalFormId"
+  ).value =
+    animal.id || "";
 
 
-  setField(
-    "f_name",
-    animal.name
-  );
+  document.getElementById(
+    "animalFormAnimalId"
+  ).value =
+    animal.animal_id || "";
 
 
-  setField(
-    "f_type",
-    animal.type
-  );
+  document.getElementById(
+    "animalFormName"
+  ).value =
+    animal.name || "";
 
 
-  setField(
-    "f_breed",
-    animal.breed
-  );
+  document.getElementById(
+    "animalFormType"
+  ).value =
+    animal.type || "";
 
 
-  setField(
-    "f_gender",
-    animal.gender
-  );
+  document.getElementById(
+    "animalFormBreed"
+  ).value =
+    animal.breed || "";
 
 
-  setField(
-    "f_dob",
-    animal.date_of_birth
-  );
+  document.getElementById(
+    "animalFormGender"
+  ).value =
+    animal.gender || "";
 
 
-  setField(
-    "f_colour",
-    animal.colour
-  );
+  document.getElementById(
+    "animalFormDob"
+  ).value =
+    animal.date_of_birth || "";
 
 
-  setField(
-    "f_markings",
-    animal.markings
-  );
+  document.getElementById(
+    "animalFormColour"
+  ).value =
+    animal.colour || "";
 
 
-  /* ============================================================
-     LOAD EXISTING PHOTO
-     ============================================================ */
-
-  selectedPhotoFile = null;
-
-  currentPhotoUrl =
-    animal.photo_url || "";
+  document.getElementById(
+    "animalFormMarkings"
+  ).value =
+    animal.markings || "";
 
 
-  const photoFileInput =
+  document.getElementById(
+    "animalFormMicrochip"
+  ).value =
+    animal.microchip_number || "";
+
+
+  document.getElementById(
+    "animalFormMicrochipProvider"
+  ).value =
+    animal.microchip_provider || "";
+
+
+  document.getElementById(
+    "animalFormGovernmentReference"
+  ).value =
+    animal.government_reference || "";
+
+
+  document.getElementById(
+    "animalFormStatus"
+  ).value =
+    animal.status ||
+    "ACTIVE RECORD";
+
+
+  document.getElementById(
+    "animalFormCity"
+  ).value =
+    animal.location_city || "";
+
+
+  document.getElementById(
+    "animalFormState"
+  ).value =
+    animal.location_state || "";
+
+
+  document.getElementById(
+    "animalFormCountry"
+  ).value =
+    animal.location_country ||
+    "India";
+
+
+  document.getElementById(
+    "animalFormMapUrl"
+  ).value =
+    animal.map_url || "";
+
+
+  document.getElementById(
+    "animalFormIdentificationNotes"
+  ).value =
+    animal.identification_notes ||
+    "";
+
+
+  document.getElementById(
+    "animalFormSpecialInstructions"
+  ).value =
+    animal.special_instructions ||
+    "";
+
+
+  document.getElementById(
+    "animalFormNotes"
+  ).value =
+    animal.notes ||
+    "";
+
+
+  document.getElementById(
+    "animalFormPublic"
+  ).checked =
+    animal.is_public !== false;
+
+
+  document.getElementById(
+    "animalFormLost"
+  ).checked =
+    animal.is_lost === true;
+
+
+  document.getElementById(
+    "animalFormMessage"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "animalPhotoInput"
+  ).value =
+    "";
+
+
+  if (
+    animal.photo_url
+  ) {
+
     document.getElementById(
-      "f_photo_file"
-    );
-
-
-  const photoPreview =
-    document.getElementById(
-      "photoPreview"
-    );
-
-
-  const photoStatus =
-    document.getElementById(
-      "photoUploadStatus"
-    );
-
-
-  if (photoFileInput) {
-
-    photoFileInput.value = "";
-
-  }
-
-
-  setField(
-    "f_photo",
-    currentPhotoUrl
-  );
-
-
-  if (currentPhotoUrl) {
-
-    photoPreview.innerHTML = `
+      "animalPhotoPreview"
+    ).innerHTML = `
       <img
-        src="${escapeHtml(currentPhotoUrl)}"
-        alt="${escapeHtml(animal.name)}"
-      >
+        src="${escapeHtml(
+          animal.photo_url
+        )}"
+        alt="${escapeHtml(
+          animal.name ||
+          "Animal"
+        )}"
+        style="
+          width:100%;
+          height:100%;
+          display:block;
+          object-fit:cover;
+        "
+      />
     `;
-
-
-    photoStatus.textContent =
-      "Current photo loaded. Choose a new photo to replace it.";
-
-
-    photoStatus.style.color =
-      "#2d8a62";
 
   } else {
 
-    photoPreview.innerHTML = `
-      <div class="photo-preview-empty">
-        🐾 No photo uploaded
-      </div>
+    document.getElementById(
+      "animalPhotoPreview"
+    ).innerHTML = `
+      <span
+        style="
+          font-size:30px;
+        "
+      >
+        🐾
+      </span>
     `;
-
-
-    photoStatus.textContent =
-      "";
-
   }
 
 
-  setField(
-    "f_microchip",
-    animal.microchip_number
-  );
-
-
-  setField(
-    "f_microchip_provider",
-    animal.microchip_provider
-  );
-
-
-  setField(
-    "f_government_reference",
-    animal.government_reference
-  );
-
-
-  setField(
-    "f_identification_notes",
-    animal.identification_notes
-  );
-
-
-  setField(
-    "f_location_city",
-    animal.location_city
-  );
-
-
-  setField(
-    "f_location_state",
-    animal.location_state
-  );
-
-
-  setField(
-    "f_location_country",
-    animal.location_country || "India"
-  );
-
-
-  setField(
-    "f_map_url",
-    animal.map_url
-  );
-
-
-  setField(
-    "f_status",
-    animal.status
-  );
-
-
-  setField(
-    "f_registration_date",
-    animal.registration_date
-  );
-
-
-  setField(
-    "f_public",
-    animal.is_public
-  );
-
-
-  setField(
-    "f_lost",
-    animal.is_lost
-  );
-
-
-  setField(
-    "f_special",
-    animal.special_instructions
-  );
-
-
-  setField(
-    "f_notes",
-    animal.notes
-  );
-
-
   document.getElementById(
-    "vaccinationRows"
-  ).innerHTML = "";
+    "animalSaveButton"
+  ).textContent =
+    "UPDATE ANIMAL";
 
 
-  document.getElementById(
-    "medicalRows"
-  ).innerHTML = "";
-
-
-  document.getElementById(
-    "weightRows"
-  ).innerHTML = "";
-
-
-  const owner =
-    await loadOwner(
-      animal.owner_id
-    );
-
-
-  if (owner) {
-
-    setField(
-      "f_owner_name",
-      owner.name
-    );
-
-
-    setField(
-      "f_owner_phone",
-      owner.phone
-    );
-
-
-    setField(
-      "f_owner_alt",
-      owner.alternate_phone
-    );
-
-
-    setField(
-      "f_owner_email",
-      owner.email
-    );
-
-
-    setField(
-      "f_owner_city",
-      owner.city
-    );
-
-
-    setField(
-      "f_owner_state",
-      owner.state
-    );
-
-
-    setField(
-      "f_owner_country",
-      owner.country || "India"
-    );
-
-
-    setField(
-      "f_owner_postal",
-      owner.postal_code
-    );
-
-
-    setField(
-      "f_emergency_name",
-      owner.emergency_contact_name
-    );
-
-
-    setField(
-      "f_emergency_phone",
-      owner.emergency_contact_phone
-    );
-
-  }
-
-
-  const records =
-    await loadChildRecords(
-      animal.id
-    );
-
-
-  if (records.behaviour) {
-
-    setField(
-      "f_temperament",
-      records.behaviour.temperament
-    );
-
-
-    setField(
-      "f_energy",
-      records.behaviour.energy_level
-    );
-
-
-    setField(
-      "f_children",
-      records.behaviour.good_with_children
-    );
-
-
-    setField(
-      "f_dogs",
-      records.behaviour.good_with_dogs
-    );
-
-
-    setField(
-      "f_cats",
-      records.behaviour.good_with_cats
-    );
-
-
-    setField(
-      "f_stranger",
-      records.behaviour.stranger_friendliness
-    );
-
-
-    setField(
-      "f_leash",
-      records.behaviour.leash_behavior
-    );
-
-
-    setField(
-      "f_handling",
-      records.behaviour.handling_behavior
-    );
-
-
-    setField(
-      "f_food",
-      records.behaviour.food_preferences
-    );
-
-
-    setField(
-      "f_behaviour_instructions",
-      records.behaviour.special_instructions
-    );
-
-  }
-
-
-  records.vaccinations.forEach(
-    record =>
-      addVaccinationRow(
-        record
-      )
-  );
-
-
-  records.medical.forEach(
-    record =>
-      addMedicalRow(
-        record
-      )
-  );
-
-
-  records.weight.forEach(
-    record =>
-      addWeightRow(
-        record
-      )
-  );
-
-
-  document.getElementById(
-    "editorMessage"
-  ).textContent = "";
-
-
-  modal.classList.add(
-    "open"
-  );
+  modal.style.display =
+    "block";
 }
 
 
 /* ============================================================
-   CLOSE EDITOR
+   CLOSE ANIMAL MODAL
    ============================================================ */
 
-function closeAnimalEditor() {
+function closeAnimalModal() {
 
   const modal =
     document.getElementById(
-      "animalEditorModal"
+      "animalModal"
     );
 
 
-  if (modal) {
-
-    modal.classList.remove(
-      "open"
-    );
-
+  if (!modal) {
+    return;
   }
+
+
+  modal.style.display =
+    "none";
 
 
   editingAnimalId =
     null;
+
+
+  selectedPhotoFile =
+    null;
+
+
+  currentPhotoUrl =
+    "";
 }
 
 
 /* ============================================================
-   COLLECT VACCINATIONS
+   PHOTO SELECTION
    ============================================================ */
 
-function collectVaccinations() {
-
-  const rows =
-    document.querySelectorAll(
-      ".vaccination-row"
-    );
-
-
-  return Array.from(
-    rows
-  )
-    .map(row => {
-
-      const get =
-        field =>
-          row
-            .querySelector(
-              `[data-field="${field}"]`
-            )
-            ?.value
-            ?.trim() || "";
-
-
-      return {
-
-        vaccine_name:
-          get("vaccine"),
-
-
-        vaccination_date:
-          get("date"),
-
-
-        next_due_date:
-          get("next") || null,
-
-
-        batch_number:
-          get("batch") || null,
-
-
-        manufacturer:
-          get("manufacturer") || null,
-
-
-        clinic_name:
-          get("clinic") || null,
-
-
-        veterinarian_name:
-          get("vet") || null,
-
-
-        status:
-          get("status") ||
-          "RECORDED"
-
-      };
-
-    })
-    .filter(
-      record =>
-        record.vaccine_name &&
-        record.vaccination_date
-    );
-}
-
-
-/* ============================================================
-   COLLECT MEDICAL
-   ============================================================ */
-
-function collectMedicalRecords() {
-
-  const rows =
-    document.querySelectorAll(
-      ".medical-row"
-    );
-
-
-  return Array.from(
-    rows
-  )
-    .map(row => {
-
-      const get =
-        field =>
-          row
-            .querySelector(
-              `[data-field="${field}"]`
-            )
-            ?.value
-            ?.trim() || "";
-
-
-      return {
-
-        record_date:
-          get("date"),
-
-
-        record_type:
-          get("type") || null,
-
-
-        diagnosis:
-          get("diagnosis") || null,
-
-
-        treatment:
-          get("treatment") || null,
-
-
-        medication:
-          get("medication") || null,
-
-
-        clinic_name:
-          get("clinic") || null,
-
-
-        veterinarian_name:
-          get("vet") || null
-
-      };
-
-    })
-    .filter(
-      record =>
-        record.record_date
-    );
-}
-
-
-/* ============================================================
-   COLLECT WEIGHT
-   ============================================================ */
-
-function collectWeightRecords() {
-
-  const rows =
-    document.querySelectorAll(
-      ".weight-row"
-    );
-
-
-  return Array.from(
-    rows
-  )
-    .map(row => {
-
-      const get =
-        field =>
-          row
-            .querySelector(
-              `[data-field="${field}"]`
-            )
-            ?.value
-            ?.trim() || "";
-
-
-      return {
-
-        recorded_date:
-          get("date"),
-
-
-        weight:
-          get("weight"),
-
-
-        unit:
-          get("unit") ||
-          "kg"
-
-      };
-
-    })
-    .filter(
-      record =>
-        record.recorded_date &&
-        record.weight
-    );
-}
-
-
-/* ============================================================
-   SAVE OWNER
-   ============================================================ */
-
-async function saveOwner() {
-
-  const ownerName =
-    getField(
-      "f_owner_name"
-    );
-
-
-  if (!ownerName) {
-
-    return null;
-
-  }
-
-
-  const ownerData = {
-
-    name:
-      ownerName,
-
-
-    phone:
-      getField(
-        "f_owner_phone"
-      ) || null,
-
-
-    alternate_phone:
-      getField(
-        "f_owner_alt"
-      ) || null,
-
-
-    email:
-      getField(
-        "f_owner_email"
-      ) || null,
-
-
-    city:
-      getField(
-        "f_owner_city"
-      ) || null,
-
-
-    state:
-      getField(
-        "f_owner_state"
-      ) || null,
-
-
-    country:
-      getField(
-        "f_owner_country"
-      ) || "India",
-
-
-    postal_code:
-      getField(
-        "f_owner_postal"
-      ) || null,
-
-
-    emergency_contact_name:
-      getField(
-        "f_emergency_name"
-      ) || null,
-
-
-    emergency_contact_phone:
-      getField(
-        "f_emergency_phone"
-      ) || null
-
-  };
-
-
-  let ownerId =
-    editingAnimalId
-      ? animalsCache.find(
-          a =>
-            a.id ===
-            editingAnimalId
-        )?.owner_id
-      : null;
-
-
-  if (ownerId) {
-
-    const {
-      error
-    } =
-      await supabaseClient
-        .from("owners")
-        .update(
-          ownerData
-        )
-        .eq(
-          "id",
-          ownerId
-        );
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    return ownerId;
-
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("owners")
-      .insert(
-        ownerData
-      )
-      .select(
-        "id"
-      )
-      .single();
-
-
-  if (error) {
-    throw error;
-  }
-
-
-  return data.id;
-}
-
-
-/* ============================================================
-   SAVE BEHAVIOUR
-   ============================================================ */
-
-async function saveBehaviour(
-  animalId
+function handleAnimalPhoto(
+  input
 ) {
 
-  const behaviourData = {
-
-    animal_id:
-      animalId,
+  const file =
+    input?.files?.[0];
 
 
-    temperament:
-      getField(
-        "f_temperament"
-      ) || null,
+  if (!file) {
 
+    selectedPhotoFile =
+      null;
 
-    energy_level:
-      getField(
-        "f_energy"
-      ) || null,
-
-
-    good_with_children:
-      getField(
-        "f_children"
-      ),
-
-
-    good_with_dogs:
-      getField(
-        "f_dogs"
-      ),
-
-
-    good_with_cats:
-      getField(
-        "f_cats"
-      ),
-
-
-    stranger_friendliness:
-      getField(
-        "f_stranger"
-      ) || null,
-
-
-    leash_behavior:
-      getField(
-        "f_leash"
-      ) || null,
-
-
-    handling_behavior:
-      getField(
-        "f_handling"
-      ) || null,
-
-
-    food_preferences:
-      getField(
-        "f_food"
-      ) || null,
-
-
-    special_instructions:
-      getField(
-        "f_behaviour_instructions"
-      ) || null
-
-  };
-
-
-  const {
-    data: existing,
-    error:
-      existingError
-  } =
-    await supabaseClient
-      .from("behaviour_traits")
-      .select("id")
-      .eq(
-        "animal_id",
-        animalId
-      )
-      .maybeSingle();
-
-
-  if (existingError) {
-    throw existingError;
-  }
-
-
-  if (existing?.id) {
-
-    const {
-      error
-    } =
-      await supabaseClient
-        .from("behaviour_traits")
-        .update(
-          behaviourData
-        )
-        .eq(
-          "id",
-          existing.id
-        );
-
-
-    if (error) {
-      throw error;
-    }
-
-  } else {
-
-    const {
-      error
-    } =
-      await supabaseClient
-        .from("behaviour_traits")
-        .insert(
-          behaviourData
-        );
-
-
-    if (error) {
-      throw error;
-    }
-
-  }
-}
-
-
-/* ============================================================
-   SAVE VACCINATIONS
-   ============================================================ */
-
-async function saveVaccinations(
-  animalId,
-  records
-) {
-
-  const {
-    error:
-      deleteError
-  } =
-    await supabaseClient
-      .from("vaccinations")
-      .delete()
-      .eq(
-        "animal_id",
-        animalId
-      );
-
-
-  if (deleteError) {
-    throw deleteError;
-  }
-
-
-  if (!records.length) {
     return;
   }
 
 
-  const rows =
-    records.map(
-      record => ({
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ];
 
-        animal_id:
-          animalId,
 
-        vaccine_name:
-          record.vaccine_name,
+  if (
+    !allowedTypes.includes(
+      file.type
+    )
+  ) {
 
-        vaccination_date:
-          record.vaccination_date,
-
-        next_due_date:
-          record.next_due_date,
-
-        batch_number:
-          record.batch_number,
-
-        manufacturer:
-          record.manufacturer,
-
-        clinic_name:
-          record.clinic_name,
-
-        veterinarian_name:
-          record.veterinarian_name,
-
-        status:
-          record.status
-
-      })
+    alert(
+      "Please select a JPG, PNG or WebP image."
     );
 
 
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("vaccinations")
-      .insert(
-        rows
-      );
+    input.value =
+      "";
 
 
-  if (error) {
-    throw error;
-  }
-}
+    selectedPhotoFile =
+      null;
 
 
-/* ============================================================
-   SAVE MEDICAL RECORDS
-   ============================================================ */
-
-async function saveMedicalRecords(
-  animalId,
-  records
-) {
-
-  const {
-    error:
-      deleteError
-  } =
-    await supabaseClient
-      .from("medical_records")
-      .delete()
-      .eq(
-        "animal_id",
-        animalId
-      );
-
-
-  if (deleteError) {
-    throw deleteError;
-  }
-
-
-  if (!records.length) {
     return;
   }
 
 
-  const rows =
-    records.map(
-      record => ({
+  if (
+    file.size >
+    MAX_PHOTO_SIZE
+  ) {
 
-        animal_id:
-          animalId,
-
-        record_date:
-          record.record_date,
-
-        record_type:
-          record.record_type,
-
-        diagnosis:
-          record.diagnosis,
-
-        treatment:
-          record.treatment,
-
-        medication:
-          record.medication,
-
-        clinic_name:
-          record.clinic_name,
-
-        veterinarian_name:
-          record.veterinarian_name
-
-      })
+    alert(
+      "Photo must be 5 MB or smaller."
     );
 
 
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("medical_records")
-      .insert(
-        rows
-      );
+    input.value =
+      "";
 
 
-  if (error) {
-    throw error;
-  }
-}
+    selectedPhotoFile =
+      null;
 
 
-/* ============================================================
-   SAVE WEIGHT HISTORY
-   ============================================================ */
-
-async function saveWeightHistory(
-  animalId,
-  records
-) {
-
-  const {
-    error:
-      deleteError
-  } =
-    await supabaseClient
-      .from("weight_history")
-      .delete()
-      .eq(
-        "animal_id",
-        animalId
-      );
-
-
-  if (deleteError) {
-    throw deleteError;
-  }
-
-
-  if (!records.length) {
     return;
   }
 
 
-  const rows =
-    records.map(
-      record => ({
-
-        animal_id:
-          animalId,
-
-        recorded_date:
-          record.recorded_date,
-
-        weight:
-          Number(
-            record.weight
-          ),
-
-        unit:
-          record.unit
-
-      })
-    );
+  selectedPhotoFile =
+    file;
 
 
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("weight_history")
-      .insert(
-        rows
-      );
+  const reader =
+    new FileReader();
 
 
-  if (error) {
-    throw error;
-  }
+  reader.onload =
+    function () {
+
+      const preview =
+        document.getElementById(
+          "animalPhotoPreview"
+        );
+
+
+      if (!preview) {
+        return;
+      }
+
+
+      preview.innerHTML = `
+        <img
+          src="${reader.result}"
+          alt="Selected animal photo"
+          style="
+            width:100%;
+            height:100%;
+            display:block;
+            object-fit:cover;
+          "
+        />
+      `;
+    };
+
+
+  reader.readAsDataURL(
+    file
+  );
 }
 
 
@@ -4630,220 +3794,221 @@ async function saveWeightHistory(
    SAVE ANIMAL
    ============================================================ */
 
-async function saveAnimal() {
+async function saveAnimal(
+  event
+) {
 
-  const message =
-    document.getElementById(
-      "editorMessage"
-    );
+  event.preventDefault();
 
 
   const saveButton =
     document.getElementById(
-      "editorSave"
+      "animalSaveButton"
     );
+
+
+  const message =
+    document.getElementById(
+      "animalFormMessage"
+    );
+
+
+  message.textContent =
+    "";
+
+
+  saveButton.disabled =
+    true;
+
+
+  saveButton.textContent =
+    editingAnimalId
+      ? "UPDATING..."
+      : "SAVING...";
 
 
   try {
 
-    saveButton.disabled =
-      true;
-
-
-    message.style.color =
-      "#245579";
-
-
-    message.textContent =
-      "Saving animal...";
-
-
-    const ownerId =
-      await saveOwner();
-
-
     const animalData = {
 
       animal_id:
-        getField(
-          "f_animal_id"
-        ),
-
+        document.getElementById(
+          "animalFormAnimalId"
+        ).value.trim(),
 
       name:
-        getField(
-          "f_name"
-        ),
-
+        document.getElementById(
+          "animalFormName"
+        ).value.trim(),
 
       type:
-        getField(
-          "f_type"
-        ),
-
+        document.getElementById(
+          "animalFormType"
+        ).value.trim() ||
+        null,
 
       breed:
-        getField(
-          "f_breed"
-        ) || null,
-
+        document.getElementById(
+          "animalFormBreed"
+        ).value.trim() ||
+        null,
 
       gender:
-        getField(
-          "f_gender"
-        ) || null,
-
+        document.getElementById(
+          "animalFormGender"
+        ).value ||
+        null,
 
       date_of_birth:
-        getField(
-          "f_dob"
-        ) || null,
-
+        document.getElementById(
+          "animalFormDob"
+        ).value ||
+        null,
 
       colour:
-        getField(
-          "f_colour"
-        ) || null,
-
+        document.getElementById(
+          "animalFormColour"
+        ).value.trim() ||
+        null,
 
       markings:
-        getField(
-          "f_markings"
-        ) || null,
-
-
-      photo_url:
-        currentPhotoUrl || null,
-
+        document.getElementById(
+          "animalFormMarkings"
+        ).value.trim() ||
+        null,
 
       microchip_number:
-        getField(
-          "f_microchip"
-        ) || null,
-
+        document.getElementById(
+          "animalFormMicrochip"
+        ).value.trim() ||
+        null,
 
       microchip_provider:
-        getField(
-          "f_microchip_provider"
-        ) || null,
-
+        document.getElementById(
+          "animalFormMicrochipProvider"
+        ).value.trim() ||
+        null,
 
       government_reference:
-        getField(
-          "f_government_reference"
-        ) || null,
-
-
-      identification_notes:
-        getField(
-          "f_identification_notes"
-        ) || null,
-
-
-      owner_id:
-        ownerId,
-
-
-      location_city:
-        getField(
-          "f_location_city"
-        ) || null,
-
-
-      location_state:
-        getField(
-          "f_location_state"
-        ) || null,
-
-
-      location_country:
-        getField(
-          "f_location_country"
-        ) || "India",
-
-
-      map_url:
-        getField(
-          "f_map_url"
-        ) || null,
-
+        document.getElementById(
+          "animalFormGovernmentReference"
+        ).value.trim() ||
+        null,
 
       status:
-        getField(
-          "f_status"
-        ) || "ACTIVE RECORD",
+        document.getElementById(
+          "animalFormStatus"
+        ).value ||
+        "ACTIVE RECORD",
 
+      location_city:
+        document.getElementById(
+          "animalFormCity"
+        ).value.trim() ||
+        null,
 
-      registration_date:
-        getField(
-          "f_registration_date"
-        ) || null,
+      location_state:
+        document.getElementById(
+          "animalFormState"
+        ).value.trim() ||
+        null,
 
+      location_country:
+        document.getElementById(
+          "animalFormCountry"
+        ).value.trim() ||
+        "India",
 
-      is_public:
-        getField(
-          "f_public"
-        ),
+      map_url:
+        document.getElementById(
+          "animalFormMapUrl"
+        ).value.trim() ||
+        null,
 
-
-      is_lost:
-        getField(
-          "f_lost"
-        ),
-
+      identification_notes:
+        document.getElementById(
+          "animalFormIdentificationNotes"
+        ).value.trim() ||
+        null,
 
       special_instructions:
-        getField(
-          "f_special"
-        ) || null,
-
+        document.getElementById(
+          "animalFormSpecialInstructions"
+        ).value.trim() ||
+        null,
 
       notes:
-        getField(
-          "f_notes"
-        ) || null
+        document.getElementById(
+          "animalFormNotes"
+        ).value.trim() ||
+        null,
+
+      is_public:
+        document.getElementById(
+          "animalFormPublic"
+        ).checked,
+
+      is_lost:
+        document.getElementById(
+          "animalFormLost"
+        ).checked
 
     };
 
 
-    let savedAnimalId =
-      editingAnimalId;
+    if (
+      !animalData.animal_id
+    ) {
+
+      throw new Error(
+        "Animal ID is required."
+      );
+    }
 
 
-    if (editingAnimalId) {
+    if (
+      !animalData.name
+    ) {
 
-      const {
-        error
-      } =
-        await supabaseClient
-          .from("animals")
-          .update(
-            animalData
-          )
-          .eq(
-            "id",
-            editingAnimalId
-          );
+      throw new Error(
+        "Animal name is required."
+      );
+    }
 
 
-      if (error) {
-        throw error;
-      }
+    if (
+      !editingAnimalId &&
+      selectedPhotoFile
+    ) {
 
-    } else {
+      animalData.photo_url =
+        null;
+    }
+
+
+    let savedAnimal;
+
+
+    if (
+      editingAnimalId
+    ) {
 
       const {
         data,
         error
       } =
         await supabaseClient
-          .from("animals")
-          .insert(
+          .from(
+            "animals"
+          )
+          .update(
             animalData
           )
-          .select(
-            "id"
+          .eq(
+            "id",
+            editingAnimalId
           )
+          .select()
           .single();
 
 
@@ -4852,29 +4017,43 @@ async function saveAnimal() {
       }
 
 
-      savedAnimalId =
-        data.id;
+      savedAnimal =
+        data;
 
+    } else {
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from(
+            "animals"
+          )
+          .insert(
+            animalData
+          )
+          .select()
+          .single();
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      savedAnimal =
+        data;
     }
 
 
-    /*
-      PHOTO UPLOAD
-    */
+    if (
+      selectedPhotoFile
+    ) {
 
-    if (selectedPhotoFile) {
-
-      message.style.color =
-        "#245579";
-
-
-      message.textContent =
-        "Uploading animal photo...";
-
-
-      const uploadedPhotoUrl =
+      const photoUrl =
         await uploadAnimalPhoto(
-          savedAnimalId,
+          savedAnimal.id,
           selectedPhotoFile
         );
 
@@ -4884,89 +4063,37 @@ async function saveAnimal() {
           photoUpdateError
       } =
         await supabaseClient
-          .from("animals")
+          .from(
+            "animals"
+          )
           .update({
             photo_url:
-              uploadedPhotoUrl
+              photoUrl
           })
           .eq(
             "id",
-            savedAnimalId
+            savedAnimal.id
           );
 
 
-      if (photoUpdateError) {
+      if (
+        photoUpdateError
+      ) {
         throw photoUpdateError;
       }
-
-
-      currentPhotoUrl =
-        uploadedPhotoUrl;
-
-
-      selectedPhotoFile =
-        null;
-
     }
 
 
-    message.textContent =
-      "Saving behaviour...";
-
-
-    await saveBehaviour(
-      savedAnimalId
-    );
-
-
-    message.textContent =
-      "Saving vaccinations...";
-
-
-    await saveVaccinations(
-      savedAnimalId,
-      collectVaccinations()
-    );
-
-
-    message.textContent =
-      "Saving medical records...";
-
-
-    await saveMedicalRecords(
-      savedAnimalId,
-      collectMedicalRecords()
-    );
-
-
-    message.textContent =
-      "Saving weight history...";
-
-
-    await saveWeightHistory(
-      savedAnimalId,
-      collectWeightRecords()
-    );
-
-
-    message.style.color =
-      "#2d8a62";
-
-
-    message.textContent =
-      "✓ Animal saved successfully.";
+    closeAnimalModal();
 
 
     await loadAnimals();
 
 
-    setTimeout(
-      () => {
-
-        closeAnimalEditor();
-
-      },
-      800
+    alert(
+      editingAnimalId
+        ? "Animal record updated successfully."
+        : "Animal record created successfully."
     );
 
 
@@ -4978,67 +4105,183 @@ async function saveAnimal() {
     );
 
 
-    message.style.color =
-      "#b84c4c";
-
-
     message.textContent =
       error?.message ||
-      "Unable to save animal.";
+      "Unable to save animal record.";
+
 
   } finally {
 
     saveButton.disabled =
       false;
 
+
+    saveButton.textContent =
+      editingAnimalId
+        ? "UPDATE ANIMAL"
+        : "SAVE ANIMAL";
   }
 }
 
+
 /* ============================================================
-   FORM EVENTS
+   DELETE ANIMAL
    ============================================================ */
 
-loginForm.addEventListener(
-  "submit",
-  async event => {
+async function deleteAnimal(
+  animalId
+) {
 
-    event.preventDefault();
+  const animal =
+    animalsCache.find(
+      item =>
+        item.id ===
+        animalId
+    );
 
-    await login(
-      emailInput.value,
-      passwordInput.value
+
+  if (!animal) {
+    return;
+  }
+
+
+  const confirmed =
+    window.confirm(
+      `Delete ${animal.name || "this animal"} permanently?\n\nThis action cannot be undone.`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "animals"
+        )
+        .delete()
+        .eq(
+          "id",
+          animalId
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    await loadAnimals();
+
+
+    alert(
+      "Animal record deleted."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Delete animal error:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Unable to delete animal."
     );
   }
-);
+}
 
 
-logoutButton.addEventListener(
-  "click",
-  logout
-);
+/* ============================================================
+   LOADING STATE
+   ============================================================ */
 
+function setLoading(
+  isLoading
+) {
 
-animalSearch.addEventListener(
-  "input",
-  event => {
-
-    searchAnimals(
-      event.target.value
-    );
+  if (!loading) {
+    return;
   }
-);
 
 
-addAnimalButton.addEventListener(
-  "click",
-  openAddAnimal
-);
+  loading.style.display =
+    isLoading
+      ? "block"
+      : "none";
+}
 
 
-emptyAddAnimalButton.addEventListener(
-  "click",
-  openAddAnimal
-);
+/* ============================================================
+   EVENT HANDLERS
+   ============================================================ */
+
+if (loginForm) {
+
+  loginForm.addEventListener(
+    "submit",
+    event => {
+
+      event.preventDefault();
+
+
+      login(
+        emailInput.value,
+        passwordInput.value
+      );
+    }
+  );
+}
+
+
+if (logoutButton) {
+
+  logoutButton.addEventListener(
+    "click",
+    logout
+  );
+}
+
+
+if (animalSearch) {
+
+  animalSearch.addEventListener(
+    "input",
+    event => {
+
+      searchAnimals(
+        event.target.value
+      );
+    }
+  );
+}
+
+
+if (addAnimalButton) {
+
+  addAnimalButton.addEventListener(
+    "click",
+    openAddAnimal
+  );
+}
+
+
+if (emptyAddAnimalButton) {
+
+  emptyAddAnimalButton.addEventListener(
+    "click",
+    openAddAnimal
+  );
+}
 
 
 /* ============================================================
@@ -5050,13 +4293,12 @@ document.addEventListener(
   event => {
 
     if (
-      event.key === "Escape"
+      event.key ===
+      "Escape"
     ) {
 
-      closeAnimalEditor();
-
+      closeAnimalModal();
     }
-
   }
 );
 
@@ -5065,17 +4307,99 @@ document.addEventListener(
    AUTH STATE
    ============================================================ */
 
+async function initializeAdmin() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth
+        .getSession();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    const session =
+      data?.session;
+
+
+    if (!session?.user) {
+
+      showLogin();
+
+      return;
+    }
+
+
+    currentUser =
+      session.user;
+
+
+    currentAdmin =
+      await getAdminProfile(
+        currentUser.id
+      );
+
+
+    updateAdminHeader();
+
+    showAdminApp();
+
+    await loadDashboard();
+
+
+  } catch (error) {
+
+    console.error(
+      "Admin initialization error:",
+      error
+    );
+
+
+    currentUser =
+      null;
+
+    currentAdmin =
+      null;
+
+
+    showLogin();
+
+
+    if (
+      error?.message
+    ) {
+
+      showLoginMessage(
+        error.message
+      );
+    }
+  }
+}
+
+
 supabaseClient.auth.onAuthStateChange(
   async (
     event,
     session
   ) => {
 
-    if (!session) {
+    if (
+      event ===
+      "SIGNED_OUT"
+    ) {
 
-      currentUser = null;
+      currentUser =
+        null;
 
-      currentAdmin = null;
+      currentAdmin =
+        null;
+
 
       showLogin();
 
@@ -5084,61 +4408,50 @@ supabaseClient.auth.onAuthStateChange(
 
 
     if (
-      currentUser &&
-      currentAdmin
+      event ===
+        "SIGNED_IN" &&
+      session?.user
     ) {
-
-      return;
-
-    }
-
-
-    try {
 
       currentUser =
         session.user;
 
 
-      currentAdmin =
-        await getAdminProfile(
-          currentUser.id
+      try {
+
+        currentAdmin =
+          await getAdminProfile(
+            currentUser.id
+          );
+
+
+        updateAdminHeader();
+
+        showAdminApp();
+
+        await loadDashboard();
+
+
+      } catch (error) {
+
+        console.error(
+          "Auth state admin validation error:",
+          error
         );
 
 
-      updateAdminHeader();
+        await supabaseClient.auth
+          .signOut();
 
 
-      showAdminApp();
+        showLogin();
 
-
-      await loadDashboard();
-
-
-    } catch (error) {
-
-      console.error(
-        "Session verification error:",
-        error
-      );
-
-
-      await supabaseClient.auth.signOut();
-
-
-      currentUser = null;
-
-      currentAdmin = null;
-
-
-      showLogin();
-
-
-      showLoginMessage(
-        error.message
-      );
-
+        showLoginMessage(
+          error.message ||
+          "Administrator access could not be verified."
+        );
+      }
     }
-
   }
 );
 
@@ -5147,10 +4460,5378 @@ supabaseClient.auth.onAuthStateChange(
    INITIALIZE
    ============================================================ */
 
-async function initialize() {
+initializeAdmin();
 
-  showLogin();
 
+/* ============================================================
+   END OF PART 2
+   ============================================================ */
+   /* ============================================================
+   PART 3
+   OWNER MANAGEMENT
+   ============================================================ */
+
+
+/* ============================================================
+   OWNER STATE
+   ============================================================ */
+
+let ownersCache = [];
+
+let editingOwnerId = null;
+
+
+/* ============================================================
+   OWNER MODAL
+   ============================================================ */
+
+function getOwnerModal() {
+
+  let modal =
+    document.getElementById(
+      "ownerModal"
+    );
+
+
+  if (modal) {
+    return modal;
+  }
+
+
+  modal =
+    document.createElement(
+      "div"
+    );
+
+
+  modal.id =
+    "ownerModal";
+
+
+  modal.innerHTML = `
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:10000;
+        background:rgba(15,35,50,.42);
+        backdrop-filter:blur(5px);
+      "
+      onclick="closeOwnerModal(event)"
+    ></div>
+
+
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:10001;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:18px;
+        overflow:auto;
+        pointer-events:none;
+      "
+    >
+
+      <div
+        style="
+          width:min(620px,100%);
+          max-height:90vh;
+          overflow:auto;
+          padding:22px;
+          border-radius:24px;
+          background:var(--surface);
+          box-shadow:
+            0 25px 70px
+            rgba(15,35,50,.25);
+          pointer-events:auto;
+        "
+        onclick="event.stopPropagation()"
+      >
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:18px;
+          "
+        >
+
+          <div>
+
+            <div
+              id="ownerModalTitle"
+              style="
+                color:var(--navy);
+                font-size:18px;
+                font-weight:900;
+              "
+            >
+              Add Owner
+            </div>
+
+            <div
+              style="
+                margin-top:3px;
+                color:var(--muted);
+                font-size:9px;
+              "
+            >
+              Manage animal parent / owner information.
+            </div>
+
+          </div>
+
+
+          <button
+            type="button"
+            onclick="closeOwnerModal()"
+            style="
+              width:34px;
+              height:34px;
+              border:0;
+              border-radius:50%;
+              background:var(--surface);
+              color:var(--navy);
+              box-shadow:var(--shadow-soft);
+              cursor:pointer;
+              font-size:16px;
+            "
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <form
+          id="ownerForm"
+          onsubmit="saveOwner(event)"
+        >
+
+          <input
+            type="hidden"
+            id="ownerFormId"
+          >
+
+
+          <div
+            style="
+              display:grid;
+              grid-template-columns:
+                repeat(2,minmax(0,1fr));
+              gap:13px;
+            "
+          >
+
+            <div
+              style="
+                grid-column:1/-1;
+              "
+            >
+
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Full Name
+              </label>
+
+              <input
+                id="ownerFormName"
+                required
+                placeholder="Owner / parent name"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Email
+              </label>
+
+              <input
+                id="ownerFormEmail"
+                type="email"
+                placeholder="owner@example.com"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Phone
+              </label>
+
+              <input
+                id="ownerFormPhone"
+                type="tel"
+                placeholder="Phone number"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                City
+              </label>
+
+              <input
+                id="ownerFormCity"
+                placeholder="City"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
+
+            </div>
+
+
+            <div>
+
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                State
+              </label>
+
+              <input
+                id="ownerFormState"
+                placeholder="State"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                "
+              >
+
+            </div>
+
+
+            <div
+              style="
+                grid-column:1/-1;
+              "
+            >
+
+              <label
+                style="
+                  display:block;
+                  margin-bottom:5px;
+                  color:var(--navy);
+                  font-size:8px;
+                  font-weight:900;
+                "
+              >
+                Address
+              </label>
+
+              <textarea
+                id="ownerFormAddress"
+                rows="3"
+                placeholder="Address"
+                style="
+                  width:100%;
+                  box-sizing:border-box;
+                  resize:vertical;
+                  padding:10px 11px;
+                  border:0;
+                  outline:none;
+                  border-radius:11px;
+                  background:var(--surface);
+                  color:var(--text);
+                  box-shadow:var(--shadow-inset);
+                  font-family:inherit;
+                "
+              ></textarea>
+
+            </div>
+
+
+            <div
+              style="
+                grid-column:1/-1;
+              "
+            >
+
+              <label
+                style="
+                  display:flex;
+                  align-items:center;
+                  gap:7px;
+                  color:var(--navy);
+                  font-size:9px;
+                  font-weight:800;
+                  cursor:pointer;
+                "
+              >
+
+                <input
+                  id="ownerFormActive"
+                  type="checkbox"
+                  checked
+                >
+
+                Active Owner
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="ownerFormMessage"
+            style="
+              min-height:18px;
+              margin-top:12px;
+              color:#a64040;
+              font-size:9px;
+              line-height:1.5;
+            "
+          ></div>
+
+
+          <div
+            style="
+              display:flex;
+              justify-content:flex-end;
+              gap:9px;
+              margin-top:5px;
+            "
+          >
+
+            <button
+              type="button"
+              onclick="closeOwnerModal()"
+              style="
+                border:0;
+                border-radius:10px;
+                padding:10px 14px;
+                background:var(--surface);
+                color:var(--navy);
+                box-shadow:var(--shadow-soft);
+                font-size:8px;
+                font-weight:900;
+                cursor:pointer;
+              "
+            >
+              CANCEL
+            </button>
+
+
+            <button
+              id="ownerSaveButton"
+              type="submit"
+              style="
+                border:0;
+                border-radius:10px;
+                padding:10px 16px;
+                background:
+                  linear-gradient(
+                    135deg,
+                    #245579,
+                    #173d5d
+                  );
+                color:#fff;
+                box-shadow:
+                  0 6px 15px
+                  rgba(23,61,93,.20);
+                font-size:8px;
+                font-weight:900;
+                cursor:pointer;
+              "
+            >
+              SAVE OWNER
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  `;
+
+
+  document.body.appendChild(
+    modal
+  );
+
+
+  return modal;
+}
+
+
+/* ============================================================
+   LOAD OWNERS
+   ============================================================ */
+
+async function loadOwners() {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "owners"
+      )
+      .select(
+        `
+          id,
+          name,
+          email,
+          phone,
+          address,
+          city,
+          state,
+          country,
+          is_active,
+          created_at,
+          updated_at
+        `
+      )
+      .order(
+        "created_at",
+        {
+          ascending:
+            false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Owner loading error:",
+      error
+    );
+
+
+    throw error;
+  }
+
+
+  ownersCache =
+    data || [];
+
+
+  renderOwners(
+    ownersCache
+  );
+}
+
+
+/* ============================================================
+   RENDER OWNERS
+   ============================================================ */
+
+function renderOwners(
+  owners
+) {
+
+  const container =
+    document.getElementById(
+      "ownerList"
+    );
+
+
+  if (!container) {
+    return;
+  }
+
+
+  if (!owners.length) {
+
+    container.innerHTML = `
+      <div
+        style="
+          padding:20px;
+          text-align:center;
+          color:var(--muted);
+          font-size:9px;
+        "
+      >
+        No owners found.
+      </div>
+    `;
+
+
+    return;
+  }
+
+
+  container.innerHTML =
+    owners
+      .map(
+        owner => {
+
+          const animalCount =
+            animalsCache.filter(
+              animal =>
+                animal.owner_id ===
+                owner.id
+            ).length;
+
+
+          return `
+
+            <div
+              style="
+                display:grid;
+                grid-template-columns:
+                  minmax(0,1fr)
+                  auto;
+                gap:12px;
+                align-items:center;
+                padding:13px;
+                margin-bottom:10px;
+                border-radius:15px;
+                background:var(--surface);
+                box-shadow:var(--shadow-soft);
+              "
+            >
+
+              <div>
+
+                <div
+                  style="
+                    color:var(--navy);
+                    font-size:12px;
+                    font-weight:900;
+                  "
+                >
+                  ${escapeHtml(
+                    owner.name ||
+                    "Unnamed Owner"
+                  )}
+                </div>
+
+
+                <div
+                  style="
+                    margin-top:5px;
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:8px 13px;
+                    color:var(--muted);
+                    font-size:8px;
+                  "
+                >
+
+                  <span>
+                    ✉ ${escapeHtml(
+                      owner.email ||
+                      "No email"
+                    )}
+                  </span>
+
+                  <span>
+                    ☎ ${escapeHtml(
+                      owner.phone ||
+                      "No phone"
+                    )}
+                  </span>
+
+                  <span>
+                    🐾 ${animalCount}
+                    animal${
+                      animalCount === 1
+                        ? ""
+                        : "s"
+                    }
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div
+                style="
+                  display:flex;
+                  gap:7px;
+                "
+              >
+
+                <button
+                  type="button"
+                  onclick="openEditOwner('${escapeHtml(
+                    owner.id
+                  )}')"
+                  style="
+                    border:0;
+                    border-radius:9px;
+                    padding:8px 10px;
+                    background:var(--surface);
+                    color:var(--navy);
+                    box-shadow:var(--shadow-soft);
+                    font-size:8px;
+                    font-weight:900;
+                    cursor:pointer;
+                  "
+                >
+                  EDIT
+                </button>
+
+
+                <button
+                  type="button"
+                  onclick="deleteOwner('${escapeHtml(
+                    owner.id
+                  )}')"
+                  style="
+                    border:0;
+                    border-radius:9px;
+                    padding:8px 10px;
+                    background:
+                      rgba(184,76,76,.10);
+                    color:#a64040;
+                    font-size:8px;
+                    font-weight:900;
+                    cursor:pointer;
+                  "
+                >
+                  DELETE
+                </button>
+
+              </div>
+
+            </div>
+          `;
+        }
+      )
+      .join("");
+}
+
+
+/* ============================================================
+   OPEN ADD OWNER
+   ============================================================ */
+
+function openAddOwner() {
+
+  editingOwnerId =
+    null;
+
+
+  const modal =
+    getOwnerModal();
+
+
+  document.getElementById(
+    "ownerModalTitle"
+  ).textContent =
+    "Add Owner";
+
+
+  document.getElementById(
+    "ownerForm"
+  ).reset();
+
+
+  document.getElementById(
+    "ownerFormActive"
+  ).checked =
+    true;
+
+
+  document.getElementById(
+    "ownerFormMessage"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "ownerFormId"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "ownerSaveButton"
+  ).textContent =
+    "SAVE OWNER";
+
+
+  modal.style.display =
+    "block";
+}
+
+
+/* ============================================================
+   OPEN EDIT OWNER
+   ============================================================ */
+
+function openEditOwner(
+  ownerId
+) {
+
+  const owner =
+    ownersCache.find(
+      item =>
+        item.id ===
+        ownerId
+    );
+
+
+  if (!owner) {
+
+    alert(
+      "Owner record could not be found."
+    );
+
+
+    return;
+  }
+
+
+  editingOwnerId =
+    owner.id;
+
+
+  const modal =
+    getOwnerModal();
+
+
+  document.getElementById(
+    "ownerModalTitle"
+  ).textContent =
+    "Edit Owner";
+
+
+  document.getElementById(
+    "ownerFormId"
+  ).value =
+    owner.id || "";
+
+
+  document.getElementById(
+    "ownerFormName"
+  ).value =
+    owner.name || "";
+
+
+  document.getElementById(
+    "ownerFormEmail"
+  ).value =
+    owner.email || "";
+
+
+  document.getElementById(
+    "ownerFormPhone"
+  ).value =
+    owner.phone || "";
+
+
+  document.getElementById(
+    "ownerFormCity"
+  ).value =
+    owner.city || "";
+
+
+  document.getElementById(
+    "ownerFormState"
+  ).value =
+    owner.state || "";
+
+
+  document.getElementById(
+    "ownerFormAddress"
+  ).value =
+    owner.address || "";
+
+
+  document.getElementById(
+    "ownerFormActive"
+  ).checked =
+    owner.is_active !== false;
+
+
+  document.getElementById(
+    "ownerFormMessage"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "ownerSaveButton"
+  ).textContent =
+    "UPDATE OWNER";
+
+
+  modal.style.display =
+    "block";
+}
+
+
+/* ============================================================
+   CLOSE OWNER MODAL
+   ============================================================ */
+
+function closeOwnerModal(
+  event
+) {
+
+  if (
+    event &&
+    event.target !==
+      event.currentTarget
+  ) {
+
+    return;
+  }
+
+
+  const modal =
+    document.getElementById(
+      "ownerModal"
+    );
+
+
+  if (modal) {
+
+    modal.style.display =
+      "none";
+  }
+
+
+  editingOwnerId =
+    null;
+}
+
+
+/* ============================================================
+   SAVE OWNER
+   ============================================================ */
+
+async function saveOwner(
+  event
+) {
+
+  event.preventDefault();
+
+
+  const saveButton =
+    document.getElementById(
+      "ownerSaveButton"
+    );
+
+
+  const message =
+    document.getElementById(
+      "ownerFormMessage"
+    );
+
+
+  message.textContent =
+    "";
+
+
+  saveButton.disabled =
+    true;
+
+
+  saveButton.textContent =
+    editingOwnerId
+      ? "UPDATING..."
+      : "SAVING...";
+
+
+  try {
+
+    const ownerData = {
+
+      name:
+        document.getElementById(
+          "ownerFormName"
+        ).value.trim(),
+
+      email:
+        document.getElementById(
+          "ownerFormEmail"
+        ).value.trim() ||
+        null,
+
+      phone:
+        document.getElementById(
+          "ownerFormPhone"
+        ).value.trim() ||
+        null,
+
+      address:
+        document.getElementById(
+          "ownerFormAddress"
+        ).value.trim() ||
+        null,
+
+      city:
+        document.getElementById(
+          "ownerFormCity"
+        ).value.trim() ||
+        null,
+
+      state:
+        document.getElementById(
+          "ownerFormState"
+        ).value.trim() ||
+        null,
+
+      country:
+        "India",
+
+      is_active:
+        document.getElementById(
+          "ownerFormActive"
+        ).checked
+
+    };
+
+
+    if (
+      !ownerData.name
+    ) {
+
+      throw new Error(
+        "Owner name is required."
+      );
+    }
+
+
+    if (
+      editingOwnerId
+    ) {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from(
+            "owners"
+          )
+          .update(
+            ownerData
+          )
+          .eq(
+            "id",
+            editingOwnerId
+          );
+
+
+      if (error) {
+        throw error;
+      }
+
+    } else {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from(
+            "owners"
+          )
+          .insert(
+            ownerData
+          );
+
+
+      if (error) {
+        throw error;
+      }
+    }
+
+
+    closeOwnerModal();
+
+
+    await loadOwners();
+
+
+    alert(
+      editingOwnerId
+        ? "Owner updated successfully."
+        : "Owner created successfully."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Save owner error:",
+      error
+    );
+
+
+    message.textContent =
+      error?.message ||
+      "Unable to save owner.";
+
+
+  } finally {
+
+    saveButton.disabled =
+      false;
+
+
+    saveButton.textContent =
+      editingOwnerId
+        ? "UPDATE OWNER"
+        : "SAVE OWNER";
+  }
+}
+
+
+/* ============================================================
+   DELETE OWNER
+   ============================================================ */
+
+async function deleteOwner(
+  ownerId
+) {
+
+  const owner =
+    ownersCache.find(
+      item =>
+        item.id ===
+        ownerId
+    );
+
+
+  if (!owner) {
+    return;
+  }
+
+
+  const linkedAnimals =
+    animalsCache.filter(
+      animal =>
+        animal.owner_id ===
+        ownerId
+    );
+
+
+  if (
+    linkedAnimals.length
+  ) {
+
+    alert(
+      `This owner has ${linkedAnimals.length} linked animal record(s).\n\nPlease reassign or remove the animal owner before deleting this owner.`
+    );
+
+
+    return;
+  }
+
+
+  const confirmed =
+    window.confirm(
+      `Delete ${owner.name || "this owner"} permanently?`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "owners"
+        )
+        .delete()
+        .eq(
+          "id",
+          ownerId
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    await loadOwners();
+
+
+    alert(
+      "Owner deleted successfully."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Delete owner error:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Unable to delete owner."
+    );
+  }
+}
+
+
+/* ============================================================
+   OWNER SEARCH
+   ============================================================ */
+
+function searchOwners(
+  query
+) {
+
+  const q =
+    String(
+      query || ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  if (!q) {
+
+    renderOwners(
+      ownersCache
+    );
+
+
+    return;
+  }
+
+
+  const filtered =
+    ownersCache.filter(
+      owner => {
+
+        const searchable = [
+
+          owner.name,
+          owner.email,
+          owner.phone,
+          owner.city,
+          owner.state
+
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+
+        return searchable.includes(
+          q
+        );
+      }
+    );
+
+
+  renderOwners(
+    filtered
+  );
+}
+
+
+/* ============================================================
+   OWNER UI INJECTION
+   ============================================================ */
+
+function ensureOwnerManagementPanel() {
+
+  if (
+    document.getElementById(
+      "ownerManagementPanel"
+    )
+  ) {
+
+    return;
+  }
+
+
+  const animalListElement =
+    document.getElementById(
+      "animalList"
+    );
+
+
+  if (!animalListElement) {
+    return;
+  }
+
+
+  const panel =
+    document.createElement(
+      "section"
+    );
+
+
+  panel.id =
+    "ownerManagementPanel";
+
+
+  panel.style.cssText = `
+    margin-top:20px;
+    padding:18px;
+    border-radius:20px;
+    background:var(--surface);
+    box-shadow:var(--shadow-soft);
+  `;
+
+
+  panel.innerHTML = `
+
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:14px;
+      "
+    >
+
+      <div>
+
+        <div
+          style="
+            color:var(--navy);
+            font-size:15px;
+            font-weight:900;
+          "
+        >
+          👤 Owners
+        </div>
+
+        <div
+          style="
+            margin-top:3px;
+            color:var(--muted);
+            font-size:9px;
+          "
+        >
+          Manage registered animal parents and owners.
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        onclick="openAddOwner()"
+        style="
+          border:0;
+          border-radius:10px;
+          padding:9px 12px;
+          background:
+            linear-gradient(
+              135deg,
+              #245579,
+              #173d5d
+            );
+          color:#fff;
+          font-size:8px;
+          font-weight:900;
+          cursor:pointer;
+        "
+      >
+        + ADD OWNER
+      </button>
+
+    </div>
+
+
+    <div
+      style="
+        margin-bottom:12px;
+      "
+    >
+
+      <input
+        id="ownerSearch"
+        type="search"
+        placeholder="Search owners..."
+        oninput="searchOwners(this.value)"
+        style="
+          width:100%;
+          box-sizing:border-box;
+          padding:10px 11px;
+          border:0;
+          outline:none;
+          border-radius:11px;
+          background:var(--surface);
+          color:var(--text);
+          box-shadow:var(--shadow-inset);
+          font-size:9px;
+        "
+      >
+
+    </div>
+
+
+    <div id="ownerList">
+
+      <div
+        style="
+          padding:18px;
+          text-align:center;
+          color:var(--muted);
+          font-size:9px;
+        "
+      >
+        Loading owners...
+      </div>
+
+    </div>
+
+  `;
+
+
+  animalListElement
+    .closest(
+      "section"
+    )
+    ?.insertAdjacentElement(
+      "afterend",
+      panel
+    );
+
+
+  if (
+    !document.getElementById(
+      "ownerList"
+    )
+  ) {
+
+    animalListElement
+      .parentElement
+      ?.appendChild(
+        panel
+      );
+  }
+
+
+  loadOwners()
+    .catch(
+      error => {
+
+        console.error(
+          "Owner panel load error:",
+          error
+        );
+      }
+    );
+}
+
+
+/* ============================================================
+   OWNER PANEL INITIALIZATION
+   ============================================================ */
+
+function initializeOwnerManagement() {
+
+  try {
+
+    ensureOwnerManagementPanel();
+
+  } catch (error) {
+
+    console.error(
+      "Owner management initialization error:",
+      error
+    );
+  }
+}
+
+
+/* ============================================================
+   ADMIN SEARCH HELPERS
+   ============================================================ */
+
+function clearAnimalSearch() {
+
+  if (
+    animalSearch
+  ) {
+
+    animalSearch.value =
+      "";
+
+    renderAnimals(
+      animalsCache
+    );
+  }
+}
+
+
+/* ============================================================
+   REFRESH DASHBOARD
+   ============================================================ */
+
+async function refreshAdminDashboard() {
+
+  setLoading(
+    true
+  );
+
+
+  try {
+
+    await loadAnimals();
+
+    await loadChangeRequests();
+
+    initializeOwnerManagement();
+
+
+  } catch (error) {
+
+    console.error(
+      "Dashboard refresh error:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Unable to refresh the dashboard."
+    );
+
+
+  } finally {
+
+    setLoading(
+      false
+    );
+  }
+}
+
+
+/* ============================================================
+   GLOBAL ADMIN HELPERS
+   ============================================================ */
+
+window.openAddAnimal =
+  openAddAnimal;
+
+window.openEditAnimal =
+  openEditAnimal;
+
+window.closeAnimalModal =
+  closeAnimalModal;
+
+window.saveAnimal =
+  saveAnimal;
+
+window.deleteAnimal =
+  deleteAnimal;
+
+window.handleAnimalPhoto =
+  handleAnimalPhoto;
+
+window.openAnimalProfile =
+  openAnimalProfile;
+
+window.openAddOwner =
+  openAddOwner;
+
+window.openEditOwner =
+  openEditOwner;
+
+window.closeOwnerModal =
+  closeOwnerModal;
+
+window.saveOwner =
+  saveOwner;
+
+window.deleteOwner =
+  deleteOwner;
+
+window.searchOwners =
+  searchOwners;
+
+window.loadChangeRequests =
+  loadChangeRequests;
+
+window.updateChangeRequestStatus =
+  updateChangeRequestStatus;
+
+window.loadChangeRequestAttachmentUrl =
+  loadChangeRequestAttachmentUrl;
+
+window.refreshAdminDashboard =
+  refreshAdminDashboard;
+
+
+/* ============================================================
+   PART 3 COMPLETE
+   ============================================================ */
+   /* ============================================================
+   PART 4
+   OWNER ASSIGNMENT + ANIMAL RECORD UTILITIES
+   ============================================================ */
+
+
+/* ============================================================
+   OWNER DROPDOWN
+   ============================================================ */
+
+async function populateAnimalOwnerDropdown(
+  selectedOwnerId = ""
+) {
+
+  let select =
+    document.getElementById(
+      "animalFormOwner"
+    );
+
+
+  if (!select) {
+    return;
+  }
+
+
+  if (!ownersCache.length) {
+
+    try {
+
+      await loadOwners();
+
+    } catch (error) {
+
+      console.error(
+        "Unable to load owners for dropdown:",
+        error
+      );
+    }
+  }
+
+
+  select.innerHTML = `
+    <option value="">
+      No owner assigned
+    </option>
+  `;
+
+
+  ownersCache
+    .filter(
+      owner =>
+        owner.is_active !== false
+    )
+    .forEach(
+      owner => {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+
+        option.value =
+          owner.id;
+
+
+        option.textContent =
+          owner.name ||
+          "Unnamed Owner";
+
+
+        if (
+          String(
+            owner.id
+          ) ===
+          String(
+            selectedOwnerId
+          )
+        ) {
+
+          option.selected =
+            true;
+        }
+
+
+        select.appendChild(
+          option
+        );
+      }
+    );
+}
+
+
+/* ============================================================
+   ADD OWNER FIELD TO ANIMAL MODAL
+   ============================================================ */
+
+function ensureAnimalOwnerField() {
+
+  const form =
+    document.getElementById(
+      "animalForm"
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  if (
+    document.getElementById(
+      "animalFormOwner"
+    )
+  ) {
+
+    return;
+  }
+
+
+  const grid =
+    form.querySelector(
+      "div[style*='grid-template-columns']"
+    );
+
+
+  if (!grid) {
+    return;
+  }
+
+
+  const wrapper =
+    document.createElement(
+      "div"
+    );
+
+
+  wrapper.innerHTML = `
+
+    <label
+      style="
+        display:block;
+        margin-bottom:5px;
+        color:var(--navy);
+        font-size:8px;
+        font-weight:900;
+      "
+    >
+      Owner / Parent
+    </label>
+
+
+    <select
+      id="animalFormOwner"
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:10px 11px;
+        border:0;
+        outline:none;
+        border-radius:11px;
+        background:var(--surface);
+        color:var(--text);
+        box-shadow:var(--shadow-inset);
+      "
+    >
+
+      <option value="">
+        No owner assigned
+      </option>
+
+    </select>
+
+  `;
+
+
+  const firstRow =
+    grid.children[
+      0
+    ];
+
+
+  if (
+    firstRow &&
+    firstRow.parentNode
+  ) {
+
+    firstRow.parentNode.insertBefore(
+      wrapper,
+      firstRow
+    );
+
+  } else {
+
+    grid.appendChild(
+      wrapper
+    );
+  }
+
+
+  populateAnimalOwnerDropdown();
+}
+
+
+/* ============================================================
+   EXTEND ANIMAL MODAL
+   ============================================================ */
+
+const originalGetAnimalModal =
+  getAnimalModal;
+
+
+getAnimalModal =
+  function () {
+
+    const modal =
+      originalGetAnimalModal();
+
+
+    ensureAnimalOwnerField();
+
+
+    return modal;
+  };
+
+
+/* ============================================================
+   EXTEND OPEN EDIT ANIMAL
+   ============================================================ */
+
+const originalOpenEditAnimal =
+  openEditAnimal;
+
+
+openEditAnimal =
+  function (
+    animalId
+  ) {
+
+    originalOpenEditAnimal(
+      animalId
+    );
+
+
+    const animal =
+      animalsCache.find(
+        item =>
+          item.id ===
+          animalId
+      );
+
+
+    if (!animal) {
+      return;
+    }
+
+
+    populateAnimalOwnerDropdown(
+      animal.owner_id ||
+      ""
+    );
+  };
+
+
+/* ============================================================
+   EXTEND OPEN ADD ANIMAL
+   ============================================================ */
+
+const originalOpenAddAnimal =
+  openAddAnimal;
+
+
+openAddAnimal =
+  function () {
+
+    originalOpenAddAnimal();
+
+
+    populateAnimalOwnerDropdown(
+      ""
+    );
+  };
+
+
+/* ============================================================
+   EXTEND SAVE ANIMAL
+   ============================================================ */
+
+const originalSaveAnimal =
+  saveAnimal;
+
+
+saveAnimal =
+  async function (
+    event
+  ) {
+
+    const ownerField =
+      document.getElementById(
+        "animalFormOwner"
+      );
+
+
+    if (
+      ownerField
+    ) {
+
+      const ownerId =
+        ownerField.value ||
+        null;
+
+
+      const originalFrom =
+        supabaseClient
+          .from;
+
+
+      /*
+       * The original save function already
+       * handles validation, photo upload,
+       * insert and update.
+       *
+       * We temporarily intercept the
+       * selected owner through a hidden
+       * data attribute so the original
+       * workflow remains intact.
+       */
+
+      document
+        .getElementById(
+          "animalForm"
+        )
+        ?.setAttribute(
+          "data-selected-owner",
+          ownerId || ""
+        );
+    }
+
+
+    return originalSaveAnimal(
+      event
+    );
+  };
+
+
+/* ============================================================
+   OWNER ASSIGNMENT AFTER SAVE
+   ============================================================ */
+
+async function applySelectedOwnerToAnimal(
+  animalId
+) {
+
+  const form =
+    document.getElementById(
+      "animalForm"
+    );
+
+
+  if (!form || !animalId) {
+    return;
+  }
+
+
+  const ownerId =
+    form.getAttribute(
+      "data-selected-owner"
+    ) || null;
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "animals"
+      )
+      .update({
+        owner_id:
+          ownerId
+      })
+      .eq(
+        "id",
+        animalId
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Owner assignment error:",
+      error
+    );
+
+
+    throw error;
+  }
+}
+
+
+/* ============================================================
+   ANIMAL OWNER DISPLAY
+   ============================================================ */
+
+function getAnimalOwner(
+  animal
+) {
+
+  if (
+    !animal ||
+    !animal.owner_id
+  ) {
+
+    return null;
+  }
+
+
+  return ownersCache.find(
+    owner =>
+      owner.id ===
+      animal.owner_id
+  ) || null;
+}
+
+
+/* ============================================================
+   ENHANCED ANIMAL CARD OWNER INFO
+   ============================================================ */
+
+function getOwnerDisplayHtml(
+  animal
+) {
+
+  const owner =
+    getAnimalOwner(
+      animal
+    );
+
+
+  if (!owner) {
+
+    return `
+      <span>
+        👤 No owner assigned
+      </span>
+    `;
+  }
+
+
+  return `
+    <span>
+      👤 ${escapeHtml(
+        owner.name
+      )}
+    </span>
+  `;
+}
+
+
+/* ============================================================
+   ANIMAL DETAIL VIEW
+   ============================================================ */
+
+function openAnimalDetails(
+  animalId
+) {
+
+  const animal =
+    animalsCache.find(
+      item =>
+        item.id ===
+        animalId
+    );
+
+
+  if (!animal) {
+
+    alert(
+      "Animal record could not be found."
+    );
+
+
+    return;
+  }
+
+
+  const owner =
+    getAnimalOwner(
+      animal
+    );
+
+
+  let modal =
+    document.getElementById(
+      "animalDetailsModal"
+    );
+
+
+  if (!modal) {
+
+    modal =
+      document.createElement(
+        "div"
+      );
+
+
+    modal.id =
+      "animalDetailsModal";
+
+
+    document.body.appendChild(
+      modal
+    );
+  }
+
+
+  modal.innerHTML = `
+
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:11000;
+        background:
+          rgba(15,35,50,.45);
+        backdrop-filter:blur(5px);
+      "
+      onclick="closeAnimalDetails(event)"
+    ></div>
+
+
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:11001;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:18px;
+        overflow:auto;
+        pointer-events:none;
+      "
+    >
+
+      <div
+        style="
+          width:min(760px,100%);
+          max-height:90vh;
+          overflow:auto;
+          padding:22px;
+          border-radius:24px;
+          background:var(--surface);
+          box-shadow:
+            0 25px 70px
+            rgba(15,35,50,.25);
+          pointer-events:auto;
+        "
+        onclick="event.stopPropagation()"
+      >
+
+        <div
+          style="
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:12px;
+            margin-bottom:18px;
+          "
+        >
+
+          <div>
+
+            <div
+              style="
+                color:var(--navy);
+                font-size:18px;
+                font-weight:900;
+              "
+            >
+              ${escapeHtml(
+                animal.name
+              )}
+            </div>
+
+
+            <div
+              style="
+                margin-top:4px;
+                color:var(--muted);
+                font-size:9px;
+                font-weight:700;
+              "
+            >
+              ${escapeHtml(
+                animal.animal_id
+              )}
+            </div>
+
+          </div>
+
+
+          <button
+            type="button"
+            onclick="closeAnimalDetails()"
+            style="
+              width:34px;
+              height:34px;
+              border:0;
+              border-radius:50%;
+              background:var(--surface);
+              color:var(--navy);
+              box-shadow:var(--shadow-soft);
+              cursor:pointer;
+              font-size:16px;
+            "
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <div
+          style="
+            display:grid;
+            grid-template-columns:
+              170px minmax(0,1fr);
+            gap:20px;
+          "
+        >
+
+          <div>
+
+            <div
+              style="
+                width:170px;
+                height:200px;
+                overflow:hidden;
+                border-radius:18px;
+                background:#dce4e9;
+                box-shadow:var(--shadow-inset);
+              "
+            >
+
+              ${
+                animal.photo_url
+                  ? `
+                    <img
+                      src="${escapeHtml(
+                        animal.photo_url
+                      )}"
+                      alt="${escapeHtml(
+                        animal.name
+                      )}"
+                      style="
+                        width:100%;
+                        height:100%;
+                        object-fit:cover;
+                        display:block;
+                      "
+                    >
+                  `
+                  : `
+                    <div
+                      style="
+                        width:100%;
+                        height:100%;
+                        display:grid;
+                        place-items:center;
+                        font-size:42px;
+                      "
+                    >
+                      🐾
+                    </div>
+                  `
+              }
+
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <div
+              style="
+                display:grid;
+                grid-template-columns:
+                  repeat(2,minmax(0,1fr));
+                gap:10px;
+              "
+            >
+
+              ${detailItem(
+                "Type",
+                animal.type
+              )}
+
+              ${detailItem(
+                "Breed",
+                animal.breed
+              )}
+
+              ${detailItem(
+                "Gender",
+                animal.gender
+              )}
+
+              ${detailItem(
+                "Date of Birth",
+                animal.date_of_birth
+              )}
+
+              ${detailItem(
+                "Colour",
+                animal.colour
+              )}
+
+              ${detailItem(
+                "Markings",
+                animal.markings
+              )}
+
+              ${detailItem(
+                "Microchip",
+                animal.microchip_number
+              )}
+
+              ${detailItem(
+                "Microchip Provider",
+                animal.microchip_provider
+              )}
+
+              ${detailItem(
+                "Status",
+                animal.status
+              )}
+
+              ${detailItem(
+                "Owner",
+                owner?.name ||
+                "Not assigned"
+              )}
+
+              ${detailItem(
+                "City",
+                animal.location_city
+              )}
+
+              ${detailItem(
+                "State",
+                animal.location_state
+              )}
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          style="
+            display:grid;
+            gap:12px;
+            margin-top:18px;
+          "
+        >
+
+          ${detailBlock(
+            "Identification Notes",
+            animal.identification_notes
+          )}
+
+          ${detailBlock(
+            "Special Instructions",
+            animal.special_instructions
+          )}
+
+          ${detailBlock(
+            "Notes",
+            animal.notes
+          )}
+
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin-top:18px;
+          "
+        >
+
+          <button
+            type="button"
+            onclick="openEditAnimal('${escapeHtml(
+              animal.id
+            )}');closeAnimalDetails()"
+            style="
+              border:0;
+              border-radius:10px;
+              padding:10px 13px;
+              background:
+                linear-gradient(
+                  135deg,
+                  #245579,
+                  #173d5d
+                );
+              color:#fff;
+              font-size:8px;
+              font-weight:900;
+              cursor:pointer;
+            "
+          >
+            EDIT RECORD
+          </button>
+
+
+          <button
+            type="button"
+            onclick="openAnimalProfile('${escapeHtml(
+              animal.id
+            )}')"
+            style="
+              border:0;
+              border-radius:10px;
+              padding:10px 13px;
+              background:var(--surface);
+              color:var(--navy);
+              box-shadow:var(--shadow-soft);
+              font-size:8px;
+              font-weight:900;
+              cursor:pointer;
+            "
+          >
+            OPEN DIGITAL ID
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+
+  modal.style.display =
+    "block";
+}
+
+
+/* ============================================================
+   DETAIL ITEM
+   ============================================================ */
+
+function detailItem(
+  label,
+  value
+) {
+
+  return `
+    <div
+      style="
+        padding:9px 10px;
+        border-radius:10px;
+        background:
+          rgba(36,85,121,.045);
+        box-shadow:var(--shadow-inset);
+      "
+    >
+
+      <div
+        style="
+          color:var(--muted);
+          font-size:7px;
+          font-weight:900;
+          text-transform:uppercase;
+          letter-spacing:.05em;
+        "
+      >
+        ${escapeHtml(
+          label
+        )}
+      </div>
+
+
+      <div
+        style="
+          margin-top:4px;
+          color:var(--navy);
+          font-size:9px;
+          font-weight:800;
+          word-break:break-word;
+        "
+      >
+        ${escapeHtml(
+          value ||
+          "Not specified"
+        )}
+      </div>
+
+    </div>
+  `;
+}
+
+
+/* ============================================================
+   DETAIL BLOCK
+   ============================================================ */
+
+function detailBlock(
+  label,
+  value
+) {
+
+  if (!value) {
+    return "";
+  }
+
+
+  return `
+    <div
+      style="
+        padding:11px 12px;
+        border-radius:12px;
+        background:
+          rgba(36,85,121,.045);
+        box-shadow:var(--shadow-inset);
+      "
+    >
+
+      <div
+        style="
+          color:var(--muted);
+          font-size:7px;
+          font-weight:900;
+          text-transform:uppercase;
+        "
+      >
+        ${escapeHtml(
+          label
+        )}
+      </div>
+
+
+      <div
+        style="
+          margin-top:5px;
+          color:var(--text);
+          font-size:9px;
+          line-height:1.55;
+          white-space:pre-wrap;
+        "
+      >
+        ${escapeHtml(
+          value
+        )}
+      </div>
+
+    </div>
+  `;
+}
+
+
+/* ============================================================
+   CLOSE ANIMAL DETAILS
+   ============================================================ */
+
+function closeAnimalDetails(
+  event
+) {
+
+  if (
+    event &&
+    event.target !==
+      event.currentTarget
+  ) {
+
+    return;
+  }
+
+
+  const modal =
+    document.getElementById(
+      "animalDetailsModal"
+    );
+
+
+  if (modal) {
+
+    modal.style.display =
+      "none";
+  }
+}
+
+
+/* ============================================================
+   ANIMAL CARD DETAILS BUTTON
+   ============================================================ */
+
+function addAnimalDetailsButton(
+  animal
+) {
+
+  return `
+    <button
+      type="button"
+      onclick="openAnimalDetails('${escapeHtml(
+        animal.id
+      )}')"
+      style="
+        border:0;
+        border-radius:9px;
+        padding:8px 11px;
+        background:var(--surface);
+        color:var(--navy);
+        box-shadow:var(--shadow-soft);
+        font-size:8px;
+        font-weight:900;
+        cursor:pointer;
+      "
+    >
+      DETAILS
+    </button>
+  `;
+}
+
+
+/* ============================================================
+   OWNER ASSIGNMENT HELPER
+   ============================================================ */
+
+async function assignAnimalOwner(
+  animalId,
+  ownerId
+) {
+
+  if (!animalId) {
+
+    throw new Error(
+      "Animal ID is required."
+    );
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "animals"
+      )
+      .update({
+        owner_id:
+          ownerId ||
+          null
+      })
+      .eq(
+        "id",
+        animalId
+      );
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  await loadAnimals();
+
+
+  return true;
+}
+
+
+/* ============================================================
+   QUICK OWNER ASSIGNMENT
+   ============================================================ */
+
+async function quickAssignOwner(
+  animalId
+) {
+
+  const animal =
+    animalsCache.find(
+      item =>
+        item.id ===
+        animalId
+    );
+
+
+  if (!animal) {
+    return;
+  }
+
+
+  if (!ownersCache.length) {
+
+    try {
+
+      await loadOwners();
+
+    } catch (error) {
+
+      console.error(
+        "Owner load error:",
+        error
+      );
+    }
+  }
+
+
+  const activeOwners =
+    ownersCache.filter(
+      owner =>
+        owner.is_active !== false
+    );
+
+
+  if (!activeOwners.length) {
+
+    alert(
+      "No active owners are available. Please create an owner first."
+    );
+
+
+    return;
+  }
+
+
+  const names =
+    activeOwners
+      .map(
+        (
+          owner,
+          index
+        ) =>
+          `${index + 1}. ${owner.name}`
+      )
+      .join(
+        "\n"
+      );
+
+
+  const answer =
+    window.prompt(
+      `Enter the owner number for ${animal.name}:\n\n${names}`
+    );
+
+
+  if (
+    answer ===
+    null
+  ) {
+    return;
+  }
+
+
+  const index =
+    Number(
+      answer
+    ) - 1;
+
+
+  if (
+    !Number.isInteger(
+      index
+    ) ||
+    !activeOwners[index]
+  ) {
+
+    alert(
+      "Invalid owner selection."
+    );
+
+
+    return;
+  }
+
+
+  try {
+
+    await assignAnimalOwner(
+      animalId,
+      activeOwners[index].id
+    );
+
+
+    alert(
+      `Owner assigned to ${animal.name}.`
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Quick owner assignment error:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Unable to assign owner."
+    );
+  }
+}
+
+
+/* ============================================================
+   ANIMAL STATUS HELPERS
+   ============================================================ */
+
+async function markAnimalLost(
+  animalId
+) {
+
+  const animal =
+    animalsCache.find(
+      item =>
+        item.id ===
+        animalId
+    );
+
+
+  if (!animal) {
+    return;
+  }
+
+
+  const confirmed =
+    window.confirm(
+      `Mark ${animal.name} as LOST?`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "animals"
+        )
+        .update({
+          is_lost:
+            true
+        })
+        .eq(
+          "id",
+          animalId
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    await loadAnimals();
+
+
+  } catch (error) {
+
+    console.error(
+      "Mark lost error:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Unable to update lost status."
+    );
+  }
+}
+
+
+async function clearAnimalLost(
+  animalId
+) {
+
+  const animal =
+    animalsCache.find(
+      item =>
+        item.id ===
+        animalId
+    );
+
+
+  if (!animal) {
+    return;
+  }
+
+
+  const confirmed =
+    window.confirm(
+      `Remove LOST status from ${animal.name}?`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "animals"
+        )
+        .update({
+          is_lost:
+            false
+        })
+        .eq(
+          "id",
+          animalId
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    await loadAnimals();
+
+
+  } catch (error) {
+
+    console.error(
+      "Clear lost status error:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Unable to update lost status."
+    );
+  }
+}
+
+
+/* ============================================================
+   PUBLIC VISIBILITY
+   ============================================================ */
+
+async function toggleAnimalPublic(
+  animalId,
+  publicState
+) {
+
+  const animal =
+    animalsCache.find(
+      item =>
+        item.id ===
+        animalId
+    );
+
+
+  if (!animal) {
+    return;
+  }
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "animals"
+        )
+        .update({
+          is_public:
+            Boolean(
+              publicState
+            )
+        })
+        .eq(
+          "id",
+          animalId
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    await loadAnimals();
+
+
+  } catch (error) {
+
+    console.error(
+      "Public visibility error:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Unable to update public visibility."
+    );
+  }
+}
+
+
+/* ============================================================
+   DIGITAL ID URL
+   ============================================================ */
+
+function getAnimalDigitalIdUrl(
+  animalId
+) {
+
+  return (
+    "https://sagarjpk.github.io/animal-registry/profile.html?id=" +
+    encodeURIComponent(
+      animalId
+    )
+  );
+}
+
+
+/* ============================================================
+   COPY DIGITAL ID LINK
+   ============================================================ */
+
+async function copyAnimalDigitalId(
+  animalId
+) {
+
+  const url =
+    getAnimalDigitalIdUrl(
+      animalId
+    );
+
+
+  try {
+
+    await navigator.clipboard.writeText(
+      url
+    );
+
+
+    alert(
+      "Digital ID link copied."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Copy link error:",
+      error
+    );
+
+
+    window.prompt(
+      "Copy this Digital ID link:",
+      url
+    );
+  }
+}
+
+
+/* ============================================================
+   QR CODE HELPER
+   ============================================================ */
+
+function openAnimalQr(
+  animalId
+) {
+
+  const url =
+    getAnimalDigitalIdUrl(
+      animalId
+    );
+
+
+  let modal =
+    document.getElementById(
+      "animalQrModal"
+    );
+
+
+  if (!modal) {
+
+    modal =
+      document.createElement(
+        "div"
+      );
+
+
+    modal.id =
+      "animalQrModal";
+
+
+    document.body.appendChild(
+      modal
+    );
+  }
+
+
+  modal.innerHTML = `
+
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:12000;
+        background:
+          rgba(15,35,50,.45);
+        backdrop-filter:blur(5px);
+      "
+      onclick="closeAnimalQr(event)"
+    ></div>
+
+
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:12001;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:18px;
+        pointer-events:none;
+      "
+    >
+
+      <div
+        style="
+          width:min(390px,100%);
+          padding:22px;
+          border-radius:24px;
+          background:var(--surface);
+          box-shadow:
+            0 25px 70px
+            rgba(15,35,50,.25);
+          text-align:center;
+          pointer-events:auto;
+        "
+        onclick="event.stopPropagation()"
+      >
+
+        <div
+          style="
+            color:var(--navy);
+            font-size:17px;
+            font-weight:900;
+          "
+        >
+          Animal Digital ID
+        </div>
+
+
+        <div
+          style="
+            margin-top:4px;
+            color:var(--muted);
+            font-size:8px;
+          "
+        >
+          Scan to open the public profile.
+        </div>
+
+
+        <div
+          id="animalQrCode"
+          style="
+            width:220px;
+            height:220px;
+            margin:18px auto;
+            display:grid;
+            place-items:center;
+            background:#fff;
+            border-radius:14px;
+            box-shadow:var(--shadow-soft);
+          "
+        ></div>
+
+
+        <div
+          style="
+            color:var(--muted);
+            font-size:8px;
+            word-break:break-all;
+            line-height:1.5;
+          "
+        >
+          ${escapeHtml(
+            url
+          )}
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+            justify-content:center;
+            gap:8px;
+            margin-top:15px;
+          "
+        >
+
+          <button
+            type="button"
+            onclick="copyAnimalDigitalId('${escapeHtml(
+              animalId
+            )}')"
+            style="
+              border:0;
+              border-radius:10px;
+              padding:9px 12px;
+              background:
+                linear-gradient(
+                  135deg,
+                  #245579,
+                  #173d5d
+                );
+              color:#fff;
+              font-size:8px;
+              font-weight:900;
+              cursor:pointer;
+            "
+          >
+            COPY LINK
+          </button>
+
+
+          <button
+            type="button"
+            onclick="closeAnimalQr()"
+            style="
+              border:0;
+              border-radius:10px;
+              padding:9px 12px;
+              background:var(--surface);
+              color:var(--navy);
+              box-shadow:var(--shadow-soft);
+              font-size:8px;
+              font-weight:900;
+              cursor:pointer;
+            "
+          >
+            CLOSE
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+
+  modal.style.display =
+    "block";
+
+
+  const qrContainer =
+    document.getElementById(
+      "animalQrCode"
+    );
+
+
+  if (
+    window.QRCode &&
+    qrContainer
+  ) {
+
+    try {
+
+      new QRCode(
+        qrContainer,
+        {
+          text:
+            url,
+          width:
+            200,
+          height:
+            200,
+          correctLevel:
+            QRCode.CorrectLevel.M
+        }
+      );
+
+    } catch (error) {
+
+      console.error(
+        "QR generation error:",
+        error
+      );
+
+
+      qrContainer.innerHTML = `
+        <div
+          style="
+            padding:15px;
+            color:#a64040;
+            font-size:9px;
+          "
+        >
+          Unable to generate QR code.
+        </div>
+      `;
+    }
+
+  } else if (
+    qrContainer
+  ) {
+
+    qrContainer.innerHTML = `
+      <div
+        style="
+          padding:15px;
+          color:#a64040;
+          font-size:9px;
+        "
+      >
+        QR library is unavailable.
+      </div>
+    `;
+  }
+}
+
+
+/* ============================================================
+   CLOSE QR MODAL
+   ============================================================ */
+
+function closeAnimalQr(
+  event
+) {
+
+  if (
+    event &&
+    event.target !==
+      event.currentTarget
+  ) {
+
+    return;
+  }
+
+
+  const modal =
+    document.getElementById(
+      "animalQrModal"
+    );
+
+
+  if (modal) {
+
+    modal.style.display =
+      "none";
+  }
+}
+
+
+/* ============================================================
+   REGISTRY EXPORT
+   ============================================================ */
+
+function csvEscape(
+  value
+) {
+
+  const stringValue =
+    String(
+      value ?? ""
+    );
+
+
+  if (
+    stringValue.includes(
+      ","
+    ) ||
+    stringValue.includes(
+      '"'
+    ) ||
+    stringValue.includes(
+      "\n"
+    )
+  ) {
+
+    return (
+      '"' +
+      stringValue.replace(
+        /"/g,
+        '""'
+      ) +
+      '"'
+    );
+  }
+
+
+  return stringValue;
+}
+
+
+function exportAnimalsCsv() {
+
+  if (
+    !animalsCache.length
+  ) {
+
+    alert(
+      "There are no animal records to export."
+    );
+
+
+    return;
+  }
+
+
+  const headers = [
+
+    "Animal ID",
+    "Name",
+    "Type",
+    "Breed",
+    "Gender",
+    "Date of Birth",
+    "Colour",
+    "Markings",
+    "Microchip Number",
+    "Microchip Provider",
+    "Government Reference",
+    "Status",
+    "Public",
+    "Lost",
+    "Owner",
+    "City",
+    "State",
+    "Country",
+    "Map URL",
+    "Registration Date"
+
+  ];
+
+
+  const rows =
+    animalsCache.map(
+      animal => {
+
+        const owner =
+          getAnimalOwner(
+            animal
+          );
+
+
+        return [
+
+          animal.animal_id,
+          animal.name,
+          animal.type,
+          animal.breed,
+          animal.gender,
+          animal.date_of_birth,
+          animal.colour,
+          animal.markings,
+          animal.microchip_number,
+          animal.microchip_provider,
+          animal.government_reference,
+          animal.status,
+          animal.is_public
+            ? "Yes"
+            : "No",
+          animal.is_lost
+            ? "Yes"
+            : "No",
+          owner?.name ||
+            "",
+          animal.location_city,
+          animal.location_state,
+          animal.location_country,
+          animal.map_url,
+          animal.registration_date
+
+        ];
+      }
+    );
+
+
+  const csv = [
+
+    headers,
+
+    ...rows
+
+  ]
+    .map(
+      row =>
+        row
+          .map(
+            csvEscape
+          )
+          .join(",")
+    )
+    .join(
+      "\r\n"
+    );
+
+
+  const blob =
+    new Blob(
+      [
+        "\uFEFF",
+        csv
+      ],
+      {
+        type:
+          "text/csv;charset=utf-8;"
+      }
+    );
+
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const link =
+    document.createElement(
+      "a"
+    );
+
+
+  link.href =
+    url;
+
+
+  link.download =
+    `animal-registry-${new Date()
+      .toISOString()
+      .slice(
+        0,
+        10
+      )}.csv`;
+
+
+  document.body.appendChild(
+    link
+  );
+
+
+  link.click();
+
+
+  link.remove();
+
+
+  URL.revokeObjectURL(
+    url
+  );
+}
+
+
+/* ============================================================
+   ADMIN ACTIVITY MESSAGE
+   ============================================================ */
+
+function showAdminToast(
+  message,
+  type = "success"
+) {
+
+  let toast =
+    document.getElementById(
+      "adminToast"
+    );
+
+
+  if (!toast) {
+
+    toast =
+      document.createElement(
+        "div"
+      );
+
+
+    toast.id =
+      "adminToast";
+
+
+    toast.style.cssText = `
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:15000;
+      max-width:340px;
+      padding:12px 15px;
+      border-radius:13px;
+      color:#fff;
+      font-size:9px;
+      font-weight:800;
+      line-height:1.45;
+      box-shadow:
+        0 12px 30px
+        rgba(15,35,50,.22);
+      transform:translateY(15px);
+      opacity:0;
+      transition:
+        opacity .2s ease,
+        transform .2s ease;
+    `;
+
+
+    document.body.appendChild(
+      toast
+    );
+  }
+
+
+  toast.style.background =
+    type === "error"
+      ? "#a64040"
+      : "#287651";
+
+
+  toast.textContent =
+    message;
+
+
+  requestAnimationFrame(
+    () => {
+
+      toast.style.opacity =
+        "1";
+
+      toast.style.transform =
+        "translateY(0)";
+    }
+  );
+
+
+  clearTimeout(
+    toast._timer
+  );
+
+
+  toast._timer =
+    setTimeout(
+      () => {
+
+        toast.style.opacity =
+          "0";
+
+        toast.style.transform =
+          "translateY(15px)";
+
+      },
+      3000
+    );
+}
+
+
+/* ============================================================
+   ADMIN CONFIRMATION HELPER
+   ============================================================ */
+
+function adminConfirm(
+  message
+) {
+
+  return window.confirm(
+    message
+  );
+}
+
+
+/* ============================================================
+   KEYBOARD SHORTCUTS
+   ============================================================ */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.ctrlKey &&
+      event.key.toLowerCase() ===
+        "k"
+    ) {
+
+      if (
+        animalSearch
+      ) {
+
+        event.preventDefault();
+
+        animalSearch.focus();
+
+        animalSearch.select();
+      }
+    }
+
+
+    if (
+      event.ctrlKey &&
+      event.key.toLowerCase() ===
+        "n"
+    ) {
+
+      event.preventDefault();
+
+      openAddAnimal();
+    }
+
+
+    if (
+      event.ctrlKey &&
+      event.shiftKey &&
+      event.key.toLowerCase() ===
+        "o"
+    ) {
+
+      event.preventDefault();
+
+      openAddOwner();
+    }
+  }
+);
+
+
+/* ============================================================
+   GLOBAL FUNCTION EXPORTS
+   ============================================================ */
+
+window.openAnimalDetails =
+  openAnimalDetails;
+
+window.closeAnimalDetails =
+  closeAnimalDetails;
+
+window.assignAnimalOwner =
+  assignAnimalOwner;
+
+window.quickAssignOwner =
+  quickAssignOwner;
+
+window.markAnimalLost =
+  markAnimalLost;
+
+window.clearAnimalLost =
+  clearAnimalLost;
+
+window.toggleAnimalPublic =
+  toggleAnimalPublic;
+
+window.getAnimalDigitalIdUrl =
+  getAnimalDigitalIdUrl;
+
+window.copyAnimalDigitalId =
+  copyAnimalDigitalId;
+
+window.openAnimalQr =
+  openAnimalQr;
+
+window.closeAnimalQr =
+  closeAnimalQr;
+
+window.exportAnimalsCsv =
+  exportAnimalsCsv;
+
+window.showAdminToast =
+  showAdminToast;
+
+
+/* ============================================================
+   PART 4 COMPLETE
+   ============================================================ */
+   /* ============================================================
+   PART 5
+   CHANGE REQUEST ADMINISTRATION
+   ============================================================ */
+
+
+/* ============================================================
+   CHANGE REQUEST HELPERS
+   ============================================================ */
+
+function formatFileSize(
+  bytes
+) {
+
+  const size =
+    Number(
+      bytes
+    ) || 0;
+
+
+  if (size <= 0) {
+    return "";
+  }
+
+
+  if (size < 1024) {
+    return `${size} B`;
+  }
+
+
+  if (
+    size <
+    1024 * 1024
+  ) {
+
+    return `${(
+      size / 1024
+    ).toFixed(1)} KB`;
+  }
+
+
+  return `${(
+    size /
+    (1024 * 1024)
+  ).toFixed(1)} MB`;
+}
+
+
+/* ============================================================
+   CHANGE REQUEST ATTACHMENT
+   ============================================================ */
+
+function isSupportedChangeRequestFile(
+  file
+) {
+
+  if (!file) {
+    return false;
+  }
+
+
+  const allowedTypes = [
+
+    "application/pdf",
+
+    "image/jpeg",
+
+    "image/png"
+
+  ];
+
+
+  return allowedTypes.includes(
+    file.type
+  );
+}
+
+
+/* ============================================================
+   OPEN ATTACHMENT
+   ============================================================ */
+
+async function openChangeRequestAttachment(
+  request
+) {
+
+  if (
+    !request ||
+    !request.attachment_path
+  ) {
+
+    alert(
+      "No attachment is available for this request."
+    );
+
+
+    return;
+  }
+
+
+  try {
+
+    const button =
+      document.querySelector(
+        `[data-attachment-request="${request.id}"]`
+      );
+
+
+    if (button) {
+
+      button.disabled =
+        true;
+
+      button.textContent =
+        "OPENING...";
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.storage
+        .from(
+          request.attachment_storage ||
+          "change-request-attachments"
+        )
+        .createSignedUrl(
+          request.attachment_path,
+          1800
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    const signedUrl =
+      data?.signedUrl;
+
+
+    if (!signedUrl) {
+
+      throw new Error(
+        "Unable to create a secure attachment link."
+      );
+    }
+
+
+    window.open(
+      signedUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Open attachment error:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Unable to open the attachment."
+    );
+
+
+  } finally {
+
+    const button =
+      document.querySelector(
+        `[data-attachment-request="${request?.id}"]`
+      );
+
+
+    if (button) {
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "📎 OPEN DOCUMENT";
+    }
+  }
+}
+
+
+/* ============================================================
+   CHANGE REQUEST DETAILS
+   ============================================================ */
+
+function showChangeRequestDetails(
+  requestId
+) {
+
+  const request =
+    changeRequestsCache.find(
+      item =>
+        item.id ===
+        requestId
+    );
+
+
+  if (!request) {
+
+    alert(
+      "Change request could not be found."
+    );
+
+
+    return;
+  }
+
+
+  let modal =
+    document.getElementById(
+      "changeRequestDetailsModal"
+    );
+
+
+  if (!modal) {
+
+    modal =
+      document.createElement(
+        "div"
+      );
+
+
+    modal.id =
+      "changeRequestDetailsModal";
+
+
+    document.body.appendChild(
+      modal
+    );
+  }
+
+
+  const animal =
+    animalsCache.find(
+      item =>
+        item.id ===
+          request.animal_uuid ||
+        item.animal_id ===
+          request.animal_id
+    );
+
+
+  const profileUrl =
+    request.animal_uuid
+      ? getAnimalDigitalIdUrl(
+          request.animal_uuid
+        )
+      : "";
+
+
+  modal.innerHTML = `
+
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:13000;
+        background:
+          rgba(15,35,50,.45);
+        backdrop-filter:blur(5px);
+      "
+      onclick="closeChangeRequestDetails(event)"
+    ></div>
+
+
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:13001;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:18px;
+        overflow:auto;
+        pointer-events:none;
+      "
+    >
+
+      <div
+        style="
+          width:min(650px,100%);
+          max-height:90vh;
+          overflow:auto;
+          padding:22px;
+          border-radius:24px;
+          background:var(--surface);
+          box-shadow:
+            0 25px 70px
+            rgba(15,35,50,.25);
+          pointer-events:auto;
+        "
+        onclick="event.stopPropagation()"
+      >
+
+        <div
+          style="
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:12px;
+          "
+        >
+
+          <div>
+
+            <div
+              style="
+                color:var(--navy);
+                font-size:18px;
+                font-weight:900;
+              "
+            >
+              Change Request
+            </div>
+
+
+            <div
+              style="
+                margin-top:4px;
+                color:var(--muted);
+                font-size:9px;
+              "
+            >
+              ${escapeHtml(
+                request.change_type ||
+                "Registry change"
+              )}
+            </div>
+
+          </div>
+
+
+          <button
+            type="button"
+            onclick="closeChangeRequestDetails()"
+            style="
+              width:34px;
+              height:34px;
+              border:0;
+              border-radius:50%;
+              background:var(--surface);
+              color:var(--navy);
+              box-shadow:var(--shadow-soft);
+              cursor:pointer;
+              font-size:16px;
+            "
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <div
+          style="
+            display:grid;
+            gap:11px;
+            margin-top:18px;
+          "
+        >
+
+          ${detailBlock(
+            "Animal",
+            `${request.animal_name || "Unknown"}${
+              request.animal_id
+                ? ` • ${request.animal_id}`
+                : ""
+            }`
+          )}
+
+
+          ${detailBlock(
+            "Requester",
+            `${request.requester_name || "Unknown"}${
+              request.requester_email
+                ? ` • ${request.requester_email}`
+                : ""
+            }`
+          )}
+
+
+          ${detailBlock(
+            "Submitted",
+            formatChangeRequestDate(
+              request.created_at
+            )
+          )}
+
+
+          ${detailBlock(
+            "Message",
+            request.message
+          )}
+
+
+          ${
+            request.attachment_name
+              ? detailBlock(
+                  "Attachment",
+                  `${request.attachment_name}${
+                    request.attachment_size
+                      ? ` • ${formatFileSize(
+                          request.attachment_size
+                        )}`
+                      : ""
+                  }`
+                )
+              : ""
+          }
+
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin-top:18px;
+          "
+        >
+
+          ${
+            profileUrl
+              ? `
+                <button
+                  type="button"
+                  onclick="window.open(
+                    '${escapeHtml(
+                      profileUrl
+                    )}',
+                    '_blank',
+                    'noopener,noreferrer'
+                  )"
+                  style="
+                    border:0;
+                    border-radius:10px;
+                    padding:10px 13px;
+                    background:
+                      linear-gradient(
+                        135deg,
+                        #245579,
+                        #173d5d
+                      );
+                    color:#fff;
+                    font-size:8px;
+                    font-weight:900;
+                    cursor:pointer;
+                  "
+                >
+                  VIEW DIGITAL ID
+                </button>
+              `
+              : ""
+          }
+
+
+          ${
+            request.attachment_path
+              ? `
+                <button
+                  type="button"
+                  onclick="openChangeRequestAttachment(
+                    changeRequestsCache.find(
+                      item =>
+                        item.id ===
+                        '${escapeHtml(
+                          request.id
+                        )}'
+                    )
+                  )"
+                  style="
+                    border:0;
+                    border-radius:10px;
+                    padding:10px 13px;
+                    background:var(--surface);
+                    color:var(--navy);
+                    box-shadow:var(--shadow-soft);
+                    font-size:8px;
+                    font-weight:900;
+                    cursor:pointer;
+                  "
+                >
+                  📎 OPEN DOCUMENT
+                </button>
+              `
+              : ""
+          }
+
+
+          <button
+            type="button"
+            onclick="closeChangeRequestDetails();updateChangeRequestStatus(
+              '${escapeHtml(
+                request.id
+              )}',
+              'REVIEWED'
+            )"
+            style="
+              border:0;
+              border-radius:10px;
+              padding:10px 13px;
+              background:
+                rgba(45,138,98,.10);
+              color:#287651;
+              font-size:8px;
+              font-weight:900;
+              cursor:pointer;
+            "
+          >
+            ✓ MARK REVIEWED
+          </button>
+
+
+          <button
+            type="button"
+            onclick="closeChangeRequestDetails();updateChangeRequestStatus(
+              '${escapeHtml(
+                request.id
+              )}',
+              'REJECTED'
+            )"
+            style="
+              border:0;
+              border-radius:10px;
+              padding:10px 13px;
+              background:
+                rgba(184,76,76,.10);
+              color:#a64040;
+              font-size:8px;
+              font-weight:900;
+              cursor:pointer;
+            "
+          >
+            REJECT
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+
+  modal.style.display =
+    "block";
+}
+
+
+/* ============================================================
+   CLOSE CHANGE REQUEST DETAILS
+   ============================================================ */
+
+function closeChangeRequestDetails(
+  event
+) {
+
+  if (
+    event &&
+    event.target !==
+      event.currentTarget
+  ) {
+
+    return;
+  }
+
+
+  const modal =
+    document.getElementById(
+      "changeRequestDetailsModal"
+    );
+
+
+  if (modal) {
+
+    modal.style.display =
+      "none";
+  }
+}
+
+
+/* ============================================================
+   REQUEST STATUS LABEL
+   ============================================================ */
+
+function getChangeRequestStatusLabel(
+  status
+) {
+
+  switch (
+    String(
+      status ||
+      ""
+    ).toUpperCase()
+  ) {
+
+    case "PENDING":
+      return "PENDING";
+
+    case "REVIEWED":
+      return "REVIEWED";
+
+    case "REJECTED":
+      return "REJECTED";
+
+    default:
+      return (
+        status ||
+        "UNKNOWN"
+      );
+  }
+}
+
+
+/* ============================================================
+   REQUEST STATUS COLOR
+   ============================================================ */
+
+function getChangeRequestStatusColor(
+  status
+) {
+
+  switch (
+    String(
+      status ||
+      ""
+    ).toUpperCase()
+  ) {
+
+    case "REVIEWED":
+      return "#287651";
+
+    case "REJECTED":
+      return "#a64040";
+
+    default:
+      return "#a53a48";
+  }
+}
+
+
+/* ============================================================
+   CHANGE REQUEST HISTORY
+   ============================================================ */
+
+async function loadChangeRequestHistory() {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "change_requests"
+      )
+      .select(
+        `
+          id,
+          animal_id,
+          animal_uuid,
+          animal_name,
+          requester_name,
+          requester_email,
+          change_type,
+          message,
+          attachment_name,
+          attachment_type,
+          attachment_size,
+          attachment_path,
+          attachment_storage,
+          status,
+          created_at,
+          reviewed_at,
+          reviewed_by
+        `
+      )
+      .order(
+        "created_at",
+        {
+          ascending:
+            false
+        }
+      )
+      .limit(
+        100
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Change request history error:",
+      error
+    );
+
+
+    throw error;
+  }
+
+
+  return data || [];
+}
+
+
+/* ============================================================
+   CHANGE REQUEST HISTORY PANEL
+   ============================================================ */
+
+async function showChangeRequestHistory() {
+
+  let modal =
+    document.getElementById(
+      "changeRequestHistoryModal"
+    );
+
+
+  if (!modal) {
+
+    modal =
+      document.createElement(
+        "div"
+      );
+
+
+    modal.id =
+      "changeRequestHistoryModal";
+
+
+    document.body.appendChild(
+      modal
+    );
+  }
+
+
+  modal.innerHTML = `
+
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:14000;
+        background:
+          rgba(15,35,50,.45);
+        backdrop-filter:blur(5px);
+      "
+      onclick="closeChangeRequestHistory(event)"
+    ></div>
+
+
+    <div
+      style="
+        position:fixed;
+        inset:0;
+        z-index:14001;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:18px;
+        overflow:auto;
+        pointer-events:none;
+      "
+    >
+
+      <div
+        style="
+          width:min(900px,100%);
+          max-height:90vh;
+          overflow:auto;
+          padding:22px;
+          border-radius:24px;
+          background:var(--surface);
+          box-shadow:
+            0 25px 70px
+            rgba(15,35,50,.25);
+          pointer-events:auto;
+        "
+        onclick="event.stopPropagation()"
+      >
+
+        <div
+          style="
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:12px;
+          "
+        >
+
+          <div>
+
+            <div
+              style="
+                color:var(--navy);
+                font-size:18px;
+                font-weight:900;
+              "
+            >
+              Change Request History
+            </div>
+
+
+            <div
+              style="
+                margin-top:4px;
+                color:var(--muted);
+                font-size:9px;
+              "
+            >
+              Recently submitted and processed requests.
+            </div>
+
+          </div>
+
+
+          <button
+            type="button"
+            onclick="closeChangeRequestHistory()"
+            style="
+              width:34px;
+              height:34px;
+              border:0;
+              border-radius:50%;
+              background:var(--surface);
+              color:var(--navy);
+              box-shadow:var(--shadow-soft);
+              cursor:pointer;
+              font-size:16px;
+            "
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <div
+          id="changeRequestHistoryList"
+          style="
+            margin-top:17px;
+          "
+        >
+          Loading history...
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+
+  modal.style.display =
+    "block";
+
+
+  const list =
+    document.getElementById(
+      "changeRequestHistoryList"
+    );
+
+
+  try {
+
+    const requests =
+      await loadChangeRequestHistory();
+
+
+    if (
+      !requests.length
+    ) {
+
+      list.innerHTML = `
+        <div
+          style="
+            padding:20px;
+            text-align:center;
+            color:var(--muted);
+            font-size:9px;
+          "
+        >
+          No change request history found.
+        </div>
+      `;
+
+
+      return;
+    }
+
+
+    list.innerHTML =
+      requests
+        .map(
+          request => `
+
+            <div
+              style="
+                padding:13px;
+                margin-bottom:10px;
+                border-radius:14px;
+                background:
+                  rgba(36,85,121,.045);
+                box-shadow:var(--shadow-inset);
+              "
+            >
+
+              <div
+                style="
+                  display:flex;
+                  justify-content:space-between;
+                  align-items:flex-start;
+                  gap:10px;
+                  flex-wrap:wrap;
+                "
+              >
+
+                <div>
+
+                  <div
+                    style="
+                      color:var(--navy);
+                      font-size:11px;
+                      font-weight:900;
+                    "
+                  >
+                    ${escapeHtml(
+                      request.animal_name ||
+                      "Unknown animal"
+                    )}
+                  </div>
+
+
+                  <div
+                    style="
+                      margin-top:3px;
+                      color:var(--muted);
+                      font-size:8px;
+                    "
+                  >
+                    ${escapeHtml(
+                      request.animal_id ||
+                      ""
+                    )}
+                  </div>
+
+                </div>
+
+
+                <span
+                  style="
+                    display:inline-flex;
+                    padding:4px 8px;
+                    border-radius:999px;
+                    background:
+                      ${getChangeRequestStatusColor(
+                        request.status
+                      )}18;
+                    color:
+                      ${getChangeRequestStatusColor(
+                        request.status
+                      )};
+                    font-size:7px;
+                    font-weight:900;
+                  "
+                >
+                  ${escapeHtml(
+                    getChangeRequestStatusLabel(
+                      request.status
+                    )
+                  )}
+                </span>
+
+              </div>
+
+
+              <div
+                style="
+                  display:flex;
+                  flex-wrap:wrap;
+                  gap:8px 14px;
+                  margin-top:8px;
+                  color:var(--muted);
+                  font-size:8px;
+                "
+              >
+
+                <span>
+                  👤 ${escapeHtml(
+                    request.requester_name
+                  )}
+                </span>
+
+                <span>
+                  📝 ${escapeHtml(
+                    request.change_type
+                  )}
+                </span>
+
+                <span>
+                  🕒 ${escapeHtml(
+                    formatChangeRequestDate(
+                      request.created_at
+                    )
+                  )}
+                </span>
+
+              </div>
+
+
+              <div
+                style="
+                  margin-top:8px;
+                  color:var(--text);
+                  font-size:9px;
+                  line-height:1.5;
+                "
+              >
+                ${escapeHtml(
+                  request.message
+                )}
+              </div>
+
+
+              ${
+                request.reviewed_at
+                  ? `
+                    <div
+                      style="
+                        margin-top:8px;
+                        color:var(--muted);
+                        font-size:8px;
+                      "
+                    >
+                      Processed:
+                      ${escapeHtml(
+                        formatChangeRequestDate(
+                          request.reviewed_at
+                        )
+                      )}
+                    </div>
+                  `
+                  : ""
+              }
+
+            </div>
+
+          `
+        )
+        .join("");
+
+
+  } catch (error) {
+
+    console.error(
+      "History rendering error:",
+      error
+    );
+
+
+    list.innerHTML = `
+      <div
+        style="
+          padding:15px;
+          color:#a64040;
+          background:
+            rgba(184,76,76,.08);
+          border-radius:12px;
+          font-size:9px;
+        "
+      >
+        ${escapeHtml(
+          error?.message ||
+          "Unable to load change request history."
+        )}
+      </div>
+    `;
+  }
+}
+
+
+/* ============================================================
+   CLOSE CHANGE REQUEST HISTORY
+   ============================================================ */
+
+function closeChangeRequestHistory(
+  event
+) {
+
+  if (
+    event &&
+    event.target !==
+      event.currentTarget
+  ) {
+
+    return;
+  }
+
+
+  const modal =
+    document.getElementById(
+      "changeRequestHistoryModal"
+    );
+
+
+  if (modal) {
+
+    modal.style.display =
+      "none";
+  }
+}
+
+
+/* ============================================================
+   CHANGE REQUEST COUNT HELPERS
+   ============================================================ */
+
+async function getPendingChangeRequestCount() {
+
+  const {
+    count,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "change_requests"
+      )
+      .select(
+        "id",
+        {
+          count:
+            "exact",
+          head:
+            true
+        }
+      )
+      .eq(
+        "status",
+        "PENDING"
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Pending change request count error:",
+      error
+    );
+
+
+    return 0;
+  }
+
+
+  return count || 0;
+}
+
+
+/* ============================================================
+   PERIODIC CHANGE REQUEST REFRESH
+   ============================================================ */
+
+let changeRequestRefreshTimer =
+  null;
+
+
+function startChangeRequestRefresh() {
+
+  if (
+    changeRequestRefreshTimer
+  ) {
+
+    clearInterval(
+      changeRequestRefreshTimer
+    );
+  }
+
+
+  changeRequestRefreshTimer =
+    setInterval(
+      async () => {
+
+        if (
+          !currentUser ||
+          !currentAdmin
+        ) {
+
+          return;
+        }
+
+
+        try {
+
+          await loadChangeRequests();
+
+        } catch (error) {
+
+          console.error(
+            "Automatic change request refresh error:",
+            error
+          );
+        }
+
+      },
+      60000
+    );
+}
+
+
+function stopChangeRequestRefresh() {
+
+  if (
+    changeRequestRefreshTimer
+  ) {
+
+    clearInterval(
+      changeRequestRefreshTimer
+    );
+
+
+    changeRequestRefreshTimer =
+      null;
+  }
+}
+
+
+/* ============================================================
+   CHANGE REQUEST NOTIFICATION CHECK
+   ============================================================ */
+
+async function checkChangeRequestNotification() {
+
+  if (
+    !currentUser ||
+    !currentAdmin
+  ) {
+
+    return;
+  }
+
+
+  try {
+
+    const count =
+      await getPendingChangeRequestCount();
+
+
+    updateChangeRequestNotification(
+      count
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Change request notification error:",
+      error
+    );
+  }
+}
+
+
+/* ============================================================
+   ADMIN DASHBOARD REQUEST BUTTON
+   ============================================================ */
+
+function createChangeRequestHistoryButton() {
+
+  const panel =
+    document.getElementById(
+      "changeRequestPanel"
+    );
+
+
+  if (!panel) {
+    return;
+  }
+
+
+  if (
+    document.getElementById(
+      "changeRequestHistoryButton"
+    )
+  ) {
+
+    return;
+  }
+
+
+  const header =
+    panel.querySelector(
+      ".change-request-panel-header"
+    );
+
+
+  if (!header) {
+    return;
+  }
+
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+
+  button.id =
+    "changeRequestHistoryButton";
+
+
+  button.type =
+    "button";
+
+
+  button.className =
+    "change-request-refresh";
+
+
+  button.textContent =
+    "History";
+
+
+  button.onclick =
+    showChangeRequestHistory;
+
+
+  const refreshButton =
+    header.querySelector(
+      ".change-request-refresh"
+    );
+
+
+  if (
+    refreshButton
+  ) {
+
+    refreshButton.insertAdjacentElement(
+      "afterend",
+      button
+    );
+
+  } else {
+
+    header.appendChild(
+      button
+    );
+  }
+}
+
+
+/* ============================================================
+   ENHANCE CHANGE REQUEST PANEL
+   ============================================================ */
+
+function enhanceChangeRequestPanel() {
+
+  ensureChangeRequestPanel();
+
+  createChangeRequestHistoryButton();
+}
+
+
+/* ============================================================
+   CHANGE REQUEST INITIALIZATION
+   ============================================================ */
+
+function initializeChangeRequestManagement() {
+
+  try {
+
+    ensureChangeRequestPanel();
+
+    createChangeRequestHistoryButton();
+
+    startChangeRequestRefresh();
+
+  } catch (error) {
+
+    console.error(
+      "Change request initialization error:",
+      error
+    );
+  }
+}
+
+
+/* ============================================================
+   AUTHENTICATION REFRESH HOOK
+   ============================================================ */
+
+const originalShowAdminApp =
+  showAdminApp;
+
+
+showAdminApp =
+  function () {
+
+    originalShowAdminApp();
+
+
+    setTimeout(
+      () => {
+
+        initializeOwnerManagement();
+
+        initializeChangeRequestManagement();
+
+      },
+      100
+    );
+  };
+
+
+/* ============================================================
+   DASHBOARD REFRESH HOOK
+   ============================================================ */
+
+const originalRefreshAdminDashboard =
+  refreshAdminDashboard;
+
+
+refreshAdminDashboard =
+  async function () {
+
+    await originalRefreshAdminDashboard();
+
+
+    enhanceChangeRequestPanel();
+
+  };
+
+
+/* ============================================================
+   CHANGE REQUEST GLOBAL FUNCTIONS
+   ============================================================ */
+
+window.openChangeRequestAttachment =
+  openChangeRequestAttachment;
+
+window.showChangeRequestDetails =
+  showChangeRequestDetails;
+
+window.closeChangeRequestDetails =
+  closeChangeRequestDetails;
+
+window.loadChangeRequestHistory =
+  loadChangeRequestHistory;
+
+window.showChangeRequestHistory =
+  showChangeRequestHistory;
+
+window.closeChangeRequestHistory =
+  closeChangeRequestHistory;
+
+window.getPendingChangeRequestCount =
+  getPendingChangeRequestCount;
+
+window.checkChangeRequestNotification =
+  checkChangeRequestNotification;
+
+window.initializeChangeRequestManagement =
+  initializeChangeRequestManagement;
+
+
+/* ============================================================
+   OWNER GLOBAL FUNCTIONS
+   ============================================================ */
+
+window.populateAnimalOwnerDropdown =
+  populateAnimalOwnerDropdown;
+
+window.getAnimalOwner =
+  getAnimalOwner;
+
+window.getOwnerDisplayHtml =
+  getOwnerDisplayHtml;
+
+
+/* ============================================================
+   START BACKGROUND REFRESH
+   ============================================================ */
+
+setTimeout(
+  () => {
+
+    if (
+      currentUser &&
+      currentAdmin
+    ) {
+
+      startChangeRequestRefresh();
+
+    }
+
+  },
+  2000
+);
+
+
+/* ============================================================
+   WINDOW CLEANUP
+   ============================================================ */
+
+window.addEventListener(
+  "beforeunload",
+  () => {
+
+    stopChangeRequestRefresh();
+
+  }
+);
+
+
+/* ============================================================
+   PART 5 COMPLETE
+   ============================================================ */
+   /* ============================================================
+   PART 6
+   FINAL INITIALIZATION + SAFETY CHECKS
+   ============================================================ */
+
+
+/* ============================================================
+   FINAL UI INITIALIZATION
+   ============================================================ */
+
+function initializeFinalAdminUi() {
+
+  try {
+
+    ensureOwnerManagementPanel();
+
+  } catch (error) {
+
+    console.error(
+      "Owner UI initialization error:",
+      error
+    );
+  }
+
+
+  try {
+
+    ensureChangeRequestPanel();
+
+    createChangeRequestHistoryButton();
+
+  } catch (error) {
+
+    console.error(
+      "Change request UI initialization error:",
+      error
+    );
+  }
+}
+
+
+/* ============================================================
+   ADMIN SESSION CHECK
+   ============================================================ */
+
+async function verifyCurrentAdminSession() {
 
   try {
 
@@ -5158,25 +9839,22 @@ async function initialize() {
       data,
       error
     } =
-      await supabaseClient.auth.getSession();
+      await supabaseClient.auth
+        .getSession();
 
 
     if (error) {
-
-      console.error(
-        "Session error:",
-        error
-      );
-
-      return;
-
+      throw error;
     }
 
 
-    if (!data.session) {
+    if (
+      !data?.session?.user
+    ) {
 
-      return;
+      showLogin();
 
+      return false;
     }
 
 
@@ -5193,37 +9871,843 @@ async function initialize() {
     updateAdminHeader();
 
 
-    showAdminApp();
-
-
-    await loadDashboard();
+    return true;
 
 
   } catch (error) {
 
     console.error(
-      "Initialization error:",
+      "Session verification error:",
       error
     );
 
 
-    await supabaseClient.auth.signOut();
+    currentUser =
+      null;
+
+    currentAdmin =
+      null;
 
 
-    currentUser = null;
+    try {
 
-    currentAdmin = null;
+      await supabaseClient.auth
+        .signOut();
+
+    } catch (
+      signOutError
+    ) {
+
+      console.error(
+        "Sign out error:",
+        signOutError
+      );
+    }
 
 
     showLogin();
 
-  }
 
+    showLoginMessage(
+      error?.message ||
+      "Administrator session could not be verified."
+    );
+
+
+    return false;
+  }
 }
 
 
 /* ============================================================
-   START
+   MANUAL ADMIN SESSION REFRESH
    ============================================================ */
 
-initialize();
+async function refreshAdminSession() {
+
+  const valid =
+    await verifyCurrentAdminSession();
+
+
+  if (!valid) {
+    return;
+  }
+
+
+  await loadDashboard();
+
+
+  initializeFinalAdminUi();
+}
+
+
+/* ============================================================
+   SAFE DATABASE ERROR
+   ============================================================ */
+
+function getFriendlyDatabaseError(
+  error
+) {
+
+  if (!error) {
+
+    return "An unknown database error occurred.";
+  }
+
+
+  const message =
+    String(
+      error.message ||
+      error
+    );
+
+
+  if (
+    message.includes(
+      "relation"
+    ) &&
+    message.includes(
+      "does not exist"
+    )
+  ) {
+
+    return (
+      "The required database table does not exist yet."
+    );
+  }
+
+
+  if (
+    message.includes(
+      "permission denied"
+    ) ||
+    message.includes(
+      "row-level security"
+    )
+  ) {
+
+    return (
+      "Database permissions are preventing this operation."
+    );
+  }
+
+
+  if (
+    message.includes(
+      "JWT"
+    ) ||
+    message.includes(
+      "token"
+    )
+  ) {
+
+    return (
+      "Your administrator session has expired. Please sign in again."
+    );
+  }
+
+
+  return message;
+}
+
+
+/* ============================================================
+   SAFE ALERT
+   ============================================================ */
+
+function safeAlert(
+  message
+) {
+
+  try {
+
+    alert(
+      message
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Alert error:",
+      error
+    );
+  }
+}
+
+
+/* ============================================================
+   DATABASE CONNECTION TEST
+   ============================================================ */
+
+async function testAdminDatabaseConnection() {
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "animals"
+        )
+        .select(
+          "id",
+          {
+            count:
+              "exact",
+            head:
+              true
+          }
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    return {
+      success:
+        true,
+      message:
+        "Database connection is working."
+    };
+
+
+  } catch (error) {
+
+    console.error(
+      "Database connection test error:",
+      error
+    );
+
+
+    return {
+      success:
+        false,
+      message:
+        getFriendlyDatabaseError(
+          error
+        )
+    };
+  }
+}
+
+
+/* ============================================================
+   ADMIN HEALTH CHECK
+   ============================================================ */
+
+async function runAdminHealthCheck() {
+
+  const results = [];
+
+
+  results.push({
+    name:
+      "Authentication",
+    success:
+      Boolean(
+        currentUser &&
+        currentAdmin
+      )
+  });
+
+
+  const database =
+    await testAdminDatabaseConnection();
+
+
+  results.push({
+    name:
+      "Animal Database",
+    success:
+      database.success
+  });
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "change_requests"
+        )
+        .select(
+          "id",
+          {
+            count:
+              "exact",
+            head:
+              true
+          }
+        );
+
+
+    results.push({
+      name:
+        "Change Requests",
+      success:
+        !error
+    });
+
+
+  } catch (error) {
+
+    results.push({
+      name:
+        "Change Requests",
+      success:
+        false
+    });
+  }
+
+
+  return results;
+}
+
+
+/* ============================================================
+   HEALTH CHECK UI
+   ============================================================ */
+
+async function showAdminHealthCheck() {
+
+  const results =
+    await runAdminHealthCheck();
+
+
+  const failed =
+    results.filter(
+      result =>
+        !result.success
+    );
+
+
+  const lines =
+    results
+      .map(
+        result =>
+          `${result.success ? "✓" : "✕"} ${result.name}`
+      )
+      .join(
+        "\n"
+      );
+
+
+  safeAlert(
+    `Animal Digital ID Admin Health Check\n\n${lines}\n\n${
+      failed.length
+        ? "Some checks need attention."
+        : "Everything is working."
+    }`
+  );
+}
+
+
+/* ============================================================
+   ADMIN USER INFORMATION
+   ============================================================ */
+
+function getCurrentAdminInfo() {
+
+  return {
+
+    userId:
+      currentUser?.id ||
+      null,
+
+    email:
+      currentAdmin?.email ||
+      currentUser?.email ||
+      null,
+
+    name:
+      currentAdmin?.full_name ||
+      null,
+
+    role:
+      currentAdmin?.role ||
+      null
+
+  };
+}
+
+
+/* ============================================================
+   REQUEST TABLE DIAGNOSTICS
+   ============================================================ */
+
+async function checkChangeRequestTable() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from(
+          "change_requests"
+        )
+        .select(
+          "id,status,created_at"
+        )
+        .limit(
+          1
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    return {
+      exists:
+        true,
+      accessible:
+        true,
+      data
+    };
+
+
+  } catch (error) {
+
+    console.error(
+      "Change request table check error:",
+      error
+    );
+
+
+    return {
+      exists:
+        false,
+      accessible:
+        false,
+      error:
+        error.message
+    };
+  }
+}
+
+
+/* ============================================================
+   STORAGE DIAGNOSTICS
+   ============================================================ */
+
+async function checkChangeRequestStorage() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.storage
+        .from(
+          "change-request-attachments"
+        )
+        .list(
+          "",
+          {
+            limit:
+              1
+          }
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    return {
+      accessible:
+        true,
+      data
+    };
+
+
+  } catch (error) {
+
+    console.error(
+      "Change request storage check error:",
+      error
+    );
+
+
+    return {
+      accessible:
+        false,
+      error:
+        error.message
+    };
+  }
+}
+
+
+/* ============================================================
+   CHANGE REQUEST SYSTEM CHECK
+   ============================================================ */
+
+async function checkChangeRequestSystem() {
+
+  const table =
+    await checkChangeRequestTable();
+
+
+  const storage =
+    await checkChangeRequestStorage();
+
+
+  const message = [
+
+    "Change Request System Check",
+    "",
+
+    `Database table: ${
+      table.accessible
+        ? "✓ Accessible"
+        : "✕ Not accessible"
+    }`,
+
+    `Attachment storage: ${
+      storage.accessible
+        ? "✓ Accessible"
+        : "✕ Not accessible"
+    }`
+
+  ].join(
+    "\n"
+  );
+
+
+  safeAlert(
+    message
+  );
+}
+
+
+/* ============================================================
+   ADMIN CONSOLE COMMANDS
+   ============================================================ */
+
+window.refreshAdminSession =
+  refreshAdminSession;
+
+window.runAdminHealthCheck =
+  runAdminHealthCheck;
+
+window.showAdminHealthCheck =
+  showAdminHealthCheck;
+
+window.getCurrentAdminInfo =
+  getCurrentAdminInfo;
+
+window.checkChangeRequestTable =
+  checkChangeRequestTable;
+
+window.checkChangeRequestStorage =
+  checkChangeRequestStorage;
+
+window.checkChangeRequestSystem =
+  checkChangeRequestSystem;
+
+
+/* ============================================================
+   FINAL MOBILE ADJUSTMENTS
+   ============================================================ */
+
+function addAdminMobileStyles() {
+
+  if (
+    document.getElementById(
+      "adminMobileStyles"
+    )
+  ) {
+
+    return;
+  }
+
+
+  const style =
+    document.createElement(
+      "style"
+    );
+
+
+  style.id =
+    "adminMobileStyles";
+
+
+  style.textContent = `
+
+    @media(max-width:600px){
+
+      #animalModalCard{
+
+        padding:16px !important;
+
+        border-radius:20px !important;
+
+      }
+
+
+      #animalModalCard
+      form > div{
+
+        grid-template-columns:
+          minmax(0,1fr) !important;
+
+      }
+
+
+      #animalModalCard
+      form > div > div{
+
+        grid-column:
+          1 / -1 !important;
+
+      }
+
+
+      #ownerModal
+      input,
+      #ownerModal
+      textarea,
+      #ownerModal
+      select{
+
+        font-size:16px !important;
+
+      }
+
+
+      .change-request-panel{
+
+        padding:13px !important;
+
+        border-radius:16px !important;
+
+      }
+
+
+      .change-request-panel-header{
+
+        align-items:flex-start !important;
+
+        flex-direction:column !important;
+
+      }
+
+
+      .change-request-item{
+
+        grid-template-columns:
+          46px
+          minmax(0,1fr) !important;
+
+      }
+
+
+      .change-request-actions{
+
+        grid-column:
+          1 / -1 !important;
+
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+}
+
+
+/* ============================================================
+   FINAL UI START
+   ============================================================ */
+
+function startFinalAdminUi() {
+
+  try {
+
+    addAdminMobileStyles();
+
+  } catch (error) {
+
+    console.error(
+      "Mobile style error:",
+      error
+    );
+  }
+
+
+  try {
+
+    initializeFinalAdminUi();
+
+  } catch (error) {
+
+    console.error(
+      "Final UI initialization error:",
+      error
+    );
+  }
+}
+
+
+/* ============================================================
+   DOM READY
+   ============================================================ */
+
+if (
+  document.readyState ===
+  "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    startFinalAdminUi,
+    {
+      once:
+        true
+    }
+  );
+
+} else {
+
+  startFinalAdminUi();
+}
+
+
+/* ============================================================
+   FINAL AUTH STATE MONITOR
+   ============================================================ */
+
+supabaseClient.auth.onAuthStateChange(
+  (
+    event,
+    session
+  ) => {
+
+    if (
+      event ===
+      "SIGNED_OUT"
+    ) {
+
+      stopChangeRequestRefresh();
+
+      currentUser =
+        null;
+
+      currentAdmin =
+        null;
+
+
+      return;
+    }
+
+
+    if (
+      session?.user &&
+      event ===
+        "TOKEN_REFRESHED"
+    ) {
+
+      currentUser =
+        session.user;
+
+    }
+
+  }
+);
+
+
+/* ============================================================
+   FINAL ERROR HANDLING
+   ============================================================ */
+
+window.addEventListener(
+  "unhandledrejection",
+  event => {
+
+    console.error(
+      "Unhandled admin promise:",
+      event.reason
+    );
+  }
+);
+
+
+window.addEventListener(
+  "error",
+  event => {
+
+    console.error(
+      "Admin runtime error:",
+      event.error ||
+      event.message
+    );
+  }
+);
+
+
+/* ============================================================
+   FINAL ADMIN.JS MARKER
+   ============================================================ */
+
+window.ANIMAL_DIGITAL_ID_ADMIN =
+  {
+    version:
+      "change-request-admin-1.0",
+
+    initialized:
+      true,
+
+    features: [
+
+      "Admin Authentication",
+
+      "Animal Management",
+
+      "Owner Management",
+
+      "Animal Photos",
+
+      "Digital ID Links",
+
+      "QR Codes",
+
+      "Animal Search",
+
+      "CSV Export",
+
+      "Lost Status",
+
+      "Public Visibility",
+
+      "Change Requests",
+
+      "Change Request Attachments",
+
+      "Change Request History",
+
+      "Review Requests",
+
+      "Reject Requests"
+
+    ]
+  };
+
+
+/* ============================================================
+   ADMIN.JS COMPLETE
+   ============================================================ */
